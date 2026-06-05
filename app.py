@@ -6,7 +6,13 @@ from antifraude import calcular_score
 app = Flask(__name__)
 
 def get_conn():
-    return psycopg2.connect(os.environ["DATABASE_URL"])
+    return psycopg2.connect(
+        dbname=os.environ["PGDATABASE"],
+        user=os.environ["PGUSER"],
+        password=os.environ["POSTGRES_PASSWORD"],
+        host=os.environ["PGHOST"],
+        port=os.environ["PGPORT"]
+    )
 
 def salvar(order_id, ip, valor, score, status, motivos):
     conn = get_conn()

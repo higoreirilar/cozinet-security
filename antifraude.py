@@ -1,48 +1,14 @@
-import psycopg2
+def check_fraude(ip, valor):
 
-conn = psycopg2.connect(
-    dbname="loja",
-    user="postgres",
-    password="SUA_SENHA_AQUI",
-    host="localhost",
-    port="5432"
-)
+    # regras simples iniciais (você pode evoluir depois)
 
-cur = conn.cursor()
+    if ip is None:
+        return {"fraude": True, "motivo": "sem_ip"}
 
-cur.execute("""
-SELECT ip,
-       COUNT(*) AS compras,
-       SUM(valor) AS total
-FROM pedidos
-GROUP BY ip;
-""")
+    if float(valor) > 10000:
+        return {"fraude": True, "motivo": "valor_suspeito"}
 
-dados = cur.fetchall()
+    if ip == "127.0.0.1":
+        return {"fraude": True, "motivo": "ip_local"}
 
-print("\n🧠 SCORE DE FRAUDE:\n")
-
-for ip, compras, total in dados:
-
-    score = 0
-
-    # regra 1: muitas compras
-    if compras >= 3:
-        score += 50
-
-    # regra 2: valor alto
-    if total > 500:
-        score += 40
-
-    # regra 3: risco mínimo base
-    if compras == 1:
-        score += 10
-
-    print(f"IP: {ip}")
-    print(f"Compras: {compras}")
-    print(f"Total: R${total}")
-    print(f"🚨 Score de risco: {score}/100")
-    print("-" * 30)
-
-cur.close()
-conn.close()
+    return {"fraude": False, "motivo": "ok"}

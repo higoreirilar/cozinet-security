@@ -1,14 +1,21 @@
-def check_fraude(ip, valor):
+def calcular_score(ip, valor):
 
-    # regras simples iniciais (você pode evoluir depois)
+    score = 0
+    motivos = []
 
-    if ip is None:
-        return {"fraude": True, "motivo": "sem_ip"}
+    # valor alto
+    if float(valor) > 5000:
+        score += 40
+        motivos.append("valor_alto")
 
+    # ip inválido
+    if ip is None or ip == "0.0.0.0":
+        score += 30
+        motivos.append("ip_suspeito")
+
+    # padrão simples extra
     if float(valor) > 10000:
-        return {"fraude": True, "motivo": "valor_suspeito"}
+        score += 30
+        motivos.append("valor_extremo")
 
-    if ip == "127.0.0.1":
-        return {"fraude": True, "motivo": "ip_local"}
-
-    return {"fraude": False, "motivo": "ok"}
+    return min(score, 100), motivos

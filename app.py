@@ -1,49 +1,74 @@
 from flask import Flask, request, jsonify
 import os
 import psycopg2
-from antifraude import check_fraude
+from antifraude import calcular_score
 
 app = Flask(__name__)
 
-# -------- BANCO --------
 def get_conn():
     return psycopg2.connect(os.environ["DATABASE_URL"])
 
-def salvar_pedido(ip, valor, status):
+def salvar(order_id, ip, valor, score, status, motivos):
     conn = get_conn()
     cur = conn.cursor()
 
     cur.execute("""
-        INSERT INTO pedidos (cliente_id, ip, valor, status)
-        VALUES (1, %s, %s, %s)
-    """, (ip, valor, status))
+        INSERT INTO pedidos (order_id, ip, valor, status, motivo)
+        VALUES (%s, %s, %s, %s, %s)
+    """, (order_id, ip, valor, status, ",".join(motivos)))
 
     conn.commit()
     cur.close()
     conn.close()
 
-# -------- ROTAS --------
+def definir_status(score):
+    if score >= 60:
+        return "bloqueado"
+    elif score >= 30:
+        return "analise"
+    return "aprovado"
+
+@app.route("/webhook/tray", methods=["POST"])
+def webhook():
+    data = request.json
+
+    order_id = data.get("order_id")
+    ip = data.get("ip", "0.0.0.0")
+    valor = data.get("total", 0)
+
+    score, motivos = calcular_score(ip, valor)
+    status = definir_status(score)
+
+    salvar(order_id, ip, valor, score, status, motivos)
+
+    # ALERTA ADMIN
+    if status == "bloqueado":
+        print(f"🚨 ALERTA FRAUDE: {order_id} SCORE {score}")
+
+    return jsonify({
+        "order_id": order_id,
+        "score": score,
+        "status": status,
+        "motivos": motivos
+    })
+
+@app.route("/dashboard")
+def dashboard():
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute("SELECT * FROM pedidos ORDER BY id DESC")
+    data = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return jsonify(data)
 
 @app.route("/")
 def home():
-    return "Cozinet API rodando"
-
-@app.route("/compra", methods=["POST"])
-def compra():
-    data = request.json
-
-    ip = data.get("ip")
-    valor = data.get("valor")
-
-    # antifraude
-    resultado = check_fraude(ip, valor)
-
-    status = "bloqueado" if resultado["fraude"] else "aprovado"
-
-    salvar_pedido(ip, valor, status)
-
-    return jsonify(resultado)
+    return "Cozinet Antifraude v2 Online"
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app.run(host="0.0.0.0", port=port)

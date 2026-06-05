@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 import psycopg2
+import os
 
 app = Flask(__name__)
 
@@ -34,8 +35,10 @@ def compra():
 
     return jsonify({"status": "recebido", "fraude": "em_analise"})
 
-if __name__ == '__main__':
-    app.run(debug=True)
-    
+@app.route("/")
+def home():
+    return "API Cozinet rodando"
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000)
+    port = int(os.environ.get("PORT", 8000))
+    app.run(host="0.0.0.0", port=port, debug=False)

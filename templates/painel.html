@@ -3,9 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Painel Antifraude</title>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<title>Antifraude Painel</title>
 
 <style>
 body {
@@ -15,58 +13,71 @@ body {
     color: white;
 }
 
-/* HEADER PEQUENO */
+/* HEADER MELHORADO */
 header {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 15px;
+    gap: 12px;
+    padding: 14px 18px;
     background: #111117;
     border-bottom: 1px solid #ff6a00;
 }
 
 header img {
-    width: 40px;
+    width: 70px; /* 🔥 AUMENTADO */
+    height: auto;
 }
 
 header h1 {
-    font-size: 14px;
-    color: #ff6a00;
+    font-size: 18px;
     margin: 0;
+    color: #ff6a00;
 }
 
-/* MINI STATS (CANTO) */
+/* MINI PAINEL STATUS (MAIOR E MAIS LEGÍVEL) */
 .stats {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 12px;
+    right: 12px;
     display: flex;
-    gap: 8px;
+    gap: 10px;
 }
 
 .box {
     background: #15151c;
-    padding: 6px 10px;
-    border-radius: 8px;
-    font-size: 12px;
-    border: 1px solid #333;
+    padding: 10px 14px;  /* 🔥 AUMENTADO */
+    border-radius: 10px;
+    border: 1px solid #2a2a2a;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 90px;
+    justify-content: center;
 }
 
-.aprovado { color: #2cff7a; }
-.analise { color: #ffb100; }
-.bloqueado { color: #ff3b3b; }
+/* BOLINHAS MAIORES */
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
 
-/* CONTAINER */
+.green { background: #2cff7a; }
+.yellow { background: #ffb100; }
+.red { background: #ff3b3b; }
+
+/* TABELA */
 .container {
     padding: 15px;
 }
 
-/* TABLE */
 table {
     width: 100%;
     border-collapse: collapse;
     background: #15151c;
-    border-radius: 8px;
+    border-radius: 10px;
     overflow: hidden;
     font-size: 13px;
 }
@@ -74,12 +85,12 @@ table {
 th {
     background: #111117;
     color: #ff6a00;
-    padding: 8px;
+    padding: 10px;
     text-align: left;
 }
 
 td {
-    padding: 8px;
+    padding: 10px;
     border-bottom: 1px solid #222;
 }
 
@@ -87,16 +98,16 @@ tr:hover {
     background: #1c1c25;
 }
 
-/* TOAST */
-#toast {
-    position: fixed;
-    bottom: 15px;
-    right: 15px;
-    background: #ff3b3b;
-    padding: 10px;
-    border-radius: 6px;
-    display: none;
+/* STATUS */
+.aprovado { color: #2cff7a; font-weight: bold; }
+.analise { color: #ffb100; font-weight: bold; }
+.bloqueado { color: #ff3b3b; font-weight: bold; }
+
+/* INFO BAR SIMPLES (NOVO EXTRA LEVE) */
+.info {
+    padding: 10px 15px;
     font-size: 12px;
+    color: #aaa;
 }
 </style>
 </head>
@@ -105,43 +116,52 @@ tr:hover {
 
 <header>
     <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
-    <h1>ANTIFRAUDE</h1>
+    <h1>PAINEL ANTIFRAUDE</h1>
 </header>
 
-<!-- MINI ESTATÍSTICAS NO CANTO -->
+<!-- STATUS MAIOR E MAIS VISÍVEL -->
 <div class="stats">
-    <div class="box">🟢 <span id="aprovados">0</span></div>
-    <div class="box">🟡 <span id="analise">0</span></div>
-    <div class="box">🔴 <span id="bloqueados">0</span></div>
+
+    <div class="box">
+        <span class="dot green"></span>
+        <span id="aprovados">0</span>
+    </div>
+
+    <div class="box">
+        <span class="dot yellow"></span>
+        <span id="analise">0</span>
+    </div>
+
+    <div class="box">
+        <span class="dot red"></span>
+        <span id="bloqueados">0</span>
+    </div>
+
+</div>
+
+<!-- INFO EXTRA (NADA EXTRAVAGANTE) -->
+<div class="info">
+    Monitoramento em tempo real • Atualização automática a cada 3s
 </div>
 
 <!-- TABELA -->
 <div class="container">
 <table>
 <tr>
-<th>ID</th>
-<th>Pedido</th>
-<th>IP</th>
-<th>Valor</th>
-<th>Status</th>
-<th>Motivo</th>
-<th>Data</th>
+    <th>ID</th>
+    <th>Pedido</th>
+    <th>IP</th>
+    <th>Valor</th>
+    <th>Status</th>
+    <th>Motivos</th>
+    <th>Data</th>
 </tr>
 
 <tbody id="tabela"></tbody>
 </table>
 </div>
 
-<div id="toast"></div>
-
 <script>
-function toast(msg){
-    const t = document.getElementById("toast");
-    t.innerText = msg;
-    t.style.display = "block";
-    setTimeout(()=>t.style.display="none",2500);
-}
-
 async function atualizar(){
     const res = await fetch("/dashboard");
     const dados = await res.json();
@@ -172,10 +192,6 @@ async function atualizar(){
     document.getElementById("aprovados").innerText = a;
     document.getElementById("analise").innerText = b;
     document.getElementById("bloqueados").innerText = c;
-
-    if(c > 0){
-        toast("🚨 Pedido bloqueado detectado!");
-    }
 }
 
 setInterval(atualizar,3000);

@@ -15,20 +15,6 @@ def get_conn():
         port=os.environ["PGPORT"]
     )
 
-# ---------------- SALVAR PEDIDO ----------------
-def salvar(order_id, ip, valor, score, status, motivos):
-    conn = get_conn()
-    cur = conn.cursor()
-
-    cur.execute("""
-        INSERT INTO pedidos (order_id, ip, valor, status, motivo)
-        VALUES (%s, %s, %s, %s, %s)
-    """, (order_id, ip, valor, status, ",".join(motivos)))
-
-    conn.commit()
-    cur.close()
-    conn.close()
-
 # ---------------- STATUS ----------------
 def definir_status(score):
     if score >= 60:
@@ -37,10 +23,30 @@ def definir_status(score):
         return "analise"
     return "aprovado"
 
-# ---------------- WEBHOOK TRAY ----------------
+# ---------------- SALVAR PEDIDO ----------------
+def salvar(order_id, ip, valor, status, motivos):
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute("""
+        INSERT INTO pedidos (order_id, ip, valor, status, motivo)
+        VALUES (%s, %s, %s, %s, %s)
+    """, (
+        order_id,
+        ip,
+        valor,
+        status,
+        ",".join(motivos)
+    ))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+# ---------------- WEBHOOK ----------------
 @app.route("/webhook/tray", methods=["POST"])
 def webhook():
-    data = request.json
+    data = request.get_json(silent=True) or {}
 
     order_id = data.get("order_id")
     ip = data.get("ip", "0.0.0.0")
@@ -49,13 +55,15 @@ def webhook():
     score, motivos = calcular_score(ip, valor)
     status = definir_status(score)
 
-    salvar(order_id, ip, valor, score, status, motivos)
+    salvar(order_id, ip, valor, status, motivos)
 
     if status == "bloqueado":
         print(f"🚨 ALERTA FRAUDE: {order_id} SCORE {score}")
 
     return jsonify({
         "order_id": order_id,
+        "ip": ip,
+        "valor": valor,
         "score": score,
         "status": status,
         "motivos": motivos
@@ -67,7 +75,12 @@ def dashboard():
     conn = get_conn()
     cur = conn.cursor()
 
-    cur.execute("SELECT * FROM pedidos ORDER BY id DESC")
+    cur.execute("""
+        SELECT id, order_id, ip, valor, status, motivo, created_at
+        FROM pedidos
+        ORDER BY id DESC
+    """)
+
     rows = cur.fetchall()
 
     cur.close()
@@ -82,7 +95,7 @@ def dashboard():
             "valor": r[3],
             "status": r[4],
             "motivos": r[5],
-            "created_at": r[6]   # 🔥 NOVO CAMPO
+            "created_at": r[6]
         })
 
     return jsonify(resultado)
@@ -93,7 +106,12 @@ def painel():
     conn = get_conn()
     cur = conn.cursor()
 
-    cur.execute("SELECT * FROM pedidos ORDER BY id DESC")
+    cur.execute("""
+        SELECT id, order_id, ip, valor, status, motivo, created_at
+        FROM pedidos
+        ORDER BY id DESC
+    """)
+
     rows = cur.fetchall()
 
     cur.close()
@@ -104,7 +122,7 @@ def painel():
 # ---------------- HOME ----------------
 @app.route("/")
 def home():
-    return "Cozinet Antifraude v2 Online"
+    return "🛡️ Cozinet Antifraude Online - Sistema Ativo"
 
 # ---------------- START ----------------
 if __name__ == "__main__":

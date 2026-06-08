@@ -66,6 +66,15 @@ body {
     color: #ff6a00;
 }
 
+/* ADMIN BOX (NOVO) */
+.admin-box {
+    background: #111214;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid #ff6a00;
+    font-size: 13px;
+}
+
 /* CARDS PREMIUM */
 .cards {
     display: flex;
@@ -91,18 +100,10 @@ body {
     opacity: 0.8;
 }
 
-/* CORES MAIS BONITAS */
-.green {
-    background: linear-gradient(135deg, #16a34a, #22c55e);
-}
-
-.yellow {
-    background: linear-gradient(135deg, #f59e0b, #fbbf24);
-}
-
-.red {
-    background: linear-gradient(135deg, #dc2626, #ef4444);
-}
+/* CORES */
+.green { background: linear-gradient(135deg, #16a34a, #22c55e); }
+.yellow { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+.red { background: linear-gradient(135deg, #dc2626, #ef4444); }
 
 /* TABELA */
 table {
@@ -161,10 +162,20 @@ tr:hover {
 <div class="main">
 
     <div class="topbar">
-        <div class="title">Dashboard de Monitoramento</div>
+
+        <div class="title">
+            Dashboard de Monitoramento
+        </div>
+
+        <!-- 👤 ADMIN LOGADO -->
+        <div class="admin-box">
+            👤 <b>{{ usuario }}</b><br>
+            <span style="color:#22c55e;">ADMIN LOGADO</span>
+        </div>
+
     </div>
 
-    <!-- CARDS BONITOS -->
+    <!-- CARDS -->
     <div class="cards">
 
         <div class="card green">

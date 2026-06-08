@@ -5,7 +5,7 @@ from antifraude import calcular_score
 
 app = Flask(__name__)
 
-# ---------------- CONEXÃO BANCO ----------------
+# ---------------- BANCO ----------------
 def get_conn():
     return psycopg2.connect(
         dbname=os.environ["PGDATABASE"],
@@ -15,22 +15,14 @@ def get_conn():
         port=os.environ["PGPORT"]
     )
 
-# ---------------- STATUS ----------------
-def definir_status(score):
-    if score >= 60:
-        return "bloqueado"
-    elif score >= 30:
-        return "analise"
-    return "aprovado"
-
-# ---------------- SALVAR PEDIDO ----------------
-def salvar(order_id, ip, valor, status, motivos):
+# ---------------- SALVAR ----------------
+def salvar(order_id, ip, valor, status, motivos, device):
     conn = get_conn()
     cur = conn.cursor()
 
     cur.execute("""
-        INSERT INTO pedidos (order_id, ip, valor, status, motivo)
-        VALUES (%s, %s, %s, %s, %s)
+        INSERT INTO pedidos (order_id, ip, valor, status, motivo, created_at)
+        VALUES (%s, %s, %s, %s, %s, NOW())
     """, (
         order_id,
         ip,
@@ -43,86 +35,142 @@ def salvar(order_id, ip, valor, status, motivos):
     cur.close()
     conn.close()
 
+# ---------------- STATUS ----------------
+def definir_status(score):
+    if score >= 60:
+        return "bloqueado"
+    elif score >= 30:
+        return "analise"
+    return "aprovado"
+
+# ---------------- DEVICE ----------------
+def detectar_device(user_agent):
+    ua = (user_agent or "").lower()
+    if "mobile" in ua or "android" in ua or "iphone" in ua:
+        return "mobile"
+    return "desktop"
+
 # ---------------- WEBHOOK ----------------
 @app.route("/webhook/tray", methods=["POST"])
 def webhook():
-    data = request.get_json(silent=True) or {}
+    data = request.json
 
     order_id = data.get("order_id")
-    ip = data.get("ip", "0.0.0.0")
-    valor = data.get("total", 0)
+    ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+    valor = float(data.get("total", 0))
 
     score, motivos = calcular_score(ip, valor)
     status = definir_status(score)
 
-    salvar(order_id, ip, valor, status, motivos)
+    device = detectar_device(request.headers.get("User-Agent"))
 
-    if status == "bloqueado":
-        print(f"🚨 ALERTA FRAUDE: {order_id} SCORE {score}")
+    salvar(order_id, ip, valor, status, motivos, device)
 
     return jsonify({
         "order_id": order_id,
-        "ip": ip,
-        "valor": valor,
         "score": score,
         "status": status,
-        "motivos": motivos
+        "motivos": motivos,
+        "device": device
     })
 
-# ---------------- DASHBOARD JSON ----------------
+# ---------------- DASHBOARD (UI) ----------------
+@app.route("/painel")
+def painel():
+    return render_template("painel.html")
+
+# ---------------- API PRINCIPAL ----------------
 @app.route("/dashboard")
 def dashboard():
     conn = get_conn()
     cur = conn.cursor()
 
-    cur.execute("""
-        SELECT id, order_id, ip, valor, status, motivo, created_at
-        FROM pedidos
-        ORDER BY id DESC
-    """)
-
+    cur.execute("SELECT * FROM pedidos ORDER BY id DESC")
     rows = cur.fetchall()
 
     cur.close()
     conn.close()
 
-    resultado = []
-    for r in rows:
-        resultado.append({
+    return jsonify([
+        {
             "id": r[0],
             "order_id": r[1],
             "ip": r[2],
             "valor": r[3],
             "status": r[4],
             "motivos": r[5],
-            "created_at": r[6]
-        })
+            "created_at": r[6] if len(r) > 6 else None
+        }
+        for r in rows
+    ])
 
-    return jsonify(resultado)
-
-# ---------------- PAINEL HTML ----------------
-@app.route("/painel")
-def painel():
+# ---------------- PEDIDOS ----------------
+@app.route("/pedidos")
+def pedidos():
     conn = get_conn()
     cur = conn.cursor()
 
-    cur.execute("""
-        SELECT id, order_id, ip, valor, status, motivo, created_at
-        FROM pedidos
-        ORDER BY id DESC
-    """)
-
+    cur.execute("SELECT * FROM pedidos ORDER BY id DESC")
     rows = cur.fetchall()
 
     cur.close()
     conn.close()
 
-    return render_template("painel.html", dados=rows)
+    return jsonify([
+        {
+            "id": r[0],
+            "order_id": r[1],
+            "ip": r[2],
+            "valor": r[3],
+            "status": r[4],
+            "motivos": r[5],
+            "created_at": r[6] if len(r) > 6 else None
+        }
+        for r in rows
+    ])
+
+# ---------------- FRAUDES ----------------
+@app.route("/fraudes")
+def fraudes():
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT * FROM pedidos
+        WHERE status='bloqueado'
+        ORDER BY id DESC
+    """)
+    rows = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return jsonify([
+        {
+            "id": r[0],
+            "order_id": r[1],
+            "ip": r[2],
+            "valor": r[3],
+            "status": r[4],
+            "motivos": r[5],
+            "created_at": r[6] if len(r) > 6 else None
+        }
+        for r in rows
+    ])
+
+# ---------------- CONFIG ----------------
+@app.route("/config")
+def config():
+    return jsonify({
+        "sistema": "Cozinet Antifraude SaaS",
+        "status": "ativo",
+        "versao": "1.0"
+    })
 
 # ---------------- HOME ----------------
 @app.route("/")
 def home():
-    return "🛡️ Cozinet Antifraude Online - Sistema Ativo"
+    return "Cozinet SaaS Antifraude Online"
 
 # ---------------- START ----------------
 if __name__ == "__main__":

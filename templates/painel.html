@@ -3,223 +3,259 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cozinet Antifraude System</title>
+<title>Cozinet Antifraude</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
 
 *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial;
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family: 'Segoe UI', sans-serif;
 }
 
 body{
-    background:#070a12;
-    color:#fff;
-    display:flex;
+background:#05070d;
+color:#fff;
+display:flex;
 }
 
 /* SIDEBAR */
 .sidebar{
-    width:260px;
-    height:100vh;
-    background:#0c101a;
-    border-right:1px solid #1a2233;
-    padding:20px;
+width:270px;
+height:100vh;
+background:linear-gradient(180deg,#0b0f18,#070a12);
+border-right:1px solid #1c2330;
+padding:20px;
+box-shadow:10px 0 30px rgba(0,0,0,.4);
 }
 
 .logo{
-    text-align:center;
-    margin-bottom:20px;
+text-align:center;
+margin-bottom:30px;
 }
 
 .logo img{
-    width:120px;
+width:120px;
+filter:drop-shadow(0 0 10px rgba(255,122,0,.4));
 }
 
 .logo h2{
-    color:#ff7a00;
-    font-size:14px;
-    margin-top:10px;
+color:#ff7a00;
+font-size:14px;
+margin-top:10px;
 }
 
 .menu div{
-    padding:12px;
-    margin:6px 0;
-    border-radius:10px;
-    cursor:pointer;
-    color:#aaa;
-    transition:.2s;
+padding:12px;
+margin:6px 0;
+border-radius:10px;
+cursor:pointer;
+color:#aaa;
+transition:.2s;
 }
 
 .menu div:hover{
-    background:#141c2a;
-    color:#ff7a00;
+background:#141c2a;
+color:#ff7a00;
+transform:translateX(5px);
 }
 
 /* MAIN */
 .main{
-    flex:1;
-    padding:25px;
+flex:1;
+padding:30px;
 }
 
-/* TOP */
+/* TOPBAR */
 .topbar{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:20px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:25px;
 }
 
 .title{
-    font-size:20px;
-    color:#ff7a00;
+font-size:24px;
+color:#ff7a00;
+font-weight:600;
 }
 
 .admin-box{
-    background:#0f1624;
-    padding:12px;
-    border-radius:10px;
-    border:1px solid #ff7a00;
+background:#0f1624;
+border:1px solid #1c2330;
+padding:12px 16px;
+border-radius:12px;
+box-shadow:0 0 20px rgba(0,0,0,.3);
+}
+
+.admin-box span{
+color:#00ff88;
+font-size:12px;
 }
 
 .admin-box a{
-    display:inline-block;
-    margin-top:5px;
-    padding:5px 10px;
-    background:#ff3b3b;
-    color:white;
-    border-radius:6px;
-    text-decoration:none;
+display:inline-block;
+margin-top:6px;
+padding:5px 10px;
+background:#ff3b3b;
+color:#fff;
+border-radius:6px;
+text-decoration:none;
+font-size:12px;
 }
 
 /* CARDS */
 .cards{
-    display:flex;
-    gap:12px;
+display:flex;
+gap:15px;
+margin-bottom:25px;
 }
 
 .card{
-    flex:1;
-    padding:20px;
-    border-radius:12px;
-    text-align:center;
+flex:1;
+padding:25px;
+border-radius:16px;
+background:#0f1624;
+border:1px solid #1c2330;
+box-shadow:0 10px 30px rgba(0,0,0,.4);
+text-align:center;
+transition:.2s;
+}
+
+.card:hover{
+transform:translateY(-5px);
 }
 
 .card h3{
-    font-size:30px;
+font-size:38px;
+margin-top:10px;
 }
 
-.green{background:#123d25;}
-.yellow{background:#3d330f;}
-.red{background:#3d1212;}
+.card p{
+color:#aaa;
+font-size:12px;
+}
 
+/* CORES PREMIUM */
+.green{border-color:#00ff88;}
 .green h3{color:#00ff88;}
+
+.yellow{border-color:#ffcc00;}
 .yellow h3{color:#ffcc00;}
+
+.red{border-color:#ff4d4d;}
 .red h3{color:#ff4d4d;}
 
-/* TABLE */
+/* TABELA */
 table{
-    width:100%;
-    margin-top:20px;
-    border-collapse:collapse;
-    background:#0f1624;
-    border-radius:10px;
-    overflow:hidden;
+width:100%;
+margin-top:20px;
+border-collapse:collapse;
+background:#0f1624;
+border-radius:14px;
+overflow:hidden;
+box-shadow:0 10px 30px rgba(0,0,0,.4);
 }
 
 th{
-    background:#111a2a;
-    color:#ff7a00;
-    padding:10px;
+background:#111a2a;
+color:#ff7a00;
+padding:14px;
+text-align:left;
+font-size:13px;
 }
 
 td{
-    padding:10px;
-    border-bottom:1px solid #1b2436;
+padding:14px;
+border-bottom:1px solid #1b2436;
+font-size:13px;
 }
 
 tr:hover{
-    background:#141c2a;
+background:#141c2a;
 }
 
-.aprovado{color:#00ff88;font-weight:bold;}
-.analise{color:#ffcc00;font-weight:bold;}
-.bloqueado{color:#ff4d4d;font-weight:bold;}
+/* STATUS */
+.aprovado{color:#00ff88;font-weight:600;}
+.analise{color:#ffcc00;font-weight:600;}
+.bloqueado{color:#ff4d4d;font-weight:600;}
 
 </style>
+
 </head>
 
 <body>
 
 <div class="sidebar">
 
-    <div class="logo">
-        <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
-        <h2>Cozinet Antifraude</h2>
-    </div>
+<div class="logo">
+<img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
+<h2>Cozinet Antifraude System</h2>
+</div>
 
-    <div class="menu">
-        <div>📊 Dashboard</div>
-        <div>🧾 Pedidos</div>
-        <div>🚨 Fraudes</div>
-        <div>⚙️ Configurações</div>
-        <div>👤 Usuários</div>
-    </div>
+<div class="menu">
+<div>📊 Dashboard</div>
+<div>🧾 Pedidos</div>
+<div>🚨 Fraudes</div>
+<div>⚙️ Configurações</div>
+<div>👤 Usuários</div>
+</div>
 
 </div>
 
 <div class="main">
 
-    <div class="topbar">
+<div class="topbar">
 
-        <div class="title">
-            Cozinet Antifraude System
-        </div>
+<div class="title">
+Dashboard Antifraude
+</div>
 
-        <div class="admin-box">
-            👤 <b>{{ usuario }}</b><br>
-            <span style="color:#00ff88;">ADMIN LOGADO</span><br>
-            <a href="/logout">Sair</a>
-        </div>
+<div class="admin-box">
+👤 <b>{{ usuario }}</b><br>
+<span>ADMIN LOGADO</span><br>
+<a href="/logout">Sair</a>
+</div>
 
-    </div>
+</div>
 
-    <div class="cards">
-        <div class="card green">
-            <h3 id="aprovados">0</h3>
-            <p>Aprovados</p>
-        </div>
+<div class="cards">
 
-        <div class="card yellow">
-            <h3 id="analise">0</h3>
-            <p>Análise</p>
-        </div>
+<div class="card green">
+<p>Aprovados</p>
+<h3 id="aprovados">0</h3>
+</div>
 
-        <div class="card red">
-            <h3 id="bloqueados">0</h3>
-            <p>Bloqueados</p>
-        </div>
-    </div>
+<div class="card yellow">
+<p>Análise</p>
+<h3 id="analise">0</h3>
+</div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Pedido</th>
-                <th>IP</th>
-                <th>Valor</th>
-                <th>Status</th>
-                <th>Motivos</th>
-                <th>Data</th>
-            </tr>
-        </thead>
+<div class="card red">
+<p>Bloqueados</p>
+<h3 id="bloqueados">0</h3>
+</div>
 
-        <tbody id="tabela"></tbody>
-    </table>
+</div>
+
+<table>
+
+<tr>
+<th>ID</th>
+<th>Pedido</th>
+<th>IP</th>
+<th>Valor</th>
+<th>Status</th>
+<th>Motivos</th>
+<th>Data</th>
+</tr>
+
+<tbody id="tabela"></tbody>
+
+</table>
 
 </div>
 
@@ -227,34 +263,36 @@ tr:hover{
 
 async function atualizar(){
 
-    const res = await fetch("/dashboard");
-    const dados = await res.json();
+const res = await fetch("/dashboard");
+const dados = await res.json();
 
-    let a=0,b=0,c=0;
-    let html="";
+let a=0,b=0,c=0;
+let html="";
 
-    dados.forEach(d=>{
+dados.forEach(d=>{
 
-        if(d.status==="aprovado") a++;
-        if(d.status==="analise") b++;
-        if(d.status==="bloqueado") c++;
+if(d.status==="aprovado") a++;
+if(d.status==="analise") b++;
+if(d.status==="bloqueado") c++;
 
-        html += `
-        <tr>
-            <td>${d.id}</td>
-            <td>${d.order_id}</td>
-            <td>${d.ip}</td>
-            <td>R$ ${d.valor}</td>
-            <td class="${d.status}">${d.status}</td>
-            <td>${d.motivos}</td>
-            <td>${d.created_at}</td>
-        </tr>`;
-    });
+html += `
+<tr>
+<td>${d.id}</td>
+<td>${d.order_id}</td>
+<td>${d.ip}</td>
+<td>R$ ${d.valor}</td>
+<td class="${d.status}">${d.status}</td>
+<td>${d.motivos}</td>
+<td>${d.created_at}</td>
+</tr>`;
+});
 
-    document.getElementById("tabela").innerHTML = html;
-    document.getElementById("aprovados").innerText = a;
-    document.getElementById("analise").innerText = b;
-    document.getElementById("bloqueados").innerText = c;
+document.getElementById("tabela").innerHTML = html;
+
+document.getElementById("aprovados").innerText = a;
+document.getElementById("analise").innerText = b;
+document.getElementById("bloqueados").innerText = c;
+
 }
 
 setInterval(atualizar,3000);

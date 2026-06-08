@@ -3,70 +3,70 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cozinet SaaS Antifraude</title>
+<title>Cozinet Antifraude System</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
-body{
+
+*{
     margin:0;
+    padding:0;
+    box-sizing:border-box;
     font-family:Arial;
-    background:#0a0a0a;
-    color:white;
+}
+
+body{
+    background:#070a12;
+    color:#fff;
     display:flex;
 }
 
 /* SIDEBAR */
 .sidebar{
-    width:240px;
-    background:linear-gradient(180deg,#111214,#0c0c10);
+    width:260px;
     height:100vh;
-    padding:18px;
-    border-right:1px solid #222;
-    text-align:center;
+    background:#0c101a;
+    border-right:1px solid #1a2233;
+    padding:20px;
 }
 
-/* LOGO CENTRALIZADA */
 .logo{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    margin-bottom:15px;
+    text-align:center;
+    margin-bottom:20px;
 }
 
 .logo img{
-    width:180px; /* 🔥 maior */
+    width:120px;
 }
 
 .logo h2{
-    font-size:13px;
-    color:#ff6a00;
+    color:#ff7a00;
+    font-size:14px;
     margin-top:10px;
-    text-align:center;
 }
 
-/* MENU */
 .menu div{
-    padding:10px;
-    margin-top:8px;
+    padding:12px;
+    margin:6px 0;
+    border-radius:10px;
     cursor:pointer;
-    border-radius:8px;
     color:#aaa;
-    transition:0.2s;
-    text-align:left;
+    transition:.2s;
 }
 
 .menu div:hover{
-    background:#1c1c1f;
-    color:#ff6a00;
+    background:#141c2a;
+    color:#ff7a00;
 }
 
 /* MAIN */
 .main{
     flex:1;
-    padding:20px;
+    padding:25px;
 }
 
-/* TOPBAR */
+/* TOP */
 .topbar{
     display:flex;
     justify-content:space-between;
@@ -75,17 +75,15 @@ body{
 }
 
 .title{
-    font-size:18px;
-    color:#ff6a00;
+    font-size:20px;
+    color:#ff7a00;
 }
 
-/* ADMIN BOX */
 .admin-box{
-    background:#111214;
-    padding:10px 14px;
+    background:#0f1624;
+    padding:12px;
     border-radius:10px;
-    border:1px solid #ff6a00;
-    font-size:13px;
+    border:1px solid #ff7a00;
 }
 
 .admin-box a{
@@ -96,110 +94,84 @@ body{
     color:white;
     border-radius:6px;
     text-decoration:none;
-    font-size:12px;
 }
 
 /* CARDS */
 .cards{
     display:flex;
     gap:12px;
-    flex-wrap:wrap;
 }
 
 .card{
-    width:180px;
-    padding:14px;
-    border-radius:14px;
-    color:white;
-    box-shadow:0 6px 25px rgba(0,0,0,0.4);
-    transition:0.2s;
-}
-
-.card:hover{
-    transform:translateY(-3px);
+    flex:1;
+    padding:20px;
+    border-radius:12px;
+    text-align:center;
 }
 
 .card h3{
-    margin:0;
-    font-size:22px;
+    font-size:30px;
 }
 
-.card p{
-    font-size:11px;
-    opacity:0.8;
-}
+.green{background:#123d25;}
+.yellow{background:#3d330f;}
+.red{background:#3d1212;}
 
-.green{background:linear-gradient(135deg,#16a34a,#22c55e);}
-.yellow{background:linear-gradient(135deg,#f59e0b,#fbbf24);}
-.red{background:linear-gradient(135deg,#dc2626,#ef4444);}
+.green h3{color:#00ff88;}
+.yellow h3{color:#ffcc00;}
+.red h3{color:#ff4d4d;}
 
-/* TABELA */
+/* TABLE */
 table{
     width:100%;
-    border-collapse:collapse;
     margin-top:20px;
-    background:#15161a;
-    border-radius:12px;
+    border-collapse:collapse;
+    background:#0f1624;
+    border-radius:10px;
     overflow:hidden;
-    font-size:13px;
-    box-shadow:0 5px 25px rgba(0,0,0,0.4);
 }
 
 th{
-    background:#111214;
-    color:#ff6a00;
+    background:#111a2a;
+    color:#ff7a00;
     padding:10px;
-    text-align:left;
 }
 
 td{
     padding:10px;
-    border-bottom:1px solid #222;
+    border-bottom:1px solid #1b2436;
 }
 
 tr:hover{
-    background:#1c1c1f;
+    background:#141c2a;
 }
 
-/* STATUS */
-.aprovado{color:#22c55e;font-weight:bold;}
-.analise{color:#fbbf24;font-weight:bold;}
-.bloqueado{color:#ef4444;font-weight:bold;}
+.aprovado{color:#00ff88;font-weight:bold;}
+.analise{color:#ffcc00;font-weight:bold;}
+.bloqueado{color:#ff4d4d;font-weight:bold;}
 
-/* SECTIONS */
-.section{display:none;}
-.active{display:block;}
 </style>
-
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
 <div class="sidebar">
 
-    <!-- LOGO CENTRALIZADA + MAIOR -->
     <div class="logo">
         <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
-        <h2>Cozinet Antifraude System</h2>
+        <h2>Cozinet Antifraude</h2>
     </div>
 
-    <!-- MENU MAIS COMPLETO -->
     <div class="menu">
         <div>📊 Dashboard</div>
         <div>🧾 Pedidos</div>
         <div>🚨 Fraudes</div>
         <div>⚙️ Configurações</div>
         <div>👤 Usuários</div>
-        <div>📍 Localização IP</div>
-        <div>📈 Relatórios</div>
-        <div>🔐 Segurança</div>
-        <div>📡 Webhooks</div>
     </div>
 
 </div>
 
-<!-- MAIN -->
 <div class="main">
 
     <div class="topbar">
@@ -210,43 +182,41 @@ tr:hover{
 
         <div class="admin-box">
             👤 <b>{{ usuario }}</b><br>
-            <span style="color:#22c55e;">ADMIN LOGADO</span><br>
+            <span style="color:#00ff88;">ADMIN LOGADO</span><br>
             <a href="/logout">Sair</a>
         </div>
 
     </div>
 
-    <!-- CARDS -->
     <div class="cards">
-
         <div class="card green">
             <h3 id="aprovados">0</h3>
-            <p>Pedidos aprovados</p>
+            <p>Aprovados</p>
         </div>
 
         <div class="card yellow">
             <h3 id="analise">0</h3>
-            <p>Em análise</p>
+            <p>Análise</p>
         </div>
 
         <div class="card red">
             <h3 id="bloqueados">0</h3>
             <p>Bloqueados</p>
         </div>
-
     </div>
 
-    <!-- TABELA -->
     <table>
-        <tr>
-            <th>ID</th>
-            <th>Pedido</th>
-            <th>IP</th>
-            <th>Valor</th>
-            <th>Status</th>
-            <th>Motivos</th>
-            <th>Data</th>
-        </tr>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Pedido</th>
+                <th>IP</th>
+                <th>Valor</th>
+                <th>Status</th>
+                <th>Motivos</th>
+                <th>Data</th>
+            </tr>
+        </thead>
 
         <tbody id="tabela"></tbody>
     </table>
@@ -254,7 +224,9 @@ tr:hover{
 </div>
 
 <script>
+
 async function atualizar(){
+
     const res = await fetch("/dashboard");
     const dados = await res.json();
 
@@ -287,6 +259,7 @@ async function atualizar(){
 
 setInterval(atualizar,3000);
 atualizar();
+
 </script>
 
 </body>

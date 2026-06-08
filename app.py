@@ -5,7 +5,7 @@ from antifraude import calcular_score
 
 app = Flask(__name__)
 
-# ---------------- DATABASE ----------------
+# ---------------- CONEXÃO BANCO ----------------
 def get_conn():
     return psycopg2.connect(
         dbname=os.environ["PGDATABASE"],
@@ -15,7 +15,7 @@ def get_conn():
         port=os.environ["PGPORT"]
     )
 
-# ---------------- SALVAR ----------------
+# ---------------- SALVAR PEDIDO ----------------
 def salvar(order_id, ip, valor, score, status, motivos):
     conn = get_conn()
     cur = conn.cursor()
@@ -37,7 +37,7 @@ def definir_status(score):
         return "analise"
     return "aprovado"
 
-# ---------------- WEBHOOK ----------------
+# ---------------- WEBHOOK TRAY ----------------
 @app.route("/webhook/tray", methods=["POST"])
 def webhook():
     data = request.json
@@ -105,7 +105,7 @@ def painel():
 def home():
     return "Cozinet Antifraude v2 Online"
 
-# ---------------- RUN ----------------
+# ---------------- START ----------------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
     app.run(host="0.0.0.0", port=port)

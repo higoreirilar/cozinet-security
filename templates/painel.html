@@ -1,256 +1,51 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cozinet Antifraude</title>
-
-<style>
-body{
-    margin:0;
-    font-family: Arial, sans-serif;
-    background:#0b0c10;
-    color:#fff;
-    display:flex;
-}
-
-/* SIDEBAR */
-.sidebar{
-    width:230px;
-    background:#12141a;
-    height:100vh;
-    padding:18px;
-    border-right:1px solid #1f232b;
-}
-
-.logo img{
-    width:130px;
-    display:block;
-    margin:auto;
-}
-
-.logo h2{
-    text-align:center;
-    font-size:12px;
-    color:#ff7a1a;
-    margin-top:8px;
-    letter-spacing:1px;
-}
-
-.menu div{
-    padding:10px;
-    margin-top:8px;
-    border-radius:6px;
-    color:#aaa;
-    cursor:pointer;
-    font-size:13px;
-}
-
-.menu div:hover{
-    background:#1c2027;
-    color:#ff7a1a;
-}
-
-/* MAIN */
-.main{
-    flex:1;
-    padding:20px;
-}
-
-/* HEADER */
-.header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:20px;
-}
-
-.header h1{
-    font-size:18px;
-    color:#ff7a1a;
-    margin:0;
-}
-
-.subtitle{
-    font-size:12px;
-    color:#999;
-}
-
-/* CARDS */
-.cards{
-    display:flex;
-    gap:12px;
-    margin-bottom:20px;
-}
-
-.card{
-    flex:1;
-    background:#141820;
-    border:1px solid #222833;
-    border-radius:12px;
-    padding:14px;
-}
-
-.card h2{
-    margin:0;
-    font-size:20px;
-}
-
-.card p{
-    margin:6px 0 0;
-    font-size:11px;
-    color:#9aa4b2;
-}
-
-/* CORES SUAVES */
-.aprovado h2{ color:#22c55e; }
-.analise h2{ color:#fbbf24; }
-.bloqueado h2{ color:#ef4444; }
-
-/* TABELA */
-table{
-    width:100%;
-    border-collapse:collapse;
-    background:#141820;
-    border-radius:10px;
-    overflow:hidden;
-    font-size:13px;
-}
-
-th{
-    background:#11151c;
-    color:#ff7a1a;
-    padding:10px;
-    text-align:left;
-}
-
-td{
-    padding:10px;
-    border-bottom:1px solid #222;
-    color:#d1d5db;
-}
-
-tr:hover{
-    background:#1b202a;
-}
-
-/* STATUS */
-.status-aprovado{ color:#22c55e; }
-.status-analise{ color:#fbbf24; }
-.status-bloqueado{ color:#ef4444; }
-
-</style>
+    <title>Painel Antifraude</title>
 </head>
 
-<body>
+<body style="margin:0;background:#0b0b0f;color:white;font-family:Arial;">
 
-<!-- SIDEBAR -->
-<div class="sidebar">
+<!-- HEADER -->
+<div style="background:#15151c;padding:15px;display:flex;align-items:center;justify-content:space-between;">
 
-    <div class="logo">
-        <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
-        <h2>ANTIFRAUDE SYSTEM</h2>
+    <div style="display:flex;align-items:center;gap:10px;">
+        <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png" style="width:60px;">
+        <h3 style="color:#ff6a00;margin:0;">Painel Antifraude</h3>
     </div>
 
-    <div class="menu">
-        <div>📊 Dashboard</div>
-        <div>🧾 Pedidos</div>
-        <div>🚨 Fraudes</div>
-        <div>⚙ Configurações</div>
+    <div>
+        👤 {{ usuario }}
+        <a href="/logout" style="color:#ff6a00;margin-left:15px;text-decoration:none;">Sair</a>
     </div>
 
 </div>
 
-<!-- MAIN -->
-<div class="main">
+<!-- DASHBOARD -->
+<div style="padding:20px;">
 
-    <div class="header">
-        <div>
-            <h1>Dashboard de Monitoramento</h1>
-            <div class="subtitle">Análise em tempo real de risco e transações</div>
-        </div>
-    </div>
+    <h2 style="color:#ff6a00;">Dashboard</h2>
 
-    <!-- CARDS -->
-    <div class="cards">
+    <div style="display:flex;gap:15px;flex-wrap:wrap;">
 
-        <div class="card aprovado">
-            <h2 id="aprovados">0</h2>
-            <p>Pedidos aprovados sem risco identificado</p>
+        <div style="background:#1c1c24;padding:20px;border-radius:10px;width:180px;">
+            <h4 style="color:#00ff88;">Aprovados</h4>
+            <p style="font-size:22px;" id="aprovados">0</p>
         </div>
 
-        <div class="card analise">
-            <h2 id="analise">0</h2>
-            <p>Transações em análise de risco</p>
+        <div style="background:#1c1c24;padding:20px;border-radius:10px;width:180px;">
+            <h4 style="color:#ffb300;">Análise</h4>
+            <p style="font-size:22px;" id="analise">0</p>
         </div>
 
-        <div class="card bloqueado">
-            <h2 id="bloqueados">0</h2>
-            <p>Pedidos bloqueados automaticamente</p>
+        <div style="background:#1c1c24;padding:20px;border-radius:10px;width:180px;">
+            <h4 style="color:#ff3b3b;">Bloqueados</h4>
+            <p style="font-size:22px;" id="bloqueados">0</p>
         </div>
 
     </div>
-
-    <!-- TABLE -->
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Pedido</th>
-                <th>IP</th>
-                <th>Valor</th>
-                <th>Status</th>
-                <th>Motivos</th>
-                <th>Data</th>
-            </tr>
-        </thead>
-        <tbody id="tabela"></tbody>
-    </table>
 
 </div>
-
-<script>
-
-async function atualizar(){
-    const res = await fetch("/dashboard");
-    const dados = await res.json();
-
-    let a=0,b=0,c=0;
-    let html="";
-
-    dados.forEach(d=>{
-
-        if(d.status==="aprovado") a++;
-        if(d.status==="analise") b++;
-        if(d.status==="bloqueado") c++;
-
-        html += `
-        <tr>
-            <td>${d.id}</td>
-            <td>${d.order_id}</td>
-            <td>${d.ip}</td>
-            <td>R$ ${d.valor}</td>
-            <td class="status-${d.status}">${d.status}</td>
-            <td>${d.motivos}</td>
-            <td>${d.created_at}</td>
-        </tr>`;
-    });
-
-    document.getElementById("tabela").innerHTML = html;
-    document.getElementById("aprovados").innerText = a;
-    document.getElementById("analise").innerText = b;
-    document.getElementById("bloqueados").innerText = c;
-}
-
-async function loop(){
-    await atualizar();
-    setTimeout(loop, 3000);
-}
-
-loop();
-atualizar();
-
-</script>
 
 </body>
 </html>

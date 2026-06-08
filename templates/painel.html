@@ -2,110 +2,77 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Cozinet SaaS Antifraude</title>
+<title>Painel Cozinet</title>
 
 <style>
-body {
+body{
     margin:0;
     font-family:Arial;
     background:#0b0b0f;
     color:white;
 }
 
-/* SIDEBAR */
-.sidebar{
-    width:220px;
-    height:100vh;
-    background:#111118;
-    position:fixed;
-    top:0;
-    left:0;
-    border-right:2px solid #ff6a00;
-    padding:20px;
-}
-
-.logo{
-    width:120px;
-    margin-bottom:20px;
-}
-
-.menu-item{
-    padding:12px;
-    margin:8px 0;
-    background:#1a1a22;
-    border-radius:8px;
-    cursor:pointer;
-    transition:0.2s;
-}
-
-.menu-item:hover{
-    background:#ff6a00;
-}
-
-/* CONTENT */
-.content{
-    margin-left:240px;
-    padding:20px;
-}
-
-/* HEADER ADMIN */
-.topbar{
+/* HEADER SIMPLES */
+.header{
+    background:#15151c;
+    padding:15px 25px;
     display:flex;
     justify-content:space-between;
     align-items:center;
-    margin-bottom:20px;
+    border-bottom:2px solid #ff6a00;
 }
 
-.title h2{
-    margin:0;
-    color:#ff6a00;
+.logo{
+    width:70px;
 }
 
-.title small{
-    color:#aaa;
-}
-
-.user-box{
+.user{
     background:#1a1a22;
     padding:10px 15px;
     border-radius:10px;
     border:1px solid #ff6a00;
 }
 
-/* CARDS */
+/* CONTEÚDO */
+.container{
+    padding:25px;
+}
+
+/* CARDS GRANDES (ESTILO ANTIGO) */
 .cards{
     display:flex;
-    gap:15px;
+    gap:20px;
     flex-wrap:wrap;
+    margin-top:20px;
 }
 
 .card{
+    flex:1;
+    min-width:200px;
     background:#1a1a22;
-    padding:20px;
-    border-radius:12px;
-    width:180px;
-    border-left:4px solid #ff6a00;
+    padding:25px;
+    border-radius:15px;
+    text-align:center;
+    font-size:18px;
+    box-shadow:0 0 10px rgba(0,0,0,0.4);
 }
 
-.aprovado{border-left-color:#00ff88;}
-.analise{border-left-color:#ffb300;}
-.bloqueado{border-left-color:#ff3b3b;}
-
-/* SEÇÕES SPA */
-.section{
-    display:none;
-}
-
-.active{
+.card b{
     display:block;
+    font-size:32px;
+    margin-top:10px;
 }
 
-/* LISTAS */
+.aprovado{border-left:5px solid #00ff88;}
+.analise{border-left:5px solid #ffb300;}
+.bloqueado{border-left:5px solid #ff3b3b;}
+
+/* LISTAS SIMPLES */
 .box{
     background:#15151c;
     padding:15px;
     border-radius:10px;
-    margin-top:10px;
+    margin-top:20px;
 }
 </style>
 
@@ -113,86 +80,52 @@ body {
 
 <body>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
+<!-- HEADER -->
+<div class="header">
+
     <img class="logo" src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
 
-    <div class="menu-item" onclick="show('dashboard')">📊 Dashboard</div>
-    <div class="menu-item" onclick="show('pedidos')">🧾 Pedidos</div>
-    <div class="menu-item" onclick="show('fraudes')">🚨 Fraudes</div>
-    <div class="menu-item" onclick="show('config')">⚙ Configurações</div>
-</div>
+    <h2 style="color:#ff6a00;">Painel Antifraude</h2>
 
-<!-- CONTENT -->
-<div class="content">
-
-    <!-- TOP ADMIN BAR -->
-    <div class="topbar">
-
-        <div class="title">
-            <h2>Cozinet SaaS Antifraude</h2>
-            <small>Sistema em tempo real</small>
-        </div>
-
-        <div class="user-box">
-            👤 <b>{{ usuario }}</b><br>
-            <span style="color:#00ff88;font-size:12px;">ADMIN LOGADO</span>
-        </div>
-
-    </div>
-
-    <!-- DASHBOARD -->
-    <div id="dashboard" class="section active">
-
-        <h3>Dashboard</h3>
-
-        <div class="cards">
-            <div class="card aprovado">
-                Aprovados<br><b id="aprovados">0</b>
-            </div>
-
-            <div class="card analise">
-                Análise<br><b id="analise">0</b>
-            </div>
-
-            <div class="card bloqueado">
-                Bloqueados<br><b id="bloqueados">0</b>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- PEDIDOS -->
-    <div id="pedidos" class="section">
-        <h3>Pedidos</h3>
-        <div class="box" id="listaPedidos">Carregando pedidos...</div>
-    </div>
-
-    <!-- FRAUDES -->
-    <div id="fraudes" class="section">
-        <h3>Fraudes</h3>
-        <div class="box" id="listaFraudes">Carregando fraudes...</div>
-    </div>
-
-    <!-- CONFIG -->
-    <div id="config" class="section">
-        <h3>Configurações</h3>
-        <div class="box">
-            Sistema Cozinet Antifraude SaaS ativo 🚀<br>
-            Usuário logado: <b>{{ usuario }}</b><br>
-            Status: ONLINE
-        </div>
+    <div class="user">
+        👤 <b>{{ usuario }}</b><br>
+        ADMIN
     </div>
 
 </div>
 
-<script>
-function show(id){
-    let sections = document.querySelectorAll('.section');
-    sections.forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-}
-</script>
+<!-- CONTEÚDO -->
+<div class="container">
+
+    <h3>Dashboard</h3>
+
+    <!-- CARDS GRANDES -->
+    <div class="cards">
+
+        <div class="card aprovado">
+            APROVADOS
+            <b id="aprovados">0</b>
+        </div>
+
+        <div class="card analise">
+            EM ANÁLISE
+            <b id="analise">0</b>
+        </div>
+
+        <div class="card bloqueado">
+            BLOQUEADOS
+            <b id="bloqueados">0</b>
+        </div>
+
+    </div>
+
+    <!-- LISTAS -->
+    <div class="box">
+        <h3>Últimos pedidos</h3>
+        <div id="listaPedidos">Carregando...</div>
+    </div>
+
+</div>
 
 </body>
 </html>

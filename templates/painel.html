@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel Antifraude</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0b0b0f;
+            color: white;
+        }
+
+        header {
+            background: #111117;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #ff6a00;
+        }
+
+        header h1 {
+            margin: 0;
+            color: #ff6a00;
+            font-size: 24px;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        .card {
+            background: #15151c;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ff6a00;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #15151c;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th {
+            background: #111117;
+            color: #ff6a00;
+            text-align: left;
+            padding: 12px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #222;
+        }
+
+        tr:hover {
+            background: #1c1c25;
+        }
+
+        .bloqueado {
+            color: #ff3b3b;
+            font-weight: bold;
+        }
+
+        .analise {
+            color: #ffb100;
+            font-weight: bold;
+        }
+
+        .aprovado {
+            color: #2cff7a;
+            font-weight: bold;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            background: #ff6a00;
+            color: black;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>🛡️ COZINET ANTIFRAUDE</h1>
+</header>
+
+<div class="container">
+
+    <div class="card">
+        <span class="badge">LIVE</span>
+        Sistema de monitoramento ativo de pedidos
+    </div>
+
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Pedido</th>
+            <th>IP</th>
+            <th>Valor</th>
+            <th>Status</th>
+            <th>Motivos</th>
+        </tr>
+
+        {% for r in dados %}
+        <tr>
+            <td>{{ r[0] }}</td>
+            <td>{{ r[1] }}</td>
+            <td>{{ r[2] }}</td>
+            <td>R$ {{ r[3] }}</td>
+            <td class="{{ r[4] }}">{{ r[4] }}</td>
+            <td>{{ r[5] }}</td>
+        </tr>
+        {% endfor %}
+
+    </table>
+</div>
+
+</body>
+</html>

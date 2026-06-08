@@ -1,241 +1,202 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cozinet SaaS Dashboard</title>
+from flask import Flask, request, jsonify, render_template
+import os
+import psycopg2
+from psycopg2 import OperationalError
+from antifraude import calcular_score
 
-<style>
-body {
-    margin: 0;
-    font-family: Arial;
-    background: #0a0a0a;
-    color: white;
-    display: flex;
-}
+app = Flask(__name__)
 
-/* SIDEBAR */
-.sidebar {
-    width: 240px;
-    background: #111214;
-    height: 100vh;
-    padding: 18px;
-    border-right: 1px solid #222;
-}
+# ---------------- CONEXÃO SEGURA ----------------
+def get_conn():
+    try:
+        return psycopg2.connect(
+            dbname=os.getenv("PGDATABASE"),
+            user=os.getenv("PGUSER"),
+            password=os.getenv("PGPASSWORD"),
+            host=os.getenv("PGHOST"),
+            port=os.getenv("PGPORT")
+        )
+    except Exception as e:
+        print("❌ ERRO CONEXÃO BANCO:", e)
+        return None
 
-.logo img {
-    width: 150px;
-}
+# ---------------- STATUS ----------------
+def definir_status(score):
+    if score >= 60:
+        return "bloqueado"
+    elif score >= 30:
+        return "analise"
+    return "aprovado"
 
-.logo h2 {
-    font-size: 13px;
-    color: #ff6a00;
-    margin-top: 10px;
-    text-align: center;
-}
+# ---------------- DEVICE ----------------
+def detectar_device(user_agent):
+    ua = (user_agent or "").lower()
+    if "mobile" in ua or "android" in ua or "iphone" in ua:
+        return "mobile"
+    return "desktop"
 
-/* MENU */
-.menu div {
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 6px;
-    color: #aaa;
-}
+# ---------------- SALVAR PEDIDO ----------------
+def salvar(order_id, ip, valor, status, motivos):
+    conn = get_conn()
+    if not conn:
+        print("❌ banco indisponível, não salvou pedido")
+        return
 
-.menu div:hover {
-    background: #1c1c1f;
-    color: #ff6a00;
-}
+    try:
+        cur = conn.cursor()
 
-/* MAIN */
-.main {
-    flex: 1;
-    padding: 20px;
-}
+        cur.execute("""
+            INSERT INTO pedidos (order_id, ip, valor, status, motivo, created_at)
+            VALUES (%s, %s, %s, %s, %s, NOW())
+        """, (
+            order_id,
+            ip,
+            valor,
+            status,
+            ",".join(motivos)
+        ))
 
-/* TOP */
-.topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
+        conn.commit()
+        cur.close()
+        conn.close()
 
-.title {
-    font-size: 18px;
-    color: #ff6a00;
-}
+    except Exception as e:
+        print("❌ erro ao salvar:", e)
 
-/* CARDS PREMIUM */
-.cards {
-    display: flex;
-    gap: 12px;
-}
+# ---------------- WEBHOOK ----------------
+@app.route("/webhook/tray", methods=["POST"])
+def webhook():
+    try:
+        data = request.json or {}
 
-.card {
-    width: 180px;
-    padding: 12px;
-    border-radius: 12px;
-    color: white;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-}
+        order_id = data.get("order_id", "unknown")
+        ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+        valor = float(data.get("total", 0))
 
-.card h3 {
-    margin: 0;
-    font-size: 18px;
-}
+        score, motivos = calcular_score(ip, valor)
+        status = definir_status(score)
 
-.card p {
-    margin: 5px 0 0;
-    font-size: 11px;
-    opacity: 0.8;
-}
+        salvar(order_id, ip, valor, status, motivos)
 
-/* CORES MAIS BONITAS */
-.green {
-    background: linear-gradient(135deg, #16a34a, #22c55e);
-}
+        return jsonify({
+            "order_id": order_id,
+            "score": score,
+            "status": status,
+            "motivos": motivos
+        })
 
-.yellow {
-    background: linear-gradient(135deg, #f59e0b, #fbbf24);
-}
+    except Exception as e:
+        print("❌ erro webhook:", e)
+        return jsonify({"error": "webhook failure"}), 500
 
-.red {
-    background: linear-gradient(135deg, #dc2626, #ef4444);
-}
+# ---------------- PAINEL SPA ----------------
+@app.route("/painel")
+def painel():
+    return render_template("painel.html")
 
-/* TABELA */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-    background: #15161a;
-    border-radius: 10px;
-    overflow: hidden;
-    font-size: 13px;
-}
+# ---------------- DASHBOARD API ----------------
+@app.route("/dashboard")
+def dashboard():
+    conn = get_conn()
+    if not conn:
+        return jsonify([])
 
-th {
-    background: #111214;
-    color: #ff6a00;
-    padding: 10px;
-    text-align: left;
-}
+    cur = conn.cursor()
 
-td {
-    padding: 10px;
-    border-bottom: 1px solid #222;
-}
+    try:
+        cur.execute("""
+            SELECT id, order_id, ip, valor, status, motivo, created_at
+            FROM pedidos
+            ORDER BY id DESC
+        """)
+        rows = cur.fetchall()
 
-tr:hover {
-    background: #1c1c1f;
-}
+    except Exception as e:
+        print("❌ erro SELECT:", e)
+        rows = []
 
-/* STATUS */
-.aprovado { color: #22c55e; font-weight: bold; }
-.analise { color: #fbbf24; font-weight: bold; }
-.bloqueado { color: #ef4444; font-weight: bold; }
-</style>
-</head>
+    finally:
+        cur.close()
+        conn.close()
 
-<body>
+    resultado = []
+    for r in rows:
+        resultado.append({
+            "id": r[0],
+            "order_id": r[1],
+            "ip": r[2],
+            "valor": float(r[3]) if r[3] else 0,
+            "status": r[4],
+            "motivos": r[5],
+            "created_at": str(r[6]) if len(r) > 6 and r[6] else ""
+        })
 
-<!-- SIDEBAR -->
-<div class="sidebar">
+    return jsonify(resultado)
 
-    <div class="logo">
-        <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
-        <h2>Cozinet Antifraude</h2>
-    </div>
+# ---------------- PEDIDOS ----------------
+@app.route("/pedidos")
+def pedidos():
+    return dashboard()
 
-    <div class="menu">
-        <div>📊 Dashboard</div>
-        <div>🧾 Pedidos</div>
-        <div>🚨 Fraudes</div>
-        <div>⚙️ Configurações</div>
-    </div>
+# ---------------- FRAUDES ----------------
+@app.route("/fraudes")
+def fraudes():
+    conn = get_conn()
+    if not conn:
+        return jsonify([])
 
-</div>
+    cur = conn.cursor()
 
-<!-- MAIN -->
-<div class="main">
+    try:
+        cur.execute("""
+            SELECT id, order_id, ip, valor, status, motivo, created_at
+            FROM pedidos
+            WHERE status = 'bloqueado'
+            ORDER BY id DESC
+        """)
+        rows = cur.fetchall()
 
-    <div class="topbar">
-        <div class="title">Dashboard de Monitoramento</div>
-    </div>
+    except Exception as e:
+        print("❌ erro fraudes:", e)
+        rows = []
 
-    <!-- CARDS BONITOS -->
-    <div class="cards">
+    finally:
+        cur.close()
+        conn.close()
 
-        <div class="card green">
-            <h3 id="aprovados">0</h3>
-            <p>Pedidos aprovados sem risco identificado</p>
-        </div>
+    return jsonify([
+        {
+            "id": r[0],
+            "order_id": r[1],
+            "ip": r[2],
+            "valor": float(r[3]) if r[3] else 0,
+            "status": r[4],
+            "motivos": r[5],
+            "created_at": str(r[6]) if len(r) > 6 and r[6] else ""
+        }
+        for r in rows
+    ])
 
-        <div class="card yellow">
-            <h3 id="analise">0</h3>
-            <p>Pedidos em análise de segurança</p>
-        </div>
+# ---------------- CONFIG ----------------
+@app.route("/config")
+def config():
+    return jsonify({
+        "sistema": "Cozinet Antifraude SaaS",
+        "status": "online",
+        "modo": "produção"
+    })
 
-        <div class="card red">
-            <h3 id="bloqueados">0</h3>
-            <p>Transações bloqueadas por risco</p>
-        </div>
+# ---------------- HEALTHCHECK ----------------
+@app.route("/status")
+def status():
+    return "OK - Cozinet rodando"
 
-    </div>
+# ---------------- HOME ----------------
+@app.route("/")
+def home():
+    return "Cozinet SaaS Antifraude Online 🚀"
 
-    <!-- TABELA -->
-    <table>
-        <tr>
-            <th>ID</th>
-            <th>Pedido</th>
-            <th>IP</th>
-            <th>Valor</th>
-            <th>Status</th>
-            <th>Motivos</th>
-            <th>Data</th>
-        </tr>
-
-        <tbody id="tabela"></tbody>
-    </table>
-
-</div>
-
-<script>
-async function atualizar(){
-    const res = await fetch("/dashboard");
-    const dados = await res.json();
-
-    let a=0,b=0,c=0;
-    let html="";
-
-    dados.forEach(d=>{
-
-        if(d.status==="aprovado") a++;
-        if(d.status==="analise") b++;
-        if(d.status==="bloqueado") c++;
-
-        html += `
-        <tr>
-            <td>${d.id}</td>
-            <td>${d.order_id}</td>
-            <td>${d.ip}</td>
-            <td>R$ ${d.valor}</td>
-            <td class="${d.status}">${d.status}</td>
-            <td>${d.motivos}</td>
-            <td>${d.created_at}</td>
-        </tr>`;
-    });
-
-    document.getElementById("tabela").innerHTML = html;
-    document.getElementById("aprovados").innerText = a;
-    document.getElementById("analise").innerText = b;
-    document.getElementById("bloqueados").innerText = c;
-}
-
-setInterval(atualizar,3000);
-atualizar();
-</script>
-
-</body>
-</html>
+# ---------------- START ----------------
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))
+    app.run(host="0.0.0.0", port=port)

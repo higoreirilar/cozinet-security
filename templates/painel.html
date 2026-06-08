@@ -172,6 +172,8 @@
 <script>
 let grafico;
 
+let ultimoTamanho = 0;
+
 async function atualizar() {
     const res = await fetch("/dashboard");
     const dados = await res.json();
@@ -180,35 +182,43 @@ async function atualizar() {
     let analise = 0;
     let bloqueados = 0;
 
-    let alertaTocado = false;
+    const tbody = document.getElementById("tabela");
+    tbody.innerHTML = "";
 
     dados.forEach(item => {
+
         if (item.status === "aprovado") aprovados++;
         else if (item.status === "analise") analise++;
-        else if (item.status === "bloqueado") {
-            bloqueados++;
-            alertaTocado = true;
-        }
+        else if (item.status === "bloqueado") bloqueados++;
+
+        tbody.innerHTML += `
+        <tr>
+            <td>${item.id}</td>
+            <td>${item.order_id}</td>
+            <td>${item.ip}</td>
+            <td>R$ ${item.valor}</td>
+            <td class="${item.status}">${item.status}</td>
+            <td>${item.motivos}</td>
+        </tr>`;
     });
 
     document.getElementById("aprovados").innerText = aprovados;
     document.getElementById("analise").innerText = analise;
     document.getElementById("bloqueados").innerText = bloqueados;
 
-    // ALERTA SONORO
-    if (alertaTocado) {
+    atualizarGrafico(aprovados, analise, bloqueados);
+
+    // 🔊 SÓ TOCA SE APARECER NOVO BLOQUEADO
+    if (bloqueados > ultimoTamanho) {
         document.getElementById("alerta").play();
     }
 
-    atualizarGrafico(aprovados, analise, bloqueados);
+    ultimoTamanho = bloqueados;
 }
 
-// GRAFICO
 function atualizarGrafico(a, b, c) {
     if (!grafico) {
-        const ctx = document.getElementById("grafico");
-
-        grafico = new Chart(ctx, {
+        grafico = new Chart(document.getElementById("grafico"), {
             type: 'bar',
             data: {
                 labels: ['Aprovados', 'Análise', 'Bloqueados'],

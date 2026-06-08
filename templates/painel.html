@@ -155,6 +155,30 @@
 
     </table>
 </div>
+    
+<script>
+async function atualizar() {
+    const res = await fetch("/dashboard");
+    const dados = await res.json();
 
+    let aprovados = 0;
+    let analise = 0;
+    let bloqueados = 0;
+
+    dados.forEach(item => {
+        if (item.status === "aprovado") aprovados++;
+        else if (item.status === "analise") analise++;
+        else if (item.status === "bloqueado") bloqueados++;
+    });
+
+    document.getElementById("aprovados").innerText = aprovados;
+    document.getElementById("analise").innerText = analise;
+    document.getElementById("bloqueados").innerText = bloqueados;
+}
+
+setInterval(atualizar, 3000);
+atualizar();
+</script>
+    
 </body>
 </html>

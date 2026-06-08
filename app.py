@@ -1,10 +1,11 @@
-from flask import Flask, request, jsonify, render_template 
+from flask import Flask, request, jsonify, render_template
 import os
 import psycopg2
 from antifraude import calcular_score
 
 app = Flask(__name__)
 
+# ---------------- DATABASE ----------------
 def get_conn():
     return psycopg2.connect(
         dbname=os.environ["PGDATABASE"],
@@ -14,6 +15,7 @@ def get_conn():
         port=os.environ["PGPORT"]
     )
 
+# ---------------- SALVAR ----------------
 def salvar(order_id, ip, valor, score, status, motivos):
     conn = get_conn()
     cur = conn.cursor()
@@ -27,6 +29,7 @@ def salvar(order_id, ip, valor, score, status, motivos):
     cur.close()
     conn.close()
 
+# ---------------- STATUS ----------------
 def definir_status(score):
     if score >= 60:
         return "bloqueado"
@@ -34,6 +37,7 @@ def definir_status(score):
         return "analise"
     return "aprovado"
 
+# ---------------- WEBHOOK ----------------
 @app.route("/webhook/tray", methods=["POST"])
 def webhook():
     data = request.json
@@ -47,7 +51,6 @@ def webhook():
 
     salvar(order_id, ip, valor, score, status, motivos)
 
-    # ALERTA ADMIN
     if status == "bloqueado":
         print(f"🚨 ALERTA FRAUDE: {order_id} SCORE {score}")
 
@@ -58,6 +61,7 @@ def webhook():
         "motivos": motivos
     })
 
+# ---------------- API JSON ----------------
 @app.route("/dashboard")
 def dashboard():
     conn = get_conn()
@@ -82,7 +86,7 @@ def dashboard():
 
     return jsonify(resultado)
 
-
+# ---------------- PAINEL HTML ----------------
 @app.route("/painel")
 def painel():
     conn = get_conn()
@@ -95,43 +99,13 @@ def painel():
     conn.close()
 
     return render_template("painel.html", dados=rows)
-def painel():
-    conn = get_conn()
-    cur = conn.cursor()
 
-    cur.execute("SELECT * FROM pedidos ORDER BY id DESC")
-    rows = cur.fetchall()
-
-    cur.close()
-    conn.close()
-
-    return render_template("painel.html", dados=rows)
-    conn = get_conn()
-    cur = conn.cursor()
-
-    cur.execute("SELECT * FROM pedidos ORDER BY id DESC")
-    rows = cur.fetchall()
-
-    cur.close()
-    conn.close()
-
-    resultado = []
-    for r in rows:
-        resultado.append({
-            "id": r[0],
-            "order_id": r[1],
-            "ip": r[2],
-            "valor": r[3],
-            "status": r[4],
-            "motivos": r[5]
-        })
-
-    return jsonify(resultado)
-
+# ---------------- HOME ----------------
 @app.route("/")
 def home():
     return "Cozinet Antifraude v2 Online"
 
+# ---------------- RUN ----------------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
     app.run(host="0.0.0.0", port=port)

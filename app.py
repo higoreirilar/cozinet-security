@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template_string
+from flask import Flask, request, jsonify, render_template 
 import os
 import psycopg2
 from antifraude import calcular_score
@@ -60,6 +60,18 @@ def webhook():
 
 @app.route("/dashboard")
 def dashboard():
+    @app.route("/painel")
+def painel():
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute("SELECT * FROM pedidos ORDER BY id DESC")
+    rows = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return render_template("painel.html", dados=rows)
     conn = get_conn()
     cur = conn.cursor()
 

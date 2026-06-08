@@ -1,153 +1,166 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <title>Painel Antifraude PRO</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<title>Painel Antifraude</title>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #0b0b0f;
-            color: white;
-        }
+<style>
+:root {
+    --bg: #0b0b0f;
+    --card: #15151c;
+    --card2: #111117;
+    --orange: #ff6a00;
+    --green: #2cff7a;
+    --yellow: #ffb100;
+    --red: #ff3b3b;
+}
 
-        header {
-            background: #111117;
-            padding: 20px;
-            text-align: center;
-            border-bottom: 2px solid #ff6a00;
-        }
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: var(--bg);
+    color: white;
+}
 
-        header h1 {
-            margin: 0;
-            color: #ff6a00;
-            font-size: 22px;
-        }
+/* HEADER PREMIUM */
+header {
+    background: linear-gradient(90deg, #0b0b0f, #15151c);
+    text-align: center;
+    padding: 25px;
+    border-bottom: 2px solid var(--orange);
+}
 
-        .container {
-            padding: 20px;
-        }
+header img {
+    width: 260px;
+    filter: drop-shadow(0 6px 10px rgba(0,0,0,0.6));
+}
 
-        /* CARDS */
-        .cards {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
+header h1 {
+    margin: 10px 0 0 0;
+    font-size: 22px;
+    color: var(--orange);
+    letter-spacing: 2px;
+}
 
-        .card {
-            background: #15151c;
-            padding: 15px 25px;
-            border-radius: 10px;
-            min-width: 150px;
-            text-align: center;
-            border: 1px solid #222;
-        }
+/* CONTAINER */
+.container {
+    padding: 20px;
+}
 
-        .card h3 {
-            margin: 0;
-            font-size: 14px;
-        }
+/* CARDS MODERNOS */
+.cards {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
 
-        .card p {
-            font-size: 22px;
-            margin: 10px 0 0;
-        }
+.card {
+    background: var(--card);
+    padding: 18px 25px;
+    border-radius: 12px;
+    min-width: 160px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    transition: 0.3s;
+}
 
-        .green { color: #2cff7a; }
-        .yellow { color: #ffb100; }
-        .red { color: #ff3b3b; }
+.card:hover {
+    transform: scale(1.05);
+}
 
-        /* TABELA */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: #15151c;
-            margin-top: 20px;
-            border-radius: 10px;
-            overflow: hidden;
-        }
+.card h3 {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.8;
+}
 
-        th {
-            background: #111117;
-            color: #ff6a00;
-            padding: 12px;
-            text-align: left;
-        }
+.card p {
+    font-size: 22px;
+    margin: 8px 0 0 0;
+}
 
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #222;
-        }
+/* CORES STATUS */
+.aprovado { color: var(--green); }
+.analise { color: var(--yellow); }
+.bloqueado { color: var(--red); }
 
-        tr:hover {
-            background: #1c1c25;
-        }
+/* TABELA PREMIUM */
+table {
+    width: 100%;
+    margin-top: 25px;
+    border-collapse: collapse;
+    background: var(--card);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
 
-        .bloqueado { color: #ff3b3b; font-weight: bold; }
-        .analise { color: #ffb100; font-weight: bold; }
-        .aprovado { color: #2cff7a; font-weight: bold; }
+th {
+    background: var(--card2);
+    color: var(--orange);
+    padding: 12px;
+    text-align: left;
+    font-size: 13px;
+    letter-spacing: 1px;
+}
 
-        .badge {
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 12px;
-        }
+td {
+    padding: 12px;
+    border-bottom: 1px solid #222;
+    font-size: 13px;
+}
 
-        /* GRÁFICO */
-        .chart-box {
-            background: #15151c;
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 10px;
-        }
-    </style>
+tr:hover {
+    background: #1c1c25;
+}
+
+/* RESPONSIVO */
+@media (max-width: 768px) {
+    .cards {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+</style>
+
 </head>
 
 <body>
 
-<header style="display:flex; align-items:center; justify-content:center; gap:15px; padding:20px; border-bottom:2px solid #ff6a00;">
-
-    <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png"
-         style="width:60px; height:60px; object-fit:contain;">
-
-    <h1 style="color:#ff6a00; margin:0;">
-        PAINEL ANTIFRAUDE
-    </h1>
-
+<header>
+    <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
+    <h1>PAINEL ANTIFRAUDE</h1>
 </header>
 
 <div class="container">
 
-    <!-- CARDS -->
-    <div class="cards">
-        <div class="card">
-            <h3 class="green">Aprovados</h3>
-            <p id="aprovados">0</p>
-        </div>
+<!-- CARDS -->
+<div class="cards">
 
-        <div class="card">
-            <h3 class="yellow">Análise</h3>
-            <p id="analise">0</p>
-        </div>
-
-        <div class="card">
-            <h3 class="red">Bloqueados</h3>
-            <p id="bloqueados">0</p>
-        </div>
+    <div class="card">
+        <h3>Aprovados</h3>
+        <p id="aprovados" class="aprovado">0</p>
     </div>
 
-    <!-- GRAFICO -->
-    <div class="chart-box">
-        <canvas id="grafico"></canvas>
+    <div class="card">
+        <h3>Análise</h3>
+        <p id="analise" class="analise">0</p>
     </div>
 
-    <!-- TABELA -->
-    <table>
+    <div class="card">
+        <h3>Bloqueados</h3>
+        <p id="bloqueados" class="bloqueado">0</p>
+    </div>
+
+</div>
+
+<!-- TABELA -->
+<table>
+    <thead>
         <tr>
             <th>ID</th>
             <th>Pedido</th>
@@ -156,61 +169,60 @@
             <th>Status</th>
             <th>Motivos</th>
         </tr>
+    </thead>
 
-        {% for r in dados %}
-        <tr>
-            <td>{{ r[0] }}</td>
-            <td>{{ r[1] }}</td>
-            <td>{{ r[2] }}</td>
-            <td>R$ {{ r[3] }}</td>
-            <td class="{{ r[4] }}">{{ r[4] }}</td>
-            <td>{{ r[5] }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+    <tbody id="tabela"></tbody>
+</table>
 
 </div>
 
-<!-- SOM ALERTA -->
-<audio id="alerta">
-    <source src="https://www.myinstants.com/media/sounds/alarm.mp3" type="audio/mpeg">
-</audio>
-
+<!-- JS (mantém seu sistema funcionando) -->
 <script>
 async function atualizar() {
-    try {
-        const res = await fetch("/dashboard");
-        const dados = await res.json();
+    const res = await fetch("/dashboard");
+    const dados = await res.json();
 
-        const tbody = document.getElementById("tabela");
-        tbody.innerHTML = "";
+    const tbody = document.getElementById("tabela");
 
-        if (!dados || dados.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="6" style="text-align:center; color:#888;">
-                        Nenhum pedido encontrado
-                    </td>
-                </tr>`;
-            return;
-        }
+    let aprovados = 0;
+    let analise = 0;
+    let bloqueados = 0;
 
-        dados.forEach(item => {
-            tbody.innerHTML += `
-                <tr>
-                    <td>${item.id || ""}</td>
-                    <td>${item.order_id || ""}</td>
-                    <td>${item.ip || ""}</td>
-                    <td>${item.valor || ""}</td>
-                    <td>${item.status || ""}</td>
-                    <td>${item.motivos || ""}</td>
-                </tr>
-            `;
-        });
+    tbody.innerHTML = "";
 
-    } catch (e) {
-        console.log("Erro ao carregar dashboard:", e);
+    if (!dados || dados.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align:center;color:#888;">
+                    Nenhum dado encontrado
+                </td>
+            </tr>`;
+        return;
     }
+
+    dados.forEach(item => {
+
+        let status = (item.status || "").toLowerCase();
+
+        if (status === "aprovado") aprovados++;
+        else if (status === "analise") analise++;
+        else if (status === "bloqueado") bloqueados++;
+
+        tbody.innerHTML += `
+            <tr>
+                <td>${item.id ?? ""}</td>
+                <td>${item.order_id ?? ""}</td>
+                <td>${item.ip ?? ""}</td>
+                <td>R$ ${item.valor ?? 0}</td>
+                <td class="${status}">${status}</td>
+                <td>${item.motivos ?? ""}</td>
+            </tr>
+        `;
+    });
+
+    document.getElementById("aprovados").innerText = aprovados;
+    document.getElementById("analise").innerText = analise;
+    document.getElementById("bloqueados").innerText = bloqueados;
 }
 
 setInterval(atualizar, 3000);

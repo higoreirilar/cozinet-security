@@ -1,17 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
-    <title>Painel Antifraude</title>
+<meta charset="UTF-8">
+<title>Painel Cozinet</title>
 </head>
 
-<body style="margin:0;background:#0b0b0f;color:white;font-family:Arial;">
+<body style="margin:0;font-family:Arial;background:#0b0b0f;color:white;">
 
 <!-- HEADER -->
-<div style="background:#15151c;padding:15px;display:flex;align-items:center;justify-content:space-between;">
+<div style="background:#15151c;padding:15px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #ff6a00;">
 
-    <div style="display:flex;align-items:center;gap:10px;">
-        <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png" style="width:60px;">
-        <h3 style="color:#ff6a00;margin:0;">Painel Antifraude</h3>
+    <div style="display:flex;align-items:center;gap:12px;">
+        <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png" style="width:55px;">
+        <h2 style="margin:0;color:#ff6a00;">Painel Antifraude</h2>
     </div>
 
     <div>
@@ -24,25 +25,33 @@
 <!-- DASHBOARD -->
 <div style="padding:20px;">
 
-    <h2 style="color:#ff6a00;">Dashboard</h2>
+    <h3 style="color:#ff6a00;">Dashboard</h3>
 
     <div style="display:flex;gap:15px;flex-wrap:wrap;">
 
-        <div style="background:#1c1c24;padding:20px;border-radius:10px;width:180px;">
-            <h4 style="color:#00ff88;">Aprovados</h4>
-            <p style="font-size:22px;" id="aprovados">0</p>
+        <div style="background:#1c1c24;padding:20px;border-radius:12px;width:180px;border-left:4px solid #00ff88;">
+            <h4>Aprovados</h4>
+            <p style="font-size:26px;" id="aprovados">0</p>
         </div>
 
-        <div style="background:#1c1c24;padding:20px;border-radius:10px;width:180px;">
-            <h4 style="color:#ffb300;">Análise</h4>
-            <p style="font-size:22px;" id="analise">0</p>
+        <div style="background:#1c1c24;padding:20px;border-radius:12px;width:180px;border-left:4px solid #ffb300;">
+            <h4>Análise</h4>
+            <p style="font-size:26px;" id="analise">0</p>
         </div>
 
-        <div style="background:#1c1c24;padding:20px;border-radius:10px;width:180px;">
-            <h4 style="color:#ff3b3b;">Bloqueados</h4>
-            <p style="font-size:22px;" id="bloqueados">0</p>
+        <div style="background:#1c1c24;padding:20px;border-radius:12px;width:180px;border-left:4px solid #ff3b3b;">
+            <h4>Bloqueados</h4>
+            <p style="font-size:26px;" id="bloqueados">0</p>
         </div>
 
+    </div>
+
+    <hr style="margin:20px 0;border:1px solid #333;">
+
+    <h3 style="color:#ff6a00;">Últimos pedidos</h3>
+
+    <div id="lista" style="background:#15151c;padding:15px;border-radius:10px;">
+        carregando...
     </div>
 
 </div>

@@ -9,7 +9,7 @@ def get_conn():
     return psycopg2.connect(
         dbname=os.environ["PGDATABASE"],
         user=os.environ["PGUSER"],
-        password=os.environ["POSTGRES_PASSWORD"],
+        password=os.environ["PGPASSWORD"],
         host=os.environ["PGHOST"],
         port=os.environ["PGPORT"]
     )

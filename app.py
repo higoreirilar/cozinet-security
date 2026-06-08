@@ -1,10 +1,11 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, session, redirect
 import os
 import psycopg2
 from psycopg2 import OperationalError
 from antifraude import calcular_score
 
 app = Flask(__name__)
+app.secret_key = "cozinet_secret_key_2026"
 
 # ---------------- CONEXÃO SEGURA ----------------
 def get_conn():
@@ -20,6 +21,75 @@ def get_conn():
         print("❌ ERRO CONEXÃO BANCO:", e)
         return None
 
+# ---------------- AUTH ----------------
+def login_required():
+    return session.get("user_id") is not None
+
+
+# ---------------- CADASTRO ----------------
+@app.route("/cadastro", methods=["GET", "POST"])
+def cadastro():
+    if request.method == "POST":
+        nome = request.form["nome"]
+        email = request.form["email"]
+        senha = request.form["senha"]
+
+        conn = get_conn()
+        cur = conn.cursor()
+
+        cur.execute("""
+            INSERT INTO usuarios (nome, email, senha)
+            VALUES (%s, %s, %s)
+        """, (nome, email, senha))
+
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        return redirect("/login")
+
+    return render_template("cadastro.html")
+
+
+# ---------------- LOGIN ----------------
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        email = request.form["email"]
+        senha = request.form["senha"]
+
+        conn = get_conn()
+        cur = conn.cursor()
+
+        cur.execute("""
+            SELECT id, nome, role FROM usuarios
+            WHERE email=%s AND senha=%s
+        """, (email, senha))
+
+        user = cur.fetchone()
+
+        cur.close()
+        conn.close()
+
+        if user:
+            session["user_id"] = user[0]
+            session["nome"] = user[1]
+            session["role"] = user[2]
+
+            return redirect("/painel")
+
+        return "Login inválido"
+
+    return render_template("login.html")
+
+
+# ---------------- LOGOUT ----------------
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/login")
+
+
 # ---------------- STATUS ----------------
 def definir_status(score):
     if score >= 60:
@@ -28,154 +98,125 @@ def definir_status(score):
         return "analise"
     return "aprovado"
 
-# ---------------- DEVICE ----------------
-def detectar_device(user_agent):
-    ua = (user_agent or "").lower()
-    if "mobile" in ua or "android" in ua or "iphone" in ua:
-        return "mobile"
-    return "desktop"
 
 # ---------------- SALVAR PEDIDO ----------------
 def salvar(order_id, ip, valor, status, motivos):
     conn = get_conn()
     if not conn:
-        print("❌ banco indisponível, não salvou pedido")
+        print("❌ banco indisponível")
         return
 
-    try:
-        cur = conn.cursor()
+    cur = conn.cursor()
 
-        cur.execute("""
-            INSERT INTO pedidos (order_id, ip, valor, status, motivo, created_at)
-            VALUES (%s, %s, %s, %s, %s, NOW())
-        """, (
-            order_id,
-            ip,
-            valor,
-            status,
-            ",".join(motivos)
-        ))
+    cur.execute("""
+        INSERT INTO pedidos (order_id, ip, valor, status, motivo, created_at)
+        VALUES (%s, %s, %s, %s, %s, NOW())
+    """, (order_id, ip, valor, status, ",".join(motivos)))
 
-        conn.commit()
-        cur.close()
-        conn.close()
+    conn.commit()
+    cur.close()
+    conn.close()
 
-    except Exception as e:
-        print("❌ erro ao salvar:", e)
 
 # ---------------- WEBHOOK ----------------
 @app.route("/webhook/tray", methods=["POST"])
 def webhook():
-    try:
-        data = request.json or {}
+    data = request.json or {}
 
-        order_id = data.get("order_id", "unknown")
-        ip = request.headers.get("X-Forwarded-For", request.remote_addr)
-        valor = float(data.get("total", 0))
+    order_id = data.get("order_id", "unknown")
+    ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+    valor = float(data.get("total", 0))
 
-        score, motivos = calcular_score(ip, valor)
-        status = definir_status(score)
+    score, motivos = calcular_score(ip, valor)
+    status = definir_status(score)
 
-        salvar(order_id, ip, valor, status, motivos)
+    salvar(order_id, ip, valor, status, motivos)
 
-        return jsonify({
-            "order_id": order_id,
-            "score": score,
-            "status": status,
-            "motivos": motivos
-        })
+    return jsonify({
+        "order_id": order_id,
+        "score": score,
+        "status": status,
+        "motivos": motivos
+    })
 
-    except Exception as e:
-        print("❌ erro webhook:", e)
-        return jsonify({"error": "webhook failure"}), 500
 
-# ---------------- PAINEL SPA ----------------
+# ---------------- PAINEL ----------------
 @app.route("/painel")
 def painel():
-    return render_template("painel.html")
+    if not login_required():
+        return redirect("/login")
 
-# ---------------- DASHBOARD API ----------------
+    return render_template("painel.html", usuario=session.get("nome"))
+
+
+# ---------------- DASHBOARD ----------------
 @app.route("/dashboard")
 def dashboard():
-    conn = get_conn()
-    if not conn:
-        return jsonify([])
+    if not login_required():
+        return jsonify({"error": "unauthorized"}), 401
 
+    conn = get_conn()
     cur = conn.cursor()
 
-    try:
-        cur.execute("""
-            SELECT id, order_id, ip, valor, status, motivo, created_at
-            FROM pedidos
-            ORDER BY id DESC
-        """)
-        rows = cur.fetchall()
+    cur.execute("""
+        SELECT id, order_id, ip, valor, status, motivo, created_at
+        FROM pedidos
+        ORDER BY id DESC
+    """)
 
-    except Exception as e:
-        print("❌ erro SELECT:", e)
-        rows = []
+    rows = cur.fetchall()
 
-    finally:
-        cur.close()
-        conn.close()
-
-    resultado = []
-    for r in rows:
-        resultado.append({
-            "id": r[0],
-            "order_id": r[1],
-            "ip": r[2],
-            "valor": float(r[3]) if r[3] else 0,
-            "status": r[4],
-            "motivos": r[5],
-            "created_at": str(r[6]) if len(r) > 6 and r[6] else ""
-        })
-
-    return jsonify(resultado)
-
-# ---------------- PEDIDOS ----------------
-@app.route("/pedidos")
-def pedidos():
-    return dashboard()
-
-# ---------------- FRAUDES ----------------
-@app.route("/fraudes")
-def fraudes():
-    conn = get_conn()
-    if not conn:
-        return jsonify([])
-
-    cur = conn.cursor()
-
-    try:
-        cur.execute("""
-            SELECT id, order_id, ip, valor, status, motivo, created_at
-            FROM pedidos
-            WHERE status = 'bloqueado'
-            ORDER BY id DESC
-        """)
-        rows = cur.fetchall()
-
-    except Exception as e:
-        print("❌ erro fraudes:", e)
-        rows = []
-
-    finally:
-        cur.close()
-        conn.close()
+    cur.close()
+    conn.close()
 
     return jsonify([
         {
             "id": r[0],
             "order_id": r[1],
             "ip": r[2],
-            "valor": float(r[3]) if r[3] else 0,
+            "valor": float(r[3]),
             "status": r[4],
             "motivos": r[5],
-            "created_at": str(r[6]) if len(r) > 6 and r[6] else ""
+            "created_at": str(r[6])
         }
         for r in rows
     ])
+
+
+# ---------------- FRAUDES ----------------
+@app.route("/fraudes")
+def fraudes():
+    if not login_required():
+        return jsonify({"error": "unauthorized"}), 401
+
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT id, order_id, ip, valor, status, motivo, created_at
+        FROM pedidos
+        WHERE status = 'bloqueado'
+        ORDER BY id DESC
+    """)
+
+    rows = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return jsonify([
+        {
+            "id": r[0],
+            "order_id": r[1],
+            "ip": r[2],
+            "valor": float(r[3]),
+            "status": r[4],
+            "motivos": r[5],
+            "created_at": str(r[6])
+        }
+        for r in rows
+    ])
+
 
 # ---------------- CONFIG ----------------
 @app.route("/config")
@@ -186,15 +227,18 @@ def config():
         "modo": "produção"
     })
 
-# ---------------- HEALTHCHECK ----------------
+
+# ---------------- STATUS ----------------
 @app.route("/status")
 def status():
     return "OK - Cozinet rodando"
+
 
 # ---------------- HOME ----------------
 @app.route("/")
 def home():
     return "Cozinet SaaS Antifraude Online 🚀"
+
 
 # ---------------- START ----------------
 if __name__ == "__main__":

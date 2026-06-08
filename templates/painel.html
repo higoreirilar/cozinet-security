@@ -3,140 +3,162 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cozinet SaaS Dashboard</title>
+<title>Cozinet SaaS Antifraude</title>
 
 <style>
-body {
-    margin: 0;
-    font-family: Arial;
-    background: #0a0a0a;
-    color: white;
-    display: flex;
+body{
+    margin:0;
+    font-family:Arial;
+    background:#0a0a0a;
+    color:white;
+    display:flex;
 }
 
 /* SIDEBAR */
-.sidebar {
-    width: 240px;
-    background: #111214;
-    height: 100vh;
-    padding: 18px;
-    border-right: 1px solid #222;
+.sidebar{
+    width:240px;
+    background:linear-gradient(180deg,#111214,#0c0c10);
+    height:100vh;
+    padding:18px;
+    border-right:1px solid #222;
 }
 
-.logo img {
-    width: 150px;
+.logo img{
+    width:140px;
 }
 
-.logo h2 {
-    font-size: 13px;
-    color: #ff6a00;
-    margin-top: 10px;
-    text-align: center;
+.logo h2{
+    font-size:13px;
+    color:#ff6a00;
+    text-align:center;
+    margin-top:10px;
 }
 
-/* MENU */
-.menu div {
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 6px;
-    color: #aaa;
+.menu div{
+    padding:10px;
+    margin-top:8px;
+    cursor:pointer;
+    border-radius:8px;
+    color:#aaa;
+    transition:0.2s;
 }
 
-.menu div:hover {
-    background: #1c1c1f;
-    color: #ff6a00;
+.menu div:hover{
+    background:#1c1c1f;
+    color:#ff6a00;
 }
 
 /* MAIN */
-.main {
-    flex: 1;
-    padding: 20px;
+.main{
+    flex:1;
+    padding:20px;
 }
 
-/* TOP */
-.topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
+/* TOPBAR */
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
 }
 
-.title {
-    font-size: 18px;
-    color: #ff6a00;
+.title{
+    font-size:18px;
+    color:#ff6a00;
 }
 
-/* ADMIN BOX (NOVO) */
-.admin-box {
-    background: #111214;
-    padding: 10px 14px;
-    border-radius: 10px;
-    border: 1px solid #ff6a00;
-    font-size: 13px;
+/* ADMIN BOX */
+.admin-box{
+    background:#111214;
+    padding:10px 14px;
+    border-radius:10px;
+    border:1px solid #ff6a00;
+    font-size:13px;
 }
 
-/* CARDS PREMIUM */
-.cards {
-    display: flex;
-    gap: 12px;
+.admin-box a{
+    display:inline-block;
+    margin-top:5px;
+    padding:5px 10px;
+    background:#ff3b3b;
+    color:white;
+    border-radius:6px;
+    text-decoration:none;
+    font-size:12px;
 }
 
-.card {
-    width: 180px;
-    padding: 12px;
-    border-radius: 12px;
-    color: white;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+/* CARDS */
+.cards{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
 }
 
-.card h3 {
-    margin: 0;
-    font-size: 18px;
+.card{
+    width:180px;
+    padding:14px;
+    border-radius:14px;
+    color:white;
+    box-shadow:0 6px 25px rgba(0,0,0,0.4);
+    transition:0.2s;
 }
 
-.card p {
-    margin: 5px 0 0;
-    font-size: 11px;
-    opacity: 0.8;
+.card:hover{
+    transform:translateY(-3px);
 }
 
-/* CORES */
-.green { background: linear-gradient(135deg, #16a34a, #22c55e); }
-.yellow { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
-.red { background: linear-gradient(135deg, #dc2626, #ef4444); }
+.card h3{
+    margin:0;
+    font-size:22px;
+}
+
+.card p{
+    font-size:11px;
+    opacity:0.8;
+}
+
+.green{background:linear-gradient(135deg,#16a34a,#22c55e);}
+.yellow{background:linear-gradient(135deg,#f59e0b,#fbbf24);}
+.red{background:linear-gradient(135deg,#dc2626,#ef4444);}
 
 /* TABELA */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-    background: #15161a;
-    border-radius: 10px;
-    overflow: hidden;
-    font-size: 13px;
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+    background:#15161a;
+    border-radius:12px;
+    overflow:hidden;
+    font-size:13px;
+    box-shadow:0 5px 25px rgba(0,0,0,0.4);
 }
 
-th {
-    background: #111214;
-    color: #ff6a00;
-    padding: 10px;
-    text-align: left;
+th{
+    background:#111214;
+    color:#ff6a00;
+    padding:10px;
+    text-align:left;
 }
 
-td {
-    padding: 10px;
-    border-bottom: 1px solid #222;
+td{
+    padding:10px;
+    border-bottom:1px solid #222;
 }
 
-tr:hover {
-    background: #1c1c1f;
+tr:hover{
+    background:#1c1c1f;
 }
 
 /* STATUS */
-.aprovado { color: #22c55e; font-weight: bold; }
-.analise { color: #fbbf24; font-weight: bold; }
-.bloqueado { color: #ef4444; font-weight: bold; }
+.aprovado{color:#22c55e;font-weight:bold;}
+.analise{color:#fbbf24;font-weight:bold;}
+.bloqueado{color:#ef4444;font-weight:bold;}
+
+/* SECTIONS */
+.section{display:none;}
+.active{display:block;}
 </style>
+
 </head>
 
 <body>
@@ -150,10 +172,10 @@ tr:hover {
     </div>
 
     <div class="menu">
-        <div>📊 Dashboard</div>
-        <div>🧾 Pedidos</div>
-        <div>🚨 Fraudes</div>
-        <div>⚙️ Configurações</div>
+        <div onclick="show('dashboard')">📊 Dashboard</div>
+        <div onclick="show('pedidos')">🧾 Pedidos</div>
+        <div onclick="show('fraudes')">🚨 Fraudes</div>
+        <div onclick="show('config')">⚙️ Configurações</div>
     </div>
 
 </div>
@@ -161,59 +183,89 @@ tr:hover {
 <!-- MAIN -->
 <div class="main">
 
+    <!-- TOP -->
     <div class="topbar">
 
         <div class="title">
-            Dashboard de Monitoramento
+            Dashboard SaaS Antifraude
         </div>
 
-        <!-- 👤 ADMIN LOGADO -->
         <div class="admin-box">
             👤 <b>{{ usuario }}</b><br>
-            <span style="color:#22c55e;">ADMIN LOGADO</span>
+            <span style="color:#22c55e;">ADMIN LOGADO</span><br>
+            <a href="/logout">Sair</a>
         </div>
 
     </div>
 
-    <!-- CARDS -->
-    <div class="cards">
+    <!-- DASHBOARD -->
+    <div id="dashboard" class="section active">
 
-        <div class="card green">
-            <h3 id="aprovados">0</h3>
-            <p>Pedidos aprovados sem risco identificado</p>
+        <div class="cards">
+
+            <div class="card green">
+                <h3 id="aprovados">0</h3>
+                <p>Pedidos aprovados</p>
+            </div>
+
+            <div class="card yellow">
+                <h3 id="analise">0</h3>
+                <p>Em análise</p>
+            </div>
+
+            <div class="card red">
+                <h3 id="bloqueados">0</h3>
+                <p>Bloqueados</p>
+            </div>
+
         </div>
 
-        <div class="card yellow">
-            <h3 id="analise">0</h3>
-            <p>Pedidos em análise de segurança</p>
-        </div>
-
-        <div class="card red">
-            <h3 id="bloqueados">0</h3>
-            <p>Transações bloqueadas por risco</p>
-        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Pedido</th>
+                    <th>IP</th>
+                    <th>Valor</th>
+                    <th>Status</th>
+                    <th>Motivos</th>
+                    <th>Data</th>
+                </tr>
+            </thead>
+            <tbody id="tabela"></tbody>
+        </table>
 
     </div>
 
-    <!-- TABELA -->
-    <table>
-        <tr>
-            <th>ID</th>
-            <th>Pedido</th>
-            <th>IP</th>
-            <th>Valor</th>
-            <th>Status</th>
-            <th>Motivos</th>
-            <th>Data</th>
-        </tr>
+    <!-- OUTRAS SEÇÕES -->
+    <div id="pedidos" class="section">
+        <h3>Pedidos</h3>
+        <div>Área de pedidos em breve...</div>
+    </div>
 
-        <tbody id="tabela"></tbody>
-    </table>
+    <div id="fraudes" class="section">
+        <h3>Fraudes</h3>
+        <div>Área de fraudes em breve...</div>
+    </div>
+
+    <div id="config" class="section">
+        <h3>Configurações</h3>
+        <div>Sistema Cozinet SaaS ativo</div>
+    </div>
 
 </div>
 
 <script>
+
+function show(id){
+    document.querySelectorAll('.section').forEach(s=>{
+        s.classList.remove('active');
+    });
+    document.getElementById(id).classList.add('active');
+}
+
 async function atualizar(){
+
     const res = await fetch("/dashboard");
     const dados = await res.json();
 
@@ -246,6 +298,7 @@ async function atualizar(){
 
 setInterval(atualizar,3000);
 atualizar();
+
 </script>
 
 </body>

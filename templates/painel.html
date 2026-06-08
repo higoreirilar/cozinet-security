@@ -3,65 +3,103 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Antifraude Painel</title>
+<title>Cozinet Antifraude</title>
 
 <style>
 body {
     margin: 0;
-    font-family: Arial;
-    background: #0b0b0f;
-    color: white;
-}
-
-/* HEADER MELHORADO */
-header {
+    font-family: Arial, sans-serif;
+    background: #0a0a0a; /* preto profundo */
+    color: #fff;
     display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 18px;
-    background: #111117;
-    border-bottom: 1px solid #ff6a00;
 }
 
-header img {
-    width: 70px; /* 🔥 AUMENTADO */
-    height: auto;
+/* SIDEBAR */
+.sidebar {
+    width: 240px;
+    background: #111214; /* cinza escuro */
+    height: 100vh;
+    padding: 18px;
+    border-right: 1px solid #222;
 }
 
-header h1 {
-    font-size: 18px;
-    margin: 0;
+/* LOGO */
+.logo {
+    text-align: center;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #222;
+}
+
+.logo img {
+    width: 110px; /* emblema maior */
+}
+
+.logo h2 {
+    font-size: 14px;
+    margin-top: 8px;
+    color: #ff6a00;
+    letter-spacing: 1px;
+}
+
+/* MENU */
+.menu {
+    margin-top: 20px;
+    font-size: 13px;
+    color: #aaa;
+}
+
+.menu div {
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.menu div:hover {
+    background: #1c1c1f;
     color: #ff6a00;
 }
 
-/* MINI PAINEL STATUS (MAIOR E MAIS LEGÍVEL) */
+/* MAIN */
+.main {
+    flex: 1;
+    padding: 20px;
+}
+
+/* HEADER */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.header h1 {
+    font-size: 16px;
+    color: #ff6a00;
+}
+
+/* STATS */
 .stats {
-    position: absolute;
-    top: 12px;
-    right: 12px;
     display: flex;
     gap: 10px;
 }
 
-.box {
-    background: #15151c;
-    padding: 10px 14px;  /* 🔥 AUMENTADO */
+.card {
+    background: #15161a;
+    padding: 10px 14px;
     border-radius: 10px;
-    border: 1px solid #2a2a2a;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    min-width: 90px;
-    justify-content: center;
+    border: 1px solid #222;
+    font-size: 12px;
+    min-width: 110px;
 }
 
-/* BOLINHAS MAIORES */
+/* BOLINHAS */
 .dot {
-    width: 10px;
-    height: 10px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
     display: inline-block;
+    margin-right: 6px;
 }
 
 .green { background: #2cff7a; }
@@ -69,24 +107,21 @@ header h1 {
 .red { background: #ff3b3b; }
 
 /* TABELA */
-.container {
-    padding: 15px;
-}
-
 table {
     width: 100%;
     border-collapse: collapse;
-    background: #15151c;
+    margin-top: 15px;
+    background: #15161a;
     border-radius: 10px;
     overflow: hidden;
     font-size: 13px;
 }
 
 th {
-    background: #111117;
+    background: #111214;
     color: #ff6a00;
-    padding: 10px;
     text-align: left;
+    padding: 10px;
 }
 
 td {
@@ -95,70 +130,63 @@ td {
 }
 
 tr:hover {
-    background: #1c1c25;
+    background: #1c1c1f;
 }
 
 /* STATUS */
 .aprovado { color: #2cff7a; font-weight: bold; }
 .analise { color: #ffb100; font-weight: bold; }
 .bloqueado { color: #ff3b3b; font-weight: bold; }
-
-/* INFO BAR SIMPLES (NOVO EXTRA LEVE) */
-.info {
-    padding: 10px 15px;
-    font-size: 12px;
-    color: #aaa;
-}
 </style>
 </head>
 
 <body>
 
-<header>
-    <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
-    <h1>PAINEL ANTIFRAUDE</h1>
-</header>
+<!-- SIDEBAR -->
+<div class="sidebar">
 
-<!-- STATUS MAIOR E MAIS VISÍVEL -->
-<div class="stats">
-
-    <div class="box">
-        <span class="dot green"></span>
-        <span id="aprovados">0</span>
+    <div class="logo">
+        <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
+        <h2>COZINET</h2>
     </div>
 
-    <div class="box">
-        <span class="dot yellow"></span>
-        <span id="analise">0</span>
-    </div>
-
-    <div class="box">
-        <span class="dot red"></span>
-        <span id="bloqueados">0</span>
+    <div class="menu">
+        <div>📊 Dashboard</div>
+        <div>🧾 Pedidos</div>
+        <div>🚨 Fraudes</div>
+        <div>⚙️ Configurações</div>
     </div>
 
 </div>
 
-<!-- INFO EXTRA (NADA EXTRAVAGANTE) -->
-<div class="info">
-    Monitoramento em tempo real • Atualização automática a cada 3s
-</div>
+<!-- MAIN -->
+<div class="main">
 
-<!-- TABELA -->
-<div class="container">
-<table>
-<tr>
-    <th>ID</th>
-    <th>Pedido</th>
-    <th>IP</th>
-    <th>Valor</th>
-    <th>Status</th>
-    <th>Motivos</th>
-    <th>Data</th>
-</tr>
+    <div class="header">
+        <h1>Painel Antifraude</h1>
 
-<tbody id="tabela"></tbody>
-</table>
+        <div class="stats">
+            <div class="card"><span class="dot green"></span> <span id="aprovados">0</span></div>
+            <div class="card"><span class="dot yellow"></span> <span id="analise">0</span></div>
+            <div class="card"><span class="dot red"></span> <span id="bloqueados">0</span></div>
+        </div>
+    </div>
+
+    <!-- TABELA -->
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Pedido</th>
+            <th>IP</th>
+            <th>Valor</th>
+            <th>Status</th>
+            <th>Motivos</th>
+            <th>Data / Hora</th>
+        </tr>
+
+        <tbody id="tabela"></tbody>
+    </table>
+
 </div>
 
 <script>
@@ -194,7 +222,7 @@ async function atualizar(){
     document.getElementById("bloqueados").innerText = c;
 }
 
-setInterval(atualizar,3000);
+setInterval(atualizar, 3000);
 atualizar();
 </script>
 

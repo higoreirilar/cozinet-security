@@ -8,22 +8,22 @@
 <style>
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background: #0a0a0a; /* preto profundo */
+    font-family: Arial;
+    background: #0a0a0a;
     color: #fff;
     display: flex;
 }
 
-/* SIDEBAR */
+/* SIDEBAR (igual SaaS referência) */
 .sidebar {
     width: 240px;
-    background: #111214; /* cinza escuro */
+    background: #111214;
     height: 100vh;
-    padding: 18px;
     border-right: 1px solid #222;
+    padding: 18px;
 }
 
-/* LOGO */
+/* LOGO GRANDE (ajuste que você pediu) */
 .logo {
     text-align: center;
     padding-bottom: 15px;
@@ -31,14 +31,13 @@ body {
 }
 
 .logo img {
-    width: 110px; /* emblema maior */
+    width: 150px; /* 🔥 AUMENTADO */
 }
 
 .logo h2 {
+    margin-top: 10px;
     font-size: 14px;
-    margin-top: 8px;
     color: #ff6a00;
-    letter-spacing: 1px;
 }
 
 /* MENU */
@@ -62,55 +61,55 @@ body {
 /* MAIN */
 .main {
     flex: 1;
-    padding: 20px;
+    padding: 18px;
 }
 
-/* HEADER */
-.header {
+/* TOP BAR (igual SaaS moderno) */
+.topbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
 }
 
-.header h1 {
+.title {
     font-size: 16px;
     color: #ff6a00;
 }
 
-/* STATS */
-.stats {
+/* CARDS (pequenos tipo SaaS real) */
+.cards {
     display: flex;
     gap: 10px;
 }
 
 .card {
     background: #15161a;
-    padding: 10px 14px;
+    padding: 8px 12px;
     border-radius: 10px;
     border: 1px solid #222;
     font-size: 12px;
     min-width: 110px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 /* BOLINHAS */
 .dot {
-    width: 9px;
-    height: 9px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    display: inline-block;
-    margin-right: 6px;
 }
 
 .green { background: #2cff7a; }
 .yellow { background: #ffb100; }
 .red { background: #ff3b3b; }
 
-/* TABELA */
+/* TABELA (clean igual SaaS) */
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 15px;
     background: #15161a;
     border-radius: 10px;
     overflow: hidden;
@@ -147,7 +146,7 @@ tr:hover {
 
     <div class="logo">
         <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
-        <h2>COZINET</h2>
+        <h2>COZINET ANTIFRAUDE</h2>
     </div>
 
     <div class="menu">
@@ -162,17 +161,32 @@ tr:hover {
 <!-- MAIN -->
 <div class="main">
 
-    <div class="header">
-        <h1>Painel Antifraude</h1>
+    <!-- TOP -->
+    <div class="topbar">
 
-        <div class="stats">
-            <div class="card"><span class="dot green"></span> <span id="aprovados">0</span></div>
-            <div class="card"><span class="dot yellow"></span> <span id="analise">0</span></div>
-            <div class="card"><span class="dot red"></span> <span id="bloqueados">0</span></div>
+        <div class="title">Painel de Monitoramento</div>
+
+        <div class="cards">
+
+            <div class="card">
+                <span class="dot green"></span>
+                <span id="aprovados">0</span>
+            </div>
+
+            <div class="card">
+                <span class="dot yellow"></span>
+                <span id="analise">0</span>
+            </div>
+
+            <div class="card">
+                <span class="dot red"></span>
+                <span id="bloqueados">0</span>
+            </div>
+
         </div>
     </div>
 
-    <!-- TABELA -->
+    <!-- TABLE -->
     <table>
         <tr>
             <th>ID</th>
@@ -181,7 +195,7 @@ tr:hover {
             <th>Valor</th>
             <th>Status</th>
             <th>Motivos</th>
-            <th>Data / Hora</th>
+            <th>Data</th>
         </tr>
 
         <tbody id="tabela"></tbody>
@@ -216,7 +230,6 @@ async function atualizar(){
     });
 
     document.getElementById("tabela").innerHTML = html;
-
     document.getElementById("aprovados").innerText = a;
     document.getElementById("analise").innerText = b;
     document.getElementById("bloqueados").innerText = c;

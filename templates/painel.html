@@ -3,77 +3,93 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Painel Antifraude</title>
+<title>Painel Antifraude Premium</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: Arial;
     background: #0b0b0f;
     color: white;
 }
 
 /* HEADER */
 header {
-    background: #111117;
     padding: 20px;
     text-align: center;
     border-bottom: 2px solid #ff6a00;
+    background: #111117;
 }
 
 header img {
     width: 140px;
-    margin-bottom: 10px;
 }
 
 header h1 {
-    margin: 0;
+    margin: 5px 0 0 0;
     color: #ff6a00;
-    font-size: 20px;
-    letter-spacing: 1px;
 }
 
 /* CARDS */
 .cards {
     display: flex;
-    gap: 15px;
     justify-content: center;
-    margin-top: 20px;
+    gap: 15px;
+    margin: 20px;
 }
 
 .card {
-    background: #15151c;
+    background: rgba(255,255,255,0.05);
     padding: 15px 25px;
     border-radius: 12px;
-    border: 1px solid #222;
+    border: 1px solid #333;
     text-align: center;
-    min-width: 120px;
+    min-width: 140px;
+    backdrop-filter: blur(8px);
 }
 
-.card h3 {
-    margin: 0;
-    font-size: 14px;
-}
+.card h3 { margin: 0; font-size: 14px; }
+.card p { font-size: 22px; margin: 5px 0; }
 
-.card p {
-    font-size: 22px;
-    margin: 5px 0 0 0;
-}
-
-/* CORES */
 .aprovado { color: #2cff7a; }
 .analise { color: #ffb100; }
 .bloqueado { color: #ff3b3b; }
 
-/* TABLE */
+/* TOAST */
+#toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #ff3b3b;
+    padding: 12px 18px;
+    border-radius: 8px;
+    display: none;
+}
+
+/* CONTAINER */
 .container {
     padding: 20px;
 }
 
+/* CONTROLES */
+.controls {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px;
+}
+
+input, select {
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+}
+
+/* TABLE */
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 25px;
     background: #15151c;
     border-radius: 10px;
     overflow: hidden;
@@ -83,7 +99,6 @@ th {
     background: #111117;
     color: #ff6a00;
     padding: 12px;
-    text-align: left;
 }
 
 td {
@@ -94,16 +109,6 @@ td {
 tr:hover {
     background: #1c1c25;
 }
-
-/* BADGE */
-.badge {
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 11px;
-    background: #ff6a00;
-    color: black;
-    font-weight: bold;
-}
 </style>
 </head>
 
@@ -111,81 +116,123 @@ tr:hover {
 
 <header>
     <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
-    <h1></h1>
+    <h1>PAINEL ANTIFRAUDE</h1>
 </header>
 
 <!-- CARDS -->
 <div class="cards">
-
-    <div class="card">
-        <h3 style="color:#2cff7a;">Aprovados</h3>
-        <p id="aprovados">0</p>
-    </div>
-
-    <div class="card">
-        <h3 style="color:#ffb100;">Análise</h3>
-        <p id="analise">0</p>
-    </div>
-
-    <div class="card">
-        <h3 style="color:#ff3b3b;">Bloqueados</h3>
-        <p id="bloqueados">0</p>
-    </div>
-
+    <div class="card"><h3>Aprovados</h3><p id="aprovados">0</p></div>
+    <div class="card"><h3>Análise</h3><p id="analise">0</p></div>
+    <div class="card"><h3>Bloqueados</h3><p id="bloqueados">0</p></div>
 </div>
 
-<!-- TABELA -->
+<!-- CONTROLES -->
+<div class="controls">
+    <input id="busca" placeholder="Buscar pedido...">
+    <select id="filtro">
+        <option value="todos">Todos</option>
+        <option value="aprovado">Aprovado</option>
+        <option value="analise">Análise</option>
+        <option value="bloqueado">Bloqueado</option>
+    </select>
+</div>
+
+<!-- CHART -->
 <div class="container">
-
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Pedido</th>
-        <th>IP</th>
-        <th>Valor</th>
-        <th>Status</th>
-        <th>Motivos</th>
-        <th>Data / Hora</th>
-    </tr>
-
-    {% for r in dados %}
-    <tr>
-        <td>{{ r[0] }}</td>
-        <td>{{ r[1] }}</td>
-        <td>{{ r[2] }}</td>
-        <td>R$ {{ r[3] }}</td>
-        <td class="{{ r[4] }}">{{ r[4] }}</td>
-        <td>{{ r[5] }}</td>
-        <td>{{ r[6] }}</td>
-    </tr>
-    {% endfor %}
-
-</table>
-
+<canvas id="grafico"></canvas>
 </div>
 
-<!-- SCRIPT CONTADOR -->
+<!-- TABLE -->
+<div class="container">
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Pedido</th>
+<th>IP</th>
+<th>Valor</th>
+<th>Status</th>
+<th>Motivos</th>
+<th>Data</th>
+</tr>
+</thead>
+
+<tbody id="tabela"></tbody>
+</table>
+</div>
+
+<div id="toast">🚨 Pedido bloqueado detectado!</div>
+
+<audio id="alerta">
+    <source src="https://www.soundjay.com/buttons/sounds/beep-07.mp3">
+</audio>
+
 <script>
-async function atualizar() {
+let chart;
+
+function toast(msg){
+    const t = document.getElementById("toast");
+    t.innerText = msg;
+    t.style.display = "block";
+    setTimeout(()=>t.style.display="none",3000);
+}
+
+async function atualizar(){
     const res = await fetch("/dashboard");
     const dados = await res.json();
 
-    let aprovados = 0;
-    let analise = 0;
-    let bloqueados = 0;
+    let a=0, b=0, c=0;
 
-    dados.forEach(item => {
-        if (item.status === "aprovado") aprovados++;
-        else if (item.status === "analise") analise++;
-        else if (item.status === "bloqueado") bloqueados++;
+    let html = "";
+
+    dados.forEach(d => {
+
+        if(d.status === "aprovado") a++;
+        if(d.status === "analise") b++;
+        if(d.status === "bloqueado") c++;
+
+        if(d.status === "bloqueado"){
+            document.getElementById("alerta").play();
+            toast("🚨 BLOQUEIO: " + d.order_id);
+        }
+
+        html += `
+        <tr>
+            <td>${d.id}</td>
+            <td>${d.order_id}</td>
+            <td>${d.ip}</td>
+            <td>R$ ${d.valor}</td>
+            <td class="${d.status}">${d.status}</td>
+            <td>${d.motivos}</td>
+            <td>${d.created_at}</td>
+        </tr>`;
     });
 
-    document.getElementById("aprovados").innerText = aprovados;
-    document.getElementById("analise").innerText = analise;
-    document.getElementById("bloqueados").innerText = bloqueados;
+    document.getElementById("tabela").innerHTML = html;
+
+    document.getElementById("aprovados").innerText = a;
+    document.getElementById("analise").innerText = b;
+    document.getElementById("bloqueados").innerText = c;
+
+    // gráfico
+    if(!chart){
+        chart = new Chart(document.getElementById("grafico"), {
+            type: 'doughnut',
+            data: {
+                labels: ['Aprovados','Análise','Bloqueados'],
+                datasets: [{
+                    data: [a,b,c],
+                    backgroundColor: ['#2cff7a','#ffb100','#ff3b3b']
+                }]
+            }
+        });
+    } else {
+        chart.data.datasets[0].data = [a,b,c];
+        chart.update();
+    }
 }
 
-setInterval(atualizar, 3000);
+setInterval(atualizar,3000);
 atualizar();
 </script>
 

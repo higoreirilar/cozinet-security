@@ -3,221 +3,181 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Painel Antifraude</title>
 
 <style>
-:root {
-    --bg: #0b0b0f;
-    --card: #15151c;
-    --card2: #111117;
-    --orange: #ff6a00;
-    --green: #2cff7a;
-    --yellow: #ffb100;
-    --red: #ff3b3b;
-}
-
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: var(--bg);
+    background: #0b0b0f;
     color: white;
 }
 
-/* HEADER PREMIUM */
+/* HEADER */
 header {
-    background: linear-gradient(90deg, #0b0b0f, #15151c);
+    background: #111117;
+    padding: 20px;
     text-align: center;
-    padding: 25px;
-    border-bottom: 2px solid var(--orange);
+    border-bottom: 2px solid #ff6a00;
 }
 
 header img {
-    width: 260px;
-    filter: drop-shadow(0 6px 10px rgba(0,0,0,0.6));
+    width: 140px;
+    margin-bottom: 10px;
 }
 
 header h1 {
-    margin: 10px 0 0 0;
-    font-size: 22px;
-    color: var(--orange);
-    letter-spacing: 2px;
+    margin: 0;
+    color: #ff6a00;
+    font-size: 20px;
+    letter-spacing: 1px;
 }
 
-/* CONTAINER */
-.container {
-    padding: 20px;
-}
-
-/* CARDS MODERNOS */
+/* CARDS */
 .cards {
     display: flex;
     gap: 15px;
     justify-content: center;
-    flex-wrap: wrap;
     margin-top: 20px;
 }
 
 .card {
-    background: var(--card);
-    padding: 18px 25px;
+    background: #15151c;
+    padding: 15px 25px;
     border-radius: 12px;
-    min-width: 160px;
+    border: 1px solid #222;
     text-align: center;
-    box-shadow: 0 0 10px rgba(0,0,0,0.3);
-    transition: 0.3s;
-}
-
-.card:hover {
-    transform: scale(1.05);
+    min-width: 120px;
 }
 
 .card h3 {
     margin: 0;
     font-size: 14px;
-    opacity: 0.8;
 }
 
 .card p {
     font-size: 22px;
-    margin: 8px 0 0 0;
+    margin: 5px 0 0 0;
 }
 
-/* CORES STATUS */
-.aprovado { color: var(--green); }
-.analise { color: var(--yellow); }
-.bloqueado { color: var(--red); }
+/* CORES */
+.aprovado { color: #2cff7a; }
+.analise { color: #ffb100; }
+.bloqueado { color: #ff3b3b; }
 
-/* TABELA PREMIUM */
+/* TABLE */
+.container {
+    padding: 20px;
+}
+
 table {
     width: 100%;
-    margin-top: 25px;
     border-collapse: collapse;
-    background: var(--card);
+    margin-top: 25px;
+    background: #15151c;
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 0 10px rgba(0,0,0,0.3);
 }
 
 th {
-    background: var(--card2);
-    color: var(--orange);
+    background: #111117;
+    color: #ff6a00;
     padding: 12px;
     text-align: left;
-    font-size: 13px;
-    letter-spacing: 1px;
 }
 
 td {
     padding: 12px;
     border-bottom: 1px solid #222;
-    font-size: 13px;
 }
 
 tr:hover {
     background: #1c1c25;
 }
 
-/* RESPONSIVO */
-@media (max-width: 768px) {
-    .cards {
-        flex-direction: column;
-        align-items: center;
-    }
+/* BADGE */
+.badge {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    background: #ff6a00;
+    color: black;
+    font-weight: bold;
 }
 </style>
-
 </head>
 
 <body>
 
 <header>
     <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
-    <h1>PAINEL ANTIFRAUDE</h1>
+    <h1></h1>
 </header>
-
-<div class="container">
 
 <!-- CARDS -->
 <div class="cards">
 
     <div class="card">
-        <h3>Aprovados</h3>
-        <p id="aprovados" class="aprovado">0</p>
+        <h3 style="color:#2cff7a;">Aprovados</h3>
+        <p id="aprovados">0</p>
     </div>
 
     <div class="card">
-        <h3>Análise</h3>
-        <p id="analise" class="analise">0</p>
+        <h3 style="color:#ffb100;">Análise</h3>
+        <p id="analise">0</p>
     </div>
 
     <div class="card">
-        <h3>Bloqueados</h3>
-        <p id="bloqueados" class="bloqueado">0</p>
+        <h3 style="color:#ff3b3b;">Bloqueados</h3>
+        <p id="bloqueados">0</p>
     </div>
 
 </div>
 
 <!-- TABELA -->
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Pedido</th>
-            <th>IP</th>
-            <th>Valor</th>
-            <th>Status</th>
-            <th>Motivos</th>
-        </tr>
-    </thead>
+<div class="container">
 
-    <tbody id="tabela"></tbody>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Pedido</th>
+        <th>IP</th>
+        <th>Valor</th>
+        <th>Status</th>
+        <th>Motivos</th>
+        <th>Data / Hora</th>
+    </tr>
+
+    {% for r in dados %}
+    <tr>
+        <td>{{ r[0] }}</td>
+        <td>{{ r[1] }}</td>
+        <td>{{ r[2] }}</td>
+        <td>R$ {{ r[3] }}</td>
+        <td class="{{ r[4] }}">{{ r[4] }}</td>
+        <td>{{ r[5] }}</td>
+        <td>{{ r[6] }}</td>
+    </tr>
+    {% endfor %}
+
 </table>
 
 </div>
 
-<!-- JS (mantém seu sistema funcionando) -->
+<!-- SCRIPT CONTADOR -->
 <script>
 async function atualizar() {
     const res = await fetch("/dashboard");
     const dados = await res.json();
 
-    const tbody = document.getElementById("tabela");
-
     let aprovados = 0;
     let analise = 0;
     let bloqueados = 0;
 
-    tbody.innerHTML = "";
-
-    if (!dados || dados.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="6" style="text-align:center;color:#888;">
-                    Nenhum dado encontrado
-                </td>
-            </tr>`;
-        return;
-    }
-
     dados.forEach(item => {
-
-        let status = (item.status || "").toLowerCase();
-
-        if (status === "aprovado") aprovados++;
-        else if (status === "analise") analise++;
-        else if (status === "bloqueado") bloqueados++;
-
-        tbody.innerHTML += `
-            <tr>
-                <td>${item.id ?? ""}</td>
-                <td>${item.order_id ?? ""}</td>
-                <td>${item.ip ?? ""}</td>
-                <td>R$ ${item.valor ?? 0}</td>
-                <td class="${status}">${status}</td>
-                <td>${item.motivos ?? ""}</td>
-            </tr>
-        `;
+        if (item.status === "aprovado") aprovados++;
+        else if (item.status === "analise") analise++;
+        else if (item.status === "bloqueado") bloqueados++;
     });
 
     document.getElementById("aprovados").innerText = aprovados;

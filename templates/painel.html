@@ -2,55 +2,35 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cozinet Antifraude</title>
+<title>Cozinet SaaS</title>
 
 <style>
 body {
     margin: 0;
     font-family: Arial;
     background: #0a0a0a;
-    color: #fff;
+    color: white;
     display: flex;
 }
 
-/* SIDEBAR (igual SaaS referência) */
+/* SIDEBAR */
 .sidebar {
     width: 240px;
     background: #111214;
     height: 100vh;
-    border-right: 1px solid #222;
     padding: 18px;
-}
-
-/* LOGO GRANDE (ajuste que você pediu) */
-.logo {
-    text-align: center;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #222;
+    border-right: 1px solid #222;
 }
 
 .logo img {
-    width: 150px; /* 🔥 AUMENTADO */
-}
-
-.logo h2 {
-    margin-top: 10px;
-    font-size: 14px;
-    color: #ff6a00;
-}
-
-/* MENU */
-.menu {
-    margin-top: 20px;
-    font-size: 13px;
-    color: #aaa;
+    width: 140px;
 }
 
 .menu div {
     padding: 10px;
-    border-radius: 8px;
     cursor: pointer;
+    border-radius: 6px;
+    color: #aaa;
 }
 
 .menu div:hover {
@@ -64,56 +44,35 @@ body {
     padding: 18px;
 }
 
-/* TOP BAR (igual SaaS moderno) */
-.topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
+/* VIEWS */
+.view {
+    display: none;
 }
 
-.title {
-    font-size: 16px;
+.active {
+    display: block;
+}
+
+/* CARDS */
+.card {
+    background: #15161a;
+    padding: 10px;
+    border-radius: 8px;
+    display: inline-block;
+    margin-right: 10px;
+    border: 1px solid #222;
+}
+
+h2 {
     color: #ff6a00;
 }
 
-/* CARDS (pequenos tipo SaaS real) */
-.cards {
-    display: flex;
-    gap: 10px;
-}
-
-.card {
-    background: #15161a;
-    padding: 8px 12px;
-    border-radius: 10px;
-    border: 1px solid #222;
-    font-size: 12px;
-    min-width: 110px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-/* BOLINHAS */
-.dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-}
-
-.green { background: #2cff7a; }
-.yellow { background: #ffb100; }
-.red { background: #ff3b3b; }
-
-/* TABELA (clean igual SaaS) */
+/* TABELA */
 table {
     width: 100%;
     border-collapse: collapse;
     background: #15161a;
-    border-radius: 10px;
-    overflow: hidden;
-    font-size: 13px;
+    margin-top: 10px;
 }
 
 th {
@@ -127,15 +86,6 @@ td {
     padding: 10px;
     border-bottom: 1px solid #222;
 }
-
-tr:hover {
-    background: #1c1c1f;
-}
-
-/* STATUS */
-.aprovado { color: #2cff7a; font-weight: bold; }
-.analise { color: #ffb100; font-weight: bold; }
-.bloqueado { color: #ff3b3b; font-weight: bold; }
 </style>
 </head>
 
@@ -146,14 +96,13 @@ tr:hover {
 
     <div class="logo">
         <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
-        <h2>COZINET ANTIFRAUDE</h2>
     </div>
 
     <div class="menu">
-        <div>📊 Dashboard</div>
-        <div>🧾 Pedidos</div>
-        <div>🚨 Fraudes</div>
-        <div>⚙️ Configurações</div>
+        <div onclick="show('dashboard')">📊 Dashboard</div>
+        <div onclick="show('pedidos')">🧾 Pedidos</div>
+        <div onclick="show('fraudes')">🚨 Fraudes</div>
+        <div onclick="show('config')">⚙ Configurações</div>
     </div>
 
 </div>
@@ -161,82 +110,101 @@ tr:hover {
 <!-- MAIN -->
 <div class="main">
 
-    <!-- TOP -->
-    <div class="topbar">
+    <!-- DASHBOARD -->
+    <div id="dashboard" class="view active">
+        <h2>Dashboard</h2>
 
-        <div class="title">Painel de Monitoramento</div>
+        <div class="card">Aprovados: <span id="a">0</span></div>
+        <div class="card">Análise: <span id="b">0</span></div>
+        <div class="card">Bloqueados: <span id="c">0</span></div>
 
-        <div class="cards">
-
-            <div class="card">
-                <span class="dot green"></span>
-                <span id="aprovados">0</span>
-            </div>
-
-            <div class="card">
-                <span class="dot yellow"></span>
-                <span id="analise">0</span>
-            </div>
-
-            <div class="card">
-                <span class="dot red"></span>
-                <span id="bloqueados">0</span>
-            </div>
-
-        </div>
+        <p>Visão geral do sistema antifraude.</p>
     </div>
 
-    <!-- TABLE -->
-    <table>
-        <tr>
-            <th>ID</th>
-            <th>Pedido</th>
-            <th>IP</th>
-            <th>Valor</th>
-            <th>Status</th>
-            <th>Motivos</th>
-            <th>Data</th>
-        </tr>
+    <!-- PEDIDOS -->
+    <div id="pedidos" class="view">
+        <h2>Pedidos</h2>
+        <table id="tablePedidos"></table>
+    </div>
 
-        <tbody id="tabela"></tbody>
-    </table>
+    <!-- FRAUDES -->
+    <div id="fraudes" class="view">
+        <h2>Fraudes</h2>
+        <table id="tableFraudes"></table>
+    </div>
+
+    <!-- CONFIG -->
+    <div id="config" class="view">
+        <h2>Configurações</h2>
+        <p>Sistema ativo ✔</p>
+    </div>
 
 </div>
 
 <script>
-async function atualizar(){
+
+let dados = [];
+
+function show(id){
+    document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+
+    if(id === "pedidos") carregarPedidos();
+    if(id === "fraudes") carregarFraudes();
+}
+
+async function load(){
     const res = await fetch("/dashboard");
-    const dados = await res.json();
+    dados = await res.json();
 
     let a=0,b=0,c=0;
-    let html="";
 
-    dados.forEach(d => {
+    dados.forEach(d=>{
+        if(d.status==="aprovado") a++;
+        if(d.status==="analise") b++;
+        if(d.status==="bloqueado") c++;
+    });
 
-        if(d.status === "aprovado") a++;
-        if(d.status === "analise") b++;
-        if(d.status === "bloqueado") c++;
+    document.getElementById("a").innerText=a;
+    document.getElementById("b").innerText=b;
+    document.getElementById("c").innerText=c;
+}
 
+function carregarPedidos(){
+    let html = `
+    <tr><th>ID</th><th>Pedido</th><th>Status</th></tr>`;
+
+    dados.forEach(d=>{
         html += `
         <tr>
             <td>${d.id}</td>
             <td>${d.order_id}</td>
-            <td>${d.ip}</td>
-            <td>R$ ${d.valor}</td>
-            <td class="${d.status}">${d.status}</td>
-            <td>${d.motivos}</td>
-            <td>${d.created_at}</td>
+            <td>${d.status}</td>
         </tr>`;
     });
 
-    document.getElementById("tabela").innerHTML = html;
-    document.getElementById("aprovados").innerText = a;
-    document.getElementById("analise").innerText = b;
-    document.getElementById("bloqueados").innerText = c;
+    document.getElementById("tablePedidos").innerHTML = html;
 }
 
-setInterval(atualizar, 3000);
-atualizar();
+function carregarFraudes(){
+    let html = `
+    <tr><th>ID</th><th>Pedido</th><th>Motivo</th></tr>`;
+
+    dados.filter(d=>d.status==="bloqueado").forEach(d=>{
+        html += `
+        <tr>
+            <td>${d.id}</td>
+            <td>${d.order_id}</td>
+            <td>${d.motivos}</td>
+        </tr>`;
+    });
+
+    document.getElementById("tableFraudes").innerHTML = html;
+}
+
+setInterval(load,3000);
+load();
+
 </script>
 
 </body>

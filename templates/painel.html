@@ -242,7 +242,12 @@ async function atualizar(){
     document.getElementById("bloqueados").innerText = c;
 }
 
-setInterval(atualizar,3000);
+async function loop(){
+    await atualizar();
+    setTimeout(loop, 3000);
+}
+
+loop();
 atualizar();
 
 </script>

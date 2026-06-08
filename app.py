@@ -60,7 +60,30 @@ def webhook():
 
 @app.route("/dashboard")
 def dashboard():
-   @app.route("/painel")
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute("SELECT * FROM pedidos ORDER BY id DESC")
+    rows = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    resultado = []
+    for r in rows:
+        resultado.append({
+            "id": r[0],
+            "order_id": r[1],
+            "ip": r[2],
+            "valor": r[3],
+            "status": r[4],
+            "motivos": r[5]
+        })
+
+    return jsonify(resultado)
+
+
+@app.route("/painel")
 def painel():
     conn = get_conn()
     cur = conn.cursor()

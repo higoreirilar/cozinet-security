@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Painel Antifraude Premium</title>
+<title>Painel Antifraude</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -15,75 +15,50 @@ body {
     color: white;
 }
 
-/* HEADER */
+/* HEADER PEQUENO */
 header {
-    padding: 20px;
-    text-align: center;
-    border-bottom: 2px solid #ff6a00;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
     background: #111117;
+    border-bottom: 1px solid #ff6a00;
 }
 
 header img {
-    width: 140px;
+    width: 40px;
 }
 
 header h1 {
-    margin: 5px 0 0 0;
+    font-size: 14px;
     color: #ff6a00;
+    margin: 0;
 }
 
-/* CARDS */
-.cards {
+/* MINI STATS (CANTO) */
+.stats {
+    position: absolute;
+    top: 10px;
+    right: 10px;
     display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin: 20px;
+    gap: 8px;
 }
 
-.card {
-    background: rgba(255,255,255,0.05);
-    padding: 15px 25px;
-    border-radius: 12px;
+.box {
+    background: #15151c;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 12px;
     border: 1px solid #333;
-    text-align: center;
-    min-width: 140px;
-    backdrop-filter: blur(8px);
 }
-
-.card h3 { margin: 0; font-size: 14px; }
-.card p { font-size: 22px; margin: 5px 0; }
 
 .aprovado { color: #2cff7a; }
 .analise { color: #ffb100; }
 .bloqueado { color: #ff3b3b; }
 
-/* TOAST */
-#toast {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #ff3b3b;
-    padding: 12px 18px;
-    border-radius: 8px;
-    display: none;
-}
-
 /* CONTAINER */
 .container {
-    padding: 20px;
-}
-
-/* CONTROLES */
-.controls {
-    display: flex;
-    justify-content: space-between;
-    margin: 20px;
-}
-
-input, select {
-    padding: 8px;
-    border-radius: 6px;
-    border: none;
+    padding: 15px;
 }
 
 /* TABLE */
@@ -91,23 +66,37 @@ table {
     width: 100%;
     border-collapse: collapse;
     background: #15151c;
-    border-radius: 10px;
+    border-radius: 8px;
     overflow: hidden;
+    font-size: 13px;
 }
 
 th {
     background: #111117;
     color: #ff6a00;
-    padding: 12px;
+    padding: 8px;
+    text-align: left;
 }
 
 td {
-    padding: 12px;
+    padding: 8px;
     border-bottom: 1px solid #222;
 }
 
 tr:hover {
     background: #1c1c25;
+}
+
+/* TOAST */
+#toast {
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    background: #ff3b3b;
+    padding: 10px;
+    border-radius: 6px;
+    display: none;
+    font-size: 12px;
 }
 </style>
 </head>
@@ -116,85 +105,55 @@ tr:hover {
 
 <header>
     <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
-    <h1>PAINEL ANTIFRAUDE</h1>
+    <h1>ANTIFRAUDE</h1>
 </header>
 
-<!-- CARDS -->
-<div class="cards">
-    <div class="card"><h3>Aprovados</h3><p id="aprovados">0</p></div>
-    <div class="card"><h3>Análise</h3><p id="analise">0</p></div>
-    <div class="card"><h3>Bloqueados</h3><p id="bloqueados">0</p></div>
+<!-- MINI ESTATÍSTICAS NO CANTO -->
+<div class="stats">
+    <div class="box">🟢 <span id="aprovados">0</span></div>
+    <div class="box">🟡 <span id="analise">0</span></div>
+    <div class="box">🔴 <span id="bloqueados">0</span></div>
 </div>
 
-<!-- CONTROLES -->
-<div class="controls">
-    <input id="busca" placeholder="Buscar pedido...">
-    <select id="filtro">
-        <option value="todos">Todos</option>
-        <option value="aprovado">Aprovado</option>
-        <option value="analise">Análise</option>
-        <option value="bloqueado">Bloqueado</option>
-    </select>
-</div>
-
-<!-- CHART -->
-<div class="container">
-<canvas id="grafico"></canvas>
-</div>
-
-<!-- TABLE -->
+<!-- TABELA -->
 <div class="container">
 <table>
-<thead>
 <tr>
 <th>ID</th>
 <th>Pedido</th>
 <th>IP</th>
 <th>Valor</th>
 <th>Status</th>
-<th>Motivos</th>
+<th>Motivo</th>
 <th>Data</th>
 </tr>
-</thead>
 
 <tbody id="tabela"></tbody>
 </table>
 </div>
 
-<div id="toast">🚨 Pedido bloqueado detectado!</div>
-
-<audio id="alerta">
-    <source src="https://www.soundjay.com/buttons/sounds/beep-07.mp3">
-</audio>
+<div id="toast"></div>
 
 <script>
-let chart;
-
 function toast(msg){
     const t = document.getElementById("toast");
     t.innerText = msg;
     t.style.display = "block";
-    setTimeout(()=>t.style.display="none",3000);
+    setTimeout(()=>t.style.display="none",2500);
 }
 
 async function atualizar(){
     const res = await fetch("/dashboard");
     const dados = await res.json();
 
-    let a=0, b=0, c=0;
-
-    let html = "";
+    let a=0,b=0,c=0;
+    let html="";
 
     dados.forEach(d => {
 
         if(d.status === "aprovado") a++;
         if(d.status === "analise") b++;
         if(d.status === "bloqueado") c++;
-
-        if(d.status === "bloqueado"){
-            document.getElementById("alerta").play();
-            toast("🚨 BLOQUEIO: " + d.order_id);
-        }
 
         html += `
         <tr>
@@ -214,21 +173,8 @@ async function atualizar(){
     document.getElementById("analise").innerText = b;
     document.getElementById("bloqueados").innerText = c;
 
-    // gráfico
-    if(!chart){
-        chart = new Chart(document.getElementById("grafico"), {
-            type: 'doughnut',
-            data: {
-                labels: ['Aprovados','Análise','Bloqueados'],
-                datasets: [{
-                    data: [a,b,c],
-                    backgroundColor: ['#2cff7a','#ffb100','#ff3b3b']
-                }]
-            }
-        });
-    } else {
-        chart.data.datasets[0].data = [a,b,c];
-        chart.update();
+    if(c > 0){
+        toast("🚨 Pedido bloqueado detectado!");
     }
 }
 

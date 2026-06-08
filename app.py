@@ -60,7 +60,18 @@ def webhook():
 
 @app.route("/dashboard")
 def dashboard():
-    @app.route("/painel")
+   @app.route("/painel")
+def painel():
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute("SELECT * FROM pedidos ORDER BY id DESC")
+    rows = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return render_template("painel.html", dados=rows)
 def painel():
     conn = get_conn()
     cur = conn.cursor()

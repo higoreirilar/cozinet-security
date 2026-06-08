@@ -170,67 +170,39 @@
 </audio>
 
 <script>
-let grafico;
-
-let ultimoTamanho = 0;
-
 async function atualizar() {
-    const res = await fetch("/dashboard");
-    const dados = await res.json();
+    try {
+        const res = await fetch("/dashboard");
+        const dados = await res.json();
 
-    let aprovados = 0;
-    let analise = 0;
-    let bloqueados = 0;
+        const tbody = document.getElementById("tabela");
+        tbody.innerHTML = "";
 
-    const tbody = document.getElementById("tabela");
-    tbody.innerHTML = "";
+        if (!dados || dados.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align:center; color:#888;">
+                        Nenhum pedido encontrado
+                    </td>
+                </tr>`;
+            return;
+        }
 
-    dados.forEach(item => {
-
-        if (item.status === "aprovado") aprovados++;
-        else if (item.status === "analise") analise++;
-        else if (item.status === "bloqueado") bloqueados++;
-
-        tbody.innerHTML += `
-        <tr>
-            <td>${item.id}</td>
-            <td>${item.order_id}</td>
-            <td>${item.ip}</td>
-            <td>R$ ${item.valor}</td>
-            <td class="${item.status}">${item.status}</td>
-            <td>${item.motivos}</td>
-        </tr>`;
-    });
-
-    document.getElementById("aprovados").innerText = aprovados;
-    document.getElementById("analise").innerText = analise;
-    document.getElementById("bloqueados").innerText = bloqueados;
-
-    atualizarGrafico(aprovados, analise, bloqueados);
-
-    // 🔊 SÓ TOCA SE APARECER NOVO BLOQUEADO
-    if (bloqueados > ultimoTamanho) {
-        document.getElementById("alerta").play();
-    }
-
-    ultimoTamanho = bloqueados;
-}
-
-function atualizarGrafico(a, b, c) {
-    if (!grafico) {
-        grafico = new Chart(document.getElementById("grafico"), {
-            type: 'bar',
-            data: {
-                labels: ['Aprovados', 'Análise', 'Bloqueados'],
-                datasets: [{
-                    data: [a, b, c],
-                    backgroundColor: ['#2cff7a', '#ffb100', '#ff3b3b']
-                }]
-            }
+        dados.forEach(item => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${item.id || ""}</td>
+                    <td>${item.order_id || ""}</td>
+                    <td>${item.ip || ""}</td>
+                    <td>${item.valor || ""}</td>
+                    <td>${item.status || ""}</td>
+                    <td>${item.motivos || ""}</td>
+                </tr>
+            `;
         });
-    } else {
-        grafico.data.datasets[0].data = [a, b, c];
-        grafico.update();
+
+    } catch (e) {
+        console.log("Erro ao carregar dashboard:", e);
     }
 }
 

@@ -61,7 +61,7 @@ def webhook():
         "motivos": motivos
     })
 
-# ---------------- API JSON ----------------
+# ---------------- DASHBOARD JSON ----------------
 @app.route("/dashboard")
 def dashboard():
     conn = get_conn()
@@ -81,7 +81,8 @@ def dashboard():
             "ip": r[2],
             "valor": r[3],
             "status": r[4],
-            "motivos": r[5]
+            "motivos": r[5],
+            "created_at": r[6]   # 🔥 NOVO CAMPO
         })
 
     return jsonify(resultado)

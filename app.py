@@ -63,7 +63,7 @@ def dashboard():
     conn = get_conn()
     cur = conn.cursor()
 
-    cur.execute("SELECT id, order_id, ip, valor, score, status, motivos FROM pedidos ORDER BY id DESC")
+    cur.execute("SELECT * FROM pedidos ORDER BY id DESC")
     rows = cur.fetchall()
 
     cur.close()
@@ -76,9 +76,8 @@ def dashboard():
             "order_id": r[1],
             "ip": r[2],
             "valor": r[3],
-            "score": r[4],
-            "status": r[5],
-            "motivos": r[6]
+            "status": r[4],
+            "motivos": r[5]
         })
 
     return jsonify(resultado)

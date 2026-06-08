@@ -2,20 +2,11 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Painel Antifraude</title>
+    <title>Painel Antifraude PRO</title>
 
-   <style>
-@keyframes pulseRed {
-    0% { background-color: #0b0f1a; }
-    50% { background-color: #3b0a0a; }
-    100% { background-color: #0b0f1a; }
-}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-.alerta {
-    animation: pulseRed 0.8s infinite;
-}
-</style>
-    
+    <style>
         body {
             margin: 0;
             font-family: Arial, sans-serif;
@@ -33,25 +24,50 @@
         header h1 {
             margin: 0;
             color: #ff6a00;
-            font-size: 24px;
+            font-size: 22px;
         }
 
         .container {
             padding: 20px;
         }
 
-        .card {
-            background: #15151c;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border-left: 4px solid #ff6a00;
+        /* CARDS */
+        .cards {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
 
+        .card {
+            background: #15151c;
+            padding: 15px 25px;
+            border-radius: 10px;
+            min-width: 150px;
+            text-align: center;
+            border: 1px solid #222;
+        }
+
+        .card h3 {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .card p {
+            font-size: 22px;
+            margin: 10px 0 0;
+        }
+
+        .green { color: #2cff7a; }
+        .yellow { color: #ffb100; }
+        .red { color: #ff3b3b; }
+
+        /* TABELA */
         table {
             width: 100%;
             border-collapse: collapse;
             background: #15151c;
+            margin-top: 20px;
             border-radius: 10px;
             overflow: hidden;
         }
@@ -59,8 +75,8 @@
         th {
             background: #111117;
             color: #ff6a00;
-            text-align: left;
             padding: 12px;
+            text-align: left;
         }
 
         td {
@@ -72,77 +88,58 @@
             background: #1c1c25;
         }
 
-        .bloqueado {
-            color: #ff3b3b;
-            font-weight: bold;
-        }
-
-        .analise {
-            color: #ffb100;
-            font-weight: bold;
-        }
-
-        .aprovado {
-            color: #2cff7a;
-            font-weight: bold;
-        }
+        .bloqueado { color: #ff3b3b; font-weight: bold; }
+        .analise { color: #ffb100; font-weight: bold; }
+        .aprovado { color: #2cff7a; font-weight: bold; }
 
         .badge {
             padding: 4px 8px;
             border-radius: 6px;
             font-size: 12px;
-            background: #ff6a00;
-            color: black;
-            font-weight: bold;
+        }
+
+        /* GRÁFICO */
+        .chart-box {
+            background: #15151c;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
         }
     </style>
 </head>
 
 <body>
 
-<header style="
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-    padding: 20px;
-    background: #0b0f1a;
-    border-bottom: 2px solid #ff6a00;
-">
-
-    <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png"
-         style="height:60px;">
-
-    <h1 style="color:#ff6a00; margin:0;">
-        PAINEL DE MONITORAMENTO (ANTIFRAUDE)
-    </h1>
+<header>
+    <h1>🛡️ PAINEL ANTIFRAUDE PRO - COZINET</h1>
 </header>
-<div style="display:flex;gap:15px;justify-content:center;margin-top:20px;">
 
-    <div style="background:#0b0f1a;padding:15px 25px;border-radius:10px;border:1px solid #22c55e;">
-        <h3 style="color:#22c55e;margin:0;">Aprovados</h3>
-        <p id="aprovados">0</p>
-    </div>
-
-    <div style="background:#0b0f1a;padding:15px 25px;border-radius:10px;border:1px solid #f59e0b;">
-        <h3 style="color:#f59e0b;margin:0;">Análise</h3>
-        <p id="analise">0</p>
-    </div>
-
-    <div style="background:#0b0f1a;padding:15px 25px;border-radius:10px;border:1px solid #ef4444;">
-        <h3 style="color:#ef4444;margin:0;">Bloqueados</h3>
-        <p id="bloqueados">0</p>
-    </div>
-
-</div>
-    
 <div class="container">
 
-    <div class="card">
-        <span class="badge">LIVE</span>
-        Sistema de monitoramento ativo de pedidos
+    <!-- CARDS -->
+    <div class="cards">
+        <div class="card">
+            <h3 class="green">Aprovados</h3>
+            <p id="aprovados">0</p>
+        </div>
+
+        <div class="card">
+            <h3 class="yellow">Análise</h3>
+            <p id="analise">0</p>
+        </div>
+
+        <div class="card">
+            <h3 class="red">Bloqueados</h3>
+            <p id="bloqueados">0</p>
+        </div>
     </div>
 
+    <!-- GRAFICO -->
+    <div class="chart-box">
+        <canvas id="grafico"></canvas>
+    </div>
+
+    <!-- TABELA -->
     <table>
         <tr>
             <th>ID</th>
@@ -159,28 +156,21 @@
             <td>{{ r[1] }}</td>
             <td>{{ r[2] }}</td>
             <td>R$ {{ r[3] }}</td>
-           <td>
-    <span style="
-        color:
-        {% if r[4]=='bloqueado' %}#ff3b3b
-        {% elif r[4]=='analise' %}#f59e0b
-        {% else %}#22c55e
-        {% endif %}
-        ;
-        font-weight:bold;
-    ">
-        {{ r[4] }}
-    </span>
-</td>
+            <td class="{{ r[4] }}">{{ r[4] }}</td>
             <td>{{ r[5] }}</td>
         </tr>
         {% endfor %}
-
     </table>
+
 </div>
-    
+
+<!-- SOM ALERTA -->
+<audio id="alerta">
+    <source src="https://www.myinstants.com/media/sounds/alarm.mp3" type="audio/mpeg">
+</audio>
+
 <script>
-let ultimoBloqueado = 0;
+let grafico;
 
 async function atualizar() {
     const res = await fetch("/dashboard");
@@ -190,35 +180,53 @@ async function atualizar() {
     let analise = 0;
     let bloqueados = 0;
 
+    let alertaTocado = false;
+
     dados.forEach(item => {
         if (item.status === "aprovado") aprovados++;
         else if (item.status === "analise") analise++;
-        else if (item.status === "bloqueado") bloqueados++;
+        else if (item.status === "bloqueado") {
+            bloqueados++;
+            alertaTocado = true;
+        }
     });
 
     document.getElementById("aprovados").innerText = aprovados;
     document.getElementById("analise").innerText = analise;
     document.getElementById("bloqueados").innerText = bloqueados;
 
-    // 🔥 ALERTA SE AUMENTAR BLOQUEIOS
-    if (bloqueados > ultimoBloqueado) {
-        document.body.classList.add("alerta");
-
-        // som de alerta
-        const audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
-        audio.play();
-
-        setTimeout(() => {
-            document.body.classList.remove("alerta");
-        }, 3000);
+    // ALERTA SONORO
+    if (alertaTocado) {
+        document.getElementById("alerta").play();
     }
 
-    ultimoBloqueado = bloqueados;
+    atualizarGrafico(aprovados, analise, bloqueados);
 }
 
-setInterval(atualizar, 2000);
+// GRAFICO
+function atualizarGrafico(a, b, c) {
+    if (!grafico) {
+        const ctx = document.getElementById("grafico");
+
+        grafico = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Aprovados', 'Análise', 'Bloqueados'],
+                datasets: [{
+                    data: [a, b, c],
+                    backgroundColor: ['#2cff7a', '#ffb100', '#ff3b3b']
+                }]
+            }
+        });
+    } else {
+        grafico.data.datasets[0].data = [a, b, c];
+        grafico.update();
+    }
+}
+
+setInterval(atualizar, 3000);
 atualizar();
 </script>
-    
+
 </body>
 </html>

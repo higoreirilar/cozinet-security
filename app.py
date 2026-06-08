@@ -63,13 +63,25 @@ def dashboard():
     conn = get_conn()
     cur = conn.cursor()
 
-    cur.execute("SELECT * FROM pedidos ORDER BY id DESC")
-    data = cur.fetchall()
+    cur.execute("SELECT id, order_id, ip, valor, score, status, motivos FROM pedidos ORDER BY id DESC")
+    rows = cur.fetchall()
 
     cur.close()
     conn.close()
 
-    return jsonify(data)
+    resultado = []
+    for r in rows:
+        resultado.append({
+            "id": r[0],
+            "order_id": r[1],
+            "ip": r[2],
+            "valor": r[3],
+            "score": r[4],
+            "status": r[5],
+            "motivos": r[6]
+        })
+
+    return jsonify(resultado)
 
 @app.route("/")
 def home():

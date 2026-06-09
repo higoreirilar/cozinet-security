@@ -3,9 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cozinet Antifraude</title>
+
+<title>Cozinet Shield</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 
@@ -17,44 +19,43 @@
 }
 
 body{
-    background:#0f0f0f;
-    color:#fff;
-    min-height:100vh;
+    background:#0b0b0b;
+    color:white;
 }
 
 .container{
     display:flex;
+    min-height:100vh;
 }
 
 /* SIDEBAR */
 
 .sidebar{
-    width:260px;
-    background:#151515;
-    border-right:1px solid #262626;
-    min-height:100vh;
-    padding:30px 20px;
+    width:280px;
+    background:#111;
+    border-right:1px solid #222;
+    padding:30px;
 }
 
 .logo{
     text-align:center;
-    margin-bottom:40px;
+    margin-bottom:50px;
 }
 
 .logo img{
-    width:90px;
+    width:180px;
     margin-bottom:15px;
 }
 
-.logo h2{
-    font-size:24px;
-    color:#ff7a00;
+.logo h1{
+    font-size:28px;
     font-weight:800;
 }
 
 .logo span{
-    color:#888;
-    font-size:13px;
+    color:#ff7a00;
+    letter-spacing:4px;
+    font-weight:700;
 }
 
 .menu{
@@ -62,18 +63,16 @@ body{
 }
 
 .menu li{
-    padding:14px 18px;
-    margin-bottom:10px;
+    padding:14px;
+    margin-bottom:8px;
     border-radius:12px;
-    cursor:pointer;
-    transition:.3s;
+    background:#151515;
     color:#bbb;
 }
 
-.menu li:hover,
 .menu li.active{
-    background:#1e1e1e;
-    color:#ff7a00;
+    border-left:4px solid #ff7a00;
+    color:white;
 }
 
 /* MAIN */
@@ -83,104 +82,92 @@ body{
     padding:30px;
 }
 
-/* HEADER */
-
 .topbar{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    margin-bottom:30px;
-}
-
-.title h1{
-    font-size:32px;
-    margin-bottom:5px;
-}
-
-.title p{
-    color:#888;
+    margin-bottom:25px;
 }
 
 .user{
     display:flex;
-    align-items:center;
     gap:15px;
-}
-
-.admin{
-    background:#1d1d1d;
-    padding:12px 18px;
-    border-radius:12px;
-    border:1px solid #2b2b2b;
+    align-items:center;
 }
 
 .logout{
     background:#ff7a00;
-    color:white;
     border:none;
+    color:white;
     padding:12px 18px;
     border-radius:12px;
     cursor:pointer;
-    font-weight:600;
-}
-
-.logout:hover{
-    background:#ff8d22;
 }
 
 /* CARDS */
 
 .stats{
-    display:flex;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
     gap:20px;
-    margin-bottom:30px;
+    margin-bottom:25px;
 }
 
 .card{
-    flex:1;
-    background:#171717;
-    border-radius:18px;
+    background:#151515;
+    border:1px solid #252525;
+    border-radius:22px;
     padding:25px;
-    border:1px solid #2a2a2a;
 }
 
 .card p{
-    color:#8e8e8e;
-    margin-bottom:10px;
+    color:#888;
 }
 
 .card h3{
     font-size:42px;
+    margin-top:10px;
 }
 
-.green{
+.approved{
     border-left:4px solid #22c55e;
 }
 
-.yellow{
+.analysis{
     border-left:4px solid #f59e0b;
 }
 
-.red{
+.blocked{
     border-left:4px solid #ef4444;
+}
+
+/* GRID */
+
+.dashboard-grid{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:20px;
+    margin-bottom:20px;
+}
+
+.panel{
+    background:#151515;
+    border:1px solid #252525;
+    border-radius:22px;
+    padding:25px;
+}
+
+.panel h3{
+    margin-bottom:20px;
 }
 
 /* TABLE */
 
 .table-box{
-    background:#171717;
-    border-radius:18px;
+    background:#151515;
+    border-radius:22px;
     overflow:hidden;
-    border:1px solid #292929;
-}
-
-.table-header{
-    padding:20px 25px;
-    border-bottom:1px solid #2a2a2a;
-}
-
-.table-header h2{
-    color:#ff7a00;
+    border:1px solid #252525;
 }
 
 table{
@@ -191,24 +178,18 @@ table{
 th{
     background:#1d1d1d;
     color:#ff7a00;
-    padding:18px;
     text-align:left;
-    font-size:14px;
+    padding:16px;
 }
 
 td{
-    padding:18px;
-    border-bottom:1px solid #252525;
-    color:#ddd;
-}
-
-tr:hover{
-    background:#1c1c1c;
+    padding:16px;
+    border-bottom:1px solid #222;
 }
 
 .status{
-    padding:7px 14px;
-    border-radius:50px;
+    padding:6px 12px;
+    border-radius:999px;
     font-size:12px;
     font-weight:600;
 }
@@ -228,18 +209,6 @@ tr:hover{
     color:#ef4444;
 }
 
-@media(max-width:1200px){
-
-    .stats{
-        flex-direction:column;
-    }
-
-    .sidebar{
-        display:none;
-    }
-
-}
-
 </style>
 </head>
 
@@ -247,164 +216,179 @@ tr:hover{
 
 <div class="container">
 
-    <!-- SIDEBAR -->
+<div class="sidebar">
 
-    <aside class="sidebar">
+<div class="logo">
+<img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
+<h1>COZINET</h1>
+<span>SHIELD</span>
+</div>
 
-        <div class="logo">
-            <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png" alt="Cozinet">
-            <h2>COZINET</h2>
-            <span>ANTIFRAUDE</span>
-        </div>
-
-        <ul class="menu">
-            <li class="active">Dashboard</li>
-            <li>Pedidos</li>
-            <li>Análises</li>
-            <li>Bloqueios</li>
-            <li>Regras</li>
-            <li>Logs</li>
-            <li>Relatórios</li>
-            <li>Configurações</li>
-        </ul>
-
-    </aside>
-
-    <!-- MAIN -->
-
-    <main class="main">
-
-        <div class="topbar">
-
-            <div class="title">
-                <h1>Painel Antifraude</h1>
-                <p>Monitoramento e análise de pedidos em tempo real</p>
-            </div>
-
-            <div class="user">
-                <div class="admin">
-                    👤 Admin
-                </div>
-
-                <button class="logout">
-                    Sair
-                </button>
-            </div>
-
-        </div>
-
-        <!-- CARDS -->
-
-        <div class="stats">
-
-            <div class="card green">
-                <p>Aprovados</p>
-                <h3 id="aprovados">0</h3>
-            </div>
-
-            <div class="card yellow">
-                <p>Em Análise</p>
-                <h3 id="analise">0</h3>
-            </div>
-
-            <div class="card red">
-                <p>Bloqueados</p>
-                <h3 id="bloqueados">2</h3>
-            </div>
-
-        </div>
-
-        <!-- TABELA -->
-
-        <div class="table-box">
-
-            <div class="table-header">
-                <h2>Pedidos Recentes</h2>
-            </div>
-
-            <table>
-
-                <thead>
-
-                    <tr>
-                        <th>ID</th>
-                        <th>Pedido</th>
-                        <th>IP</th>
-                        <th>Valor</th>
-                        <th>Status</th>
-                        <th>Motivos</th>
-                        <th>Data</th>
-                    </tr>
-
-                </thead>
-
-                <tbody id="tabelaPedidos">
-
-                    <tr>
-                        <td>#1001</td>
-                        <td>845214</td>
-                        <td>177.34.xxx.xxx</td>
-                        <td>R$ 2.499,90</td>
-                        <td>
-                            <span class="status aprovado">
-                                Aprovado
-                            </span>
-                        </td>
-                        <td>Score Baixo</td>
-                        <td>09/06/2026 09:15</td>
-                    </tr>
-
-                    <tr>
-                        <td>#1002</td>
-                        <td>845215</td>
-                        <td>189.55.xxx.xxx</td>
-                        <td>R$ 5.799,90</td>
-                        <td>
-                            <span class="status analise">
-                                Análise
-                            </span>
-                        </td>
-                        <td>Ticket Elevado</td>
-                        <td>09/06/2026 09:24</td>
-                    </tr>
-
-                    <tr>
-                        <td>#1003</td>
-                        <td>845216</td>
-                        <td>45.180.xxx.xxx</td>
-                        <td>R$ 9.990,00</td>
-                        <td>
-                            <span class="status bloqueado">
-                                Bloqueado
-                            </span>
-                        </td>
-                        <td>IP Suspeito</td>
-                        <td>09/06/2026 09:30</td>
-                    </tr>
-
-                    <tr>
-                        <td>#1004</td>
-                        <td>845217</td>
-                        <td>201.76.xxx.xxx</td>
-                        <td>R$ 12.490,00</td>
-                        <td>
-                            <span class="status bloqueado">
-                                Bloqueado
-                            </span>
-                        </td>
-                        <td>CPF Divergente</td>
-                        <td>09/06/2026 09:47</td>
-                    </tr>
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </main>
+<ul class="menu">
+<li class="active">Dashboard</li>
+<li>Pedidos</li>
+<li>Análises</li>
+<li>Bloqueados</li>
+<li>Logs</li>
+<li>Configurações</li>
+</ul>
 
 </div>
+
+<div class="main">
+
+<div class="topbar">
+
+<div>
+<h1>Cozinet Shield</h1>
+<p style="color:#777">Monitoramento antifraude em tempo real</p>
+</div>
+
+<div class="user">
+<span>👤 Admin</span>
+<button class="logout">Sair</button>
+</div>
+
+</div>
+
+<div class="stats">
+
+<div class="card approved">
+<p>Aprovados</p>
+<h3 id="aprovados">0</h3>
+</div>
+
+<div class="card analysis">
+<p>Em Análise</p>
+<h3 id="analise">0</h3>
+</div>
+
+<div class="card blocked">
+<p>Bloqueados</p>
+<h3 id="bloqueados">0</h3>
+</div>
+
+</div>
+
+<div class="dashboard-grid">
+
+<div class="panel">
+<h3>Evolução dos Pedidos</h3>
+<canvas id="graficoPedidos"></canvas>
+</div>
+
+<div class="panel">
+<h3>Distribuição de Risco</h3>
+<canvas id="graficoRisco"></canvas>
+</div>
+
+</div>
+
+<div class="table-box">
+
+<table>
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Pedido</th>
+<th>IP</th>
+<th>Valor</th>
+<th>Status</th>
+<th>Motivos</th>
+<th>Data</th>
+</tr>
+</thead>
+
+<tbody id="tabelaPedidos"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+async function carregarDashboard(){
+
+    const response = await fetch('/dashboard');
+    const dados = await response.json();
+
+    document.getElementById('aprovados').textContent =
+        dados.aprovados;
+
+    document.getElementById('analise').textContent =
+        dados.analise;
+
+    document.getElementById('bloqueados').textContent =
+        dados.bloqueados;
+
+    const tbody =
+        document.getElementById('tabelaPedidos');
+
+    tbody.innerHTML='';
+
+    dados.pedidos.forEach(p => {
+
+        const statusClass =
+            p[4] === 'aprovado'
+            ? 'aprovado'
+            : p[4] === 'analise'
+            ? 'analise'
+            : 'bloqueado';
+
+        tbody.innerHTML += `
+        <tr>
+            <td>${p[0]}</td>
+            <td>${p[1]}</td>
+            <td>${p[2]}</td>
+            <td>R$ ${p[3]}</td>
+            <td><span class="status ${statusClass}">${p[4]}</span></td>
+            <td>${p[5] || ''}</td>
+            <td>${p[6] || ''}</td>
+        </tr>`;
+    });
+
+}
+
+carregarDashboard();
+setInterval(carregarDashboard,10000);
+
+new Chart(
+document.getElementById('graficoPedidos'),
+{
+type:'line',
+data:{
+labels:['Seg','Ter','Qua','Qui','Sex','Sab','Dom'],
+datasets:[{
+data:[15,20,28,18,35,40,31],
+borderColor:'#ff7a00',
+backgroundColor:'rgba(255,122,0,.15)',
+fill:true,
+tension:.4
+}]
+},
+options:{
+plugins:{legend:{display:false}}
+}
+});
+
+new Chart(
+document.getElementById('graficoRisco'),
+{
+type:'doughnut',
+data:{
+labels:['Baixo','Médio','Alto'],
+datasets:[{
+data:[70,20,10]
+}]
+}
+});
+
+</script>
 
 </body>
 </html>

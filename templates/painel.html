@@ -1,304 +1,410 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cozinet Antifraude</title>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 
 *{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family: 'Segoe UI', sans-serif;
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Inter',sans-serif;
 }
 
 body{
-background:#05070d;
-color:#fff;
-display:flex;
+    background:#0f0f0f;
+    color:#fff;
+    min-height:100vh;
+}
+
+.container{
+    display:flex;
 }
 
 /* SIDEBAR */
+
 .sidebar{
-width:270px;
-height:100vh;
-background:linear-gradient(180deg,#0b0f18,#070a12);
-border-right:1px solid #1c2330;
-padding:20px;
-box-shadow:10px 0 30px rgba(0,0,0,.4);
+    width:260px;
+    background:#151515;
+    border-right:1px solid #262626;
+    min-height:100vh;
+    padding:30px 20px;
 }
 
 .logo{
-text-align:center;
-margin-bottom:30px;
+    text-align:center;
+    margin-bottom:40px;
 }
 
 .logo img{
-width:120px;
-filter:drop-shadow(0 0 10px rgba(255,122,0,.4));
+    width:90px;
+    margin-bottom:15px;
 }
 
 .logo h2{
-color:#ff7a00;
-font-size:14px;
-margin-top:10px;
+    font-size:24px;
+    color:#ff7a00;
+    font-weight:800;
 }
 
-.menu div{
-padding:12px;
-margin:6px 0;
-border-radius:10px;
-cursor:pointer;
-color:#aaa;
-transition:.2s;
+.logo span{
+    color:#888;
+    font-size:13px;
 }
 
-.menu div:hover{
-background:#141c2a;
-color:#ff7a00;
-transform:translateX(5px);
+.menu{
+    list-style:none;
+}
+
+.menu li{
+    padding:14px 18px;
+    margin-bottom:10px;
+    border-radius:12px;
+    cursor:pointer;
+    transition:.3s;
+    color:#bbb;
+}
+
+.menu li:hover,
+.menu li.active{
+    background:#1e1e1e;
+    color:#ff7a00;
 }
 
 /* MAIN */
+
 .main{
-flex:1;
-padding:30px;
+    flex:1;
+    padding:30px;
 }
 
-/* TOPBAR */
+/* HEADER */
+
 .topbar{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:25px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
 }
 
-.title{
-font-size:24px;
-color:#ff7a00;
-font-weight:600;
+.title h1{
+    font-size:32px;
+    margin-bottom:5px;
 }
 
-.admin-box{
-background:#0f1624;
-border:1px solid #1c2330;
-padding:12px 16px;
-border-radius:12px;
-box-shadow:0 0 20px rgba(0,0,0,.3);
+.title p{
+    color:#888;
 }
 
-.admin-box span{
-color:#00ff88;
-font-size:12px;
+.user{
+    display:flex;
+    align-items:center;
+    gap:15px;
 }
 
-.admin-box a{
-display:inline-block;
-margin-top:6px;
-padding:5px 10px;
-background:#ff3b3b;
-color:#fff;
-border-radius:6px;
-text-decoration:none;
-font-size:12px;
+.admin{
+    background:#1d1d1d;
+    padding:12px 18px;
+    border-radius:12px;
+    border:1px solid #2b2b2b;
+}
+
+.logout{
+    background:#ff7a00;
+    color:white;
+    border:none;
+    padding:12px 18px;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:600;
+}
+
+.logout:hover{
+    background:#ff8d22;
 }
 
 /* CARDS */
-.cards{
-display:flex;
-gap:15px;
-margin-bottom:25px;
+
+.stats{
+    display:flex;
+    gap:20px;
+    margin-bottom:30px;
 }
 
 .card{
-flex:1;
-padding:25px;
-border-radius:16px;
-background:#0f1624;
-border:1px solid #1c2330;
-box-shadow:0 10px 30px rgba(0,0,0,.4);
-text-align:center;
-transition:.2s;
-}
-
-.card:hover{
-transform:translateY(-5px);
-}
-
-.card h3{
-font-size:38px;
-margin-top:10px;
+    flex:1;
+    background:#171717;
+    border-radius:18px;
+    padding:25px;
+    border:1px solid #2a2a2a;
 }
 
 .card p{
-color:#aaa;
-font-size:12px;
+    color:#8e8e8e;
+    margin-bottom:10px;
 }
 
-/* CORES PREMIUM */
-.green{border-color:#00ff88;}
-.green h3{color:#00ff88;}
+.card h3{
+    font-size:42px;
+}
 
-.yellow{border-color:#ffcc00;}
-.yellow h3{color:#ffcc00;}
+.green{
+    border-left:4px solid #22c55e;
+}
 
-.red{border-color:#ff4d4d;}
-.red h3{color:#ff4d4d;}
+.yellow{
+    border-left:4px solid #f59e0b;
+}
 
-/* TABELA */
+.red{
+    border-left:4px solid #ef4444;
+}
+
+/* TABLE */
+
+.table-box{
+    background:#171717;
+    border-radius:18px;
+    overflow:hidden;
+    border:1px solid #292929;
+}
+
+.table-header{
+    padding:20px 25px;
+    border-bottom:1px solid #2a2a2a;
+}
+
+.table-header h2{
+    color:#ff7a00;
+}
+
 table{
-width:100%;
-margin-top:20px;
-border-collapse:collapse;
-background:#0f1624;
-border-radius:14px;
-overflow:hidden;
-box-shadow:0 10px 30px rgba(0,0,0,.4);
+    width:100%;
+    border-collapse:collapse;
 }
 
 th{
-background:#111a2a;
-color:#ff7a00;
-padding:14px;
-text-align:left;
-font-size:13px;
+    background:#1d1d1d;
+    color:#ff7a00;
+    padding:18px;
+    text-align:left;
+    font-size:14px;
 }
 
 td{
-padding:14px;
-border-bottom:1px solid #1b2436;
-font-size:13px;
+    padding:18px;
+    border-bottom:1px solid #252525;
+    color:#ddd;
 }
 
 tr:hover{
-background:#141c2a;
+    background:#1c1c1c;
 }
 
-/* STATUS */
-.aprovado{color:#00ff88;font-weight:600;}
-.analise{color:#ffcc00;font-weight:600;}
-.bloqueado{color:#ff4d4d;font-weight:600;}
+.status{
+    padding:7px 14px;
+    border-radius:50px;
+    font-size:12px;
+    font-weight:600;
+}
+
+.aprovado{
+    background:rgba(34,197,94,.15);
+    color:#22c55e;
+}
+
+.analise{
+    background:rgba(245,158,11,.15);
+    color:#f59e0b;
+}
+
+.bloqueado{
+    background:rgba(239,68,68,.15);
+    color:#ef4444;
+}
+
+@media(max-width:1200px){
+
+    .stats{
+        flex-direction:column;
+    }
+
+    .sidebar{
+        display:none;
+    }
+
+}
 
 </style>
-
 </head>
 
 <body>
 
-<div class="sidebar">
+<div class="container">
 
-<div class="logo">
-<img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
-<h2>Cozinet Antifraude System</h2>
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png" alt="Cozinet">
+            <h2>COZINET</h2>
+            <span>ANTIFRAUDE</span>
+        </div>
+
+        <ul class="menu">
+            <li class="active">Dashboard</li>
+            <li>Pedidos</li>
+            <li>Análises</li>
+            <li>Bloqueios</li>
+            <li>Regras</li>
+            <li>Logs</li>
+            <li>Relatórios</li>
+            <li>Configurações</li>
+        </ul>
+
+    </aside>
+
+    <!-- MAIN -->
+
+    <main class="main">
+
+        <div class="topbar">
+
+            <div class="title">
+                <h1>Painel Antifraude</h1>
+                <p>Monitoramento e análise de pedidos em tempo real</p>
+            </div>
+
+            <div class="user">
+                <div class="admin">
+                    👤 Admin
+                </div>
+
+                <button class="logout">
+                    Sair
+                </button>
+            </div>
+
+        </div>
+
+        <!-- CARDS -->
+
+        <div class="stats">
+
+            <div class="card green">
+                <p>Aprovados</p>
+                <h3 id="aprovados">0</h3>
+            </div>
+
+            <div class="card yellow">
+                <p>Em Análise</p>
+                <h3 id="analise">0</h3>
+            </div>
+
+            <div class="card red">
+                <p>Bloqueados</p>
+                <h3 id="bloqueados">2</h3>
+            </div>
+
+        </div>
+
+        <!-- TABELA -->
+
+        <div class="table-box">
+
+            <div class="table-header">
+                <h2>Pedidos Recentes</h2>
+            </div>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>ID</th>
+                        <th>Pedido</th>
+                        <th>IP</th>
+                        <th>Valor</th>
+                        <th>Status</th>
+                        <th>Motivos</th>
+                        <th>Data</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="tabelaPedidos">
+
+                    <tr>
+                        <td>#1001</td>
+                        <td>845214</td>
+                        <td>177.34.xxx.xxx</td>
+                        <td>R$ 2.499,90</td>
+                        <td>
+                            <span class="status aprovado">
+                                Aprovado
+                            </span>
+                        </td>
+                        <td>Score Baixo</td>
+                        <td>09/06/2026 09:15</td>
+                    </tr>
+
+                    <tr>
+                        <td>#1002</td>
+                        <td>845215</td>
+                        <td>189.55.xxx.xxx</td>
+                        <td>R$ 5.799,90</td>
+                        <td>
+                            <span class="status analise">
+                                Análise
+                            </span>
+                        </td>
+                        <td>Ticket Elevado</td>
+                        <td>09/06/2026 09:24</td>
+                    </tr>
+
+                    <tr>
+                        <td>#1003</td>
+                        <td>845216</td>
+                        <td>45.180.xxx.xxx</td>
+                        <td>R$ 9.990,00</td>
+                        <td>
+                            <span class="status bloqueado">
+                                Bloqueado
+                            </span>
+                        </td>
+                        <td>IP Suspeito</td>
+                        <td>09/06/2026 09:30</td>
+                    </tr>
+
+                    <tr>
+                        <td>#1004</td>
+                        <td>845217</td>
+                        <td>201.76.xxx.xxx</td>
+                        <td>R$ 12.490,00</td>
+                        <td>
+                            <span class="status bloqueado">
+                                Bloqueado
+                            </span>
+                        </td>
+                        <td>CPF Divergente</td>
+                        <td>09/06/2026 09:47</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </main>
+
 </div>
-
-<div class="menu">
-<div>📊 Dashboard</div>
-<div>🧾 Pedidos</div>
-<div>🚨 Fraudes</div>
-<div>⚙️ Configurações</div>
-<div>👤 Usuários</div>
-</div>
-
-</div>
-
-<div class="main">
-
-<div class="topbar">
-
-<div class="title">
-Dashboard Antifraude
-</div>
-
-<div class="admin-box">
-👤 <b>{{ usuario }}</b><br>
-<span>ADMIN LOGADO</span><br>
-<a href="/logout">Sair</a>
-</div>
-
-</div>
-
-<div class="cards">
-
-<div class="card green">
-<p>Aprovados</p>
-<h3 id="aprovados">0</h3>
-</div>
-
-<div class="card yellow">
-<p>Análise</p>
-<h3 id="analise">0</h3>
-</div>
-
-<div class="card red">
-<p>Bloqueados</p>
-<h3 id="bloqueados">0</h3>
-</div>
-
-</div>
-
-<table>
-
-<tr>
-<th>ID</th>
-<th>Pedido</th>
-<th>IP</th>
-<th>Valor</th>
-<th>Status</th>
-<th>Motivos</th>
-<th>Data</th>
-</tr>
-
-<tbody id="tabela"></tbody>
-
-</table>
-
-</div>
-
-<script>
-
-async function atualizar(){
-
-const res = await fetch("/dashboard");
-const dados = await res.json();
-
-let a=0,b=0,c=0;
-let html="";
-
-dados.forEach(d=>{
-
-if(d.status==="aprovado") a++;
-if(d.status==="analise") b++;
-if(d.status==="bloqueado") c++;
-
-html += `
-<tr>
-<td>${d.id}</td>
-<td>${d.order_id}</td>
-<td>${d.ip}</td>
-<td>R$ ${d.valor}</td>
-<td class="${d.status}">${d.status}</td>
-<td>${d.motivos}</td>
-<td>${d.created_at}</td>
-</tr>`;
-});
-
-document.getElementById("tabela").innerHTML = html;
-
-document.getElementById("aprovados").innerText = a;
-document.getElementById("analise").innerText = b;
-document.getElementById("bloqueados").innerText = c;
-
-}
-
-setInterval(atualizar,3000);
-atualizar();
-
-</script>
 
 </body>
 </html>

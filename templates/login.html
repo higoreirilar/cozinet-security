@@ -1,37 +1,195 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-    <title>Login - Cozinet</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Cozinet Shield - Login</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Inter',sans-serif;
+}
+
+body{
+    background:#0b0b0b;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:#fff;
+}
+
+.login-container{
+    width:100%;
+    max-width:420px;
+    padding:20px;
+}
+
+.login-card{
+    background:#151515;
+    border:1px solid #252525;
+    border-radius:24px;
+    padding:40px;
+    box-shadow:0 0 30px rgba(0,0,0,.4);
+}
+
+.logo{
+    text-align:center;
+    margin-bottom:30px;
+}
+
+.logo img{
+    width:180px;
+    display:block;
+    margin:auto;
+    margin-bottom:15px;
+}
+
+.logo h1{
+    font-size:32px;
+    font-weight:800;
+}
+
+.logo span{
+    color:#ff7a00;
+    letter-spacing:5px;
+    font-size:13px;
+    font-weight:700;
+}
+
+.subtitle{
+    text-align:center;
+    color:#888;
+    margin-bottom:30px;
+    font-size:14px;
+}
+
+.form-group{
+    margin-bottom:18px;
+}
+
+label{
+    display:block;
+    margin-bottom:8px;
+    color:#bbb;
+    font-size:14px;
+}
+
+input{
+    width:100%;
+    background:#101010;
+    border:1px solid #2a2a2a;
+    border-radius:12px;
+    padding:14px;
+    color:white;
+    font-size:15px;
+    outline:none;
+    transition:.3s;
+}
+
+input:focus{
+    border-color:#ff7a00;
+}
+
+.login-btn{
+    width:100%;
+    border:none;
+    background:#ff7a00;
+    color:white;
+    padding:15px;
+    border-radius:12px;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.login-btn:hover{
+    transform:translateY(-1px);
+}
+
+.error{
+    background:rgba(239,68,68,.15);
+    border:1px solid rgba(239,68,68,.4);
+    color:#ef4444;
+    padding:12px;
+    border-radius:12px;
+    margin-bottom:20px;
+    text-align:center;
+}
+
+.footer{
+    text-align:center;
+    margin-top:20px;
+    color:#666;
+    font-size:12px;
+}
+
+</style>
 </head>
+<body>
 
-<body style="background:#0b0b0f;color:#fff;font-family:Arial;display:flex;justify-content:center;align-items:center;height:100vh;">
+<div class="login-container">
 
-<div style="background:#15151c;padding:30px;border-radius:12px;width:340px;box-shadow:0 0 25px rgba(255,106,0,0.3);">
+    <div class="login-card">
 
-    <!-- EMBLEMA -->
-    <div style="text-align:center;margin-bottom:10px;">
-        <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png" style="width:140px;">
+        <div class="logo">
+
+            <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
+
+            <h1>COZINET</h1>
+            <span>SHIELD</span>
+
+        </div>
+
+        <div class="subtitle">
+            Plataforma Inteligente de Prevenção a Fraudes
+        </div>
+
+        {% if erro %}
+        <div class="error">
+            {{ erro }}
+        </div>
+        {% endif %}
+
+        <form method="POST">
+
+            <div class="form-group">
+                <label>E-mail</label>
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="Digite seu e-mail"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label>Senha</label>
+                <input
+                    type="password"
+                    name="senha"
+                    placeholder="Digite sua senha"
+                    required>
+            </div>
+
+            <button type="submit" class="login-btn">
+                Entrar no Painel
+            </button>
+
+        </form>
+
+        <div class="footer">
+            Cozinet Shield © 2026
+        </div>
+
     </div>
-
-    <h2 style="text-align:center;color:#ff6a00;margin-bottom:20px;">
-        PAINEL ANTIFRAUDE
-    </h2>
-
-    {% if erro %}
-        <p style="color:red;text-align:center;">{{ erro }}</p>
-    {% endif %}
-
-    <form method="POST">
-        <input name="email" placeholder="Email"
-            style="width:100%;padding:12px;margin-bottom:10px;background:#111;border:none;color:#fff;border-radius:6px;">
-
-        <input name="senha" type="password" placeholder="Senha"
-            style="width:100%;padding:12px;margin-bottom:15px;background:#111;border:none;color:#fff;border-radius:6px;">
-
-        <button style="width:100%;padding:12px;background:#ff6a00;border:none;border-radius:6px;font-weight:bold;">
-            Entrar
-        </button>
-    </form>
 
 </div>
 

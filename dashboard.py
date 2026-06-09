@@ -1,25 +1,52 @@
-from flask import Flask, jsonify
-import os
-import psycopg2
+@dashboard.route("/dashboard")
+def dashboard_data():
 
-dashboard = Flask(__name__)
-
-def get_conn():
-    return psycopg2.connect(os.environ["DATABASE_URL"])
-
-@dashboard.route("/pedidos")
-def pedidos():
     conn = get_conn()
     cur = conn.cursor()
 
-    cur.execute("SELECT * FROM pedidos")
-    dados = cur.fetchall()
+    cur.execute("""
+        SELECT COUNT(*)
+        FROM pedidos
+        WHERE status='aprovado'
+    """)
+    aprovados = cur.fetchone()[0]
+
+    cur.execute("""
+        SELECT COUNT(*)
+        FROM pedidos
+        WHERE status='analise'
+    """)
+    analise = cur.fetchone()[0]
+
+    cur.execute("""
+        SELECT COUNT(*)
+        FROM pedidos
+        WHERE status='bloqueado'
+    """)
+    bloqueados = cur.fetchone()[0]
+
+    cur.execute("""
+        SELECT
+            id,
+            order_id,
+            ip,
+            valor,
+            status,
+            motivos,
+            created_at
+        FROM pedidos
+        ORDER BY id DESC
+        LIMIT 50
+    """)
+
+    pedidos = cur.fetchall()
 
     cur.close()
     conn.close()
 
-    return jsonify(dados)
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8001))
-    dashboard.run(host="0.0.0.0", port=port)
+    return jsonify({
+        "aprovados": aprovados,
+        "analise": analise,
+        "bloqueados": bloqueados,
+        "pedidos": pedidos
+    })

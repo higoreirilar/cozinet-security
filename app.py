@@ -15,6 +15,10 @@ def get_conn():
         port=os.getenv("PGPORT")
     )
 
+# ---------------- LOGIN CHECK ----------------
+def login_required():
+    return "user_id" in session
+
 # ---------------- LOGIN ----------------
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -52,10 +56,6 @@ def logout():
     session.clear()
     return redirect("/login")
 
-# ---------------- PROTEÇÃO ----------------
-def login_required():
-    return session.get("user_id") is not None
-
 # ---------------- PAINEL ----------------
 @app.route("/painel")
 def painel():
@@ -67,7 +67,12 @@ def painel():
         usuario=session.get("nome")
     )
 
-# ---------------- DASHBOARD API ----------------
+# ---------------- HOME ----------------
+@app.route("/")
+def home():
+    return redirect("/login")
+
+# ---------------- DASHBOARD (API) ----------------
 @app.route("/dashboard")
 def dashboard():
 
@@ -78,14 +83,7 @@ def dashboard():
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT
-            id,
-            order_id,
-            ip,
-            valor,
-            status,
-            motivo,
-            created_at
+        SELECT id, order_id, ip, valor, status, motivo, created_at
         FROM pedidos
         ORDER BY id DESC
     """)
@@ -110,7 +108,7 @@ def dashboard():
 
     return jsonify(data)
 
-# ---------------- API RESUMO ----------------
+# ---------------- STATS ----------------
 @app.route("/stats")
 def stats():
 
@@ -121,7 +119,6 @@ def stats():
     cur = conn.cursor()
 
     cur.execute("SELECT status FROM pedidos")
-
     rows = cur.fetchall()
 
     cur.close()
@@ -163,16 +160,10 @@ def bloquear_ip():
     """)
 
     cur.execute("""
-        INSERT INTO ips_bloqueados (
-            ip,
-            motivo
-        )
-        VALUES (%s,%s)
+        INSERT INTO ips_bloqueados (ip, motivo)
+        VALUES (%s, %s)
         ON CONFLICT (ip) DO NOTHING
-    """, (
-        ip,
-        "Bloqueio manual pelo administrador"
-    ))
+    """, (ip, "Bloqueio manual pelo administrador"))
 
     conn.commit()
 
@@ -184,7 +175,7 @@ def bloquear_ip():
         "message": f"IP {ip} bloqueado com sucesso"
     })
 
-# ---------------- LISTAR IPS BLOQUEADOS ----------------
+# ---------------- LISTAR IPS BLOQUEADOS (API) ----------------
 @app.route("/ips-bloqueados")
 def listar_ips_bloqueados():
 
@@ -195,11 +186,7 @@ def listar_ips_bloqueados():
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT
-            id,
-            ip,
-            motivo,
-            data_bloqueio
+        SELECT id, ip, motivo, data_bloqueio
         FROM ips_bloqueados
         ORDER BY data_bloqueio DESC
     """)
@@ -219,23 +206,32 @@ def listar_ips_bloqueados():
         for r in rows
     ])
 
+# ---------------- TELA HTML BLOQUEADOS ----------------
+@app.route("/bloqueados")
+def bloqueados():
+
+    if not login_required():
+        return redirect("/login")
+
+    return render_template(
+        "bloqueados.html",
+        usuario=session.get("nome")
+    )
+
 # ---------------- DESBLOQUEAR IP ----------------
-@app.route("/desbloquear-ip", methods=["POST"])
-def desbloquear_ip():
+@app.route("/desbloquear-ip/<int:id>", methods=["POST"])
+def desbloquear_ip(id):
 
     if not login_required():
         return jsonify({"error": "unauthorized"}), 401
-
-    dados = request.get_json()
-    ip = dados.get("ip")
 
     conn = get_conn()
     cur = conn.cursor()
 
     cur.execute("""
         DELETE FROM ips_bloqueados
-        WHERE ip=%s
-    """, (ip,))
+        WHERE id=%s
+    """, (id,))
 
     conn.commit()
 
@@ -244,17 +240,13 @@ def desbloquear_ip():
 
     return jsonify({
         "success": True,
-        "message": f"IP {ip} removido da lista de bloqueio"
+        "message": "IP desbloqueado com sucesso"
     })
-
-# ---------------- HOME ----------------
-@app.route("/")
-def home():
-    return redirect("/login")
 
 # ---------------- START ----------------
 if __name__ == "__main__":
     app.run(
         host="0.0.0.0",
-        port=8000
+        port=8000,
+        debug=True
     )

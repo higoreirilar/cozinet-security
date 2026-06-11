@@ -7,7 +7,7 @@ app.secret_key = "cozinet_saas_2026"
 
 
 # =========================
-# DB
+# DB CONNECTION
 # =========================
 def get_conn():
     return psycopg2.connect(
@@ -143,7 +143,7 @@ def dashboard():
             "dispositivo": r[8],
             "valor": float(r[9]) if r[9] else 0,
             "score_risco": r[10] if r[10] else 0,
-            "status": r[11],
+            "status": r[11] or "analise",
             "motivo": r[12],
             "created_at": str(r[13]) if r[13] else "",
             "analisado_por": r[14],
@@ -167,7 +167,7 @@ def dashboard():
 
 
 # =========================
-# BLOQUEAR IP (COM STATUS PEDIDO)
+# BLOQUEAR IP
 # =========================
 @app.route("/bloquear-ip", methods=["POST"])
 def bloquear_ip():
@@ -181,12 +181,14 @@ def bloquear_ip():
     conn = get_conn()
     cur = conn.cursor()
 
+    # salva bloqueio
     cur.execute("""
         INSERT INTO ips_bloqueados(ip, motivo)
         VALUES(%s,%s)
         ON CONFLICT(ip) DO NOTHING
     """, (ip, "Bloqueio manual"))
 
+    # bloqueia pedidos
     cur.execute("""
         UPDATE pedidos
         SET status='bloqueado'
@@ -212,7 +214,7 @@ def desbloquear_ip(id):
     conn = get_conn()
     cur = conn.cursor()
 
-    # pega IP antes de remover
+    # pega IP do bloqueio
     cur.execute("SELECT ip FROM ips_bloqueados WHERE id=%s", (id,))
     row = cur.fetchone()
 
@@ -239,7 +241,7 @@ def desbloquear_ip(id):
 
 
 # =========================
-# IPs CONFIÁVEIS (OK)
+# IPs CONFIÁVEIS
 # =========================
 @app.route("/ips-confiaveis")
 def ips_confiaveis():

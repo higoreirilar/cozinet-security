@@ -21,7 +21,11 @@
     --muted:#8f8f8f;
 }
 
-*{margin:0;padding:0;box-sizing:border-box;}
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
 body{
     background:var(--bg);
@@ -97,17 +101,19 @@ body{
 .kpi-title{
     font-size:11px;
     color:#999;
-    font-weight:600;
+    text-transform:uppercase;
 }
 
 .kpi-value{
     color:var(--orange);
-    font-size:22px;
+    font-size:20px;
     font-weight:800;
 }
 
 /* PEDIDOS */
-.orders-section{margin-top:30px;}
+.orders-section{
+    margin-top:30px;
+}
 
 .section-title{
     color:var(--orange);
@@ -124,6 +130,7 @@ body{
     margin-bottom:16px;
 }
 
+/* HEADER */
 .pedido-header{
     display:flex;
     justify-content:space-between;
@@ -132,11 +139,7 @@ body{
 }
 
 .pedido-id{color:var(--orange);font-weight:800;}
-
-.pedido-cliente{
-    font-size:20px;
-    font-weight:700;
-}
+.pedido-cliente{font-size:20px;font-weight:700;}
 
 .status{
     padding:8px 14px;
@@ -153,19 +156,40 @@ body{
 .pedido-actions{
     display:flex;
     gap:10px;
-    margin:15px 0;
     flex-wrap:wrap;
+    margin:15px 0;
 }
 
-/* GRID */
+/* GRID FINAL (UMA LINHA, SEM QUEBRA) */
 .pedido-grid{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
     gap:12px;
 }
 
-.item small{color:#888;}
-.item strong{color:white;}
+.item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px;
+    background:#121212;
+    border:1px solid #2a2a2a;
+    border-radius:12px;
+}
+
+.item small{
+    color:#888;
+    font-size:11px;
+    white-space:nowrap;
+}
+
+.item .value{
+    color:white;
+    font-weight:600;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
 
 /* FOOTER */
 .footer-card{
@@ -184,6 +208,7 @@ body{
     color:white;
 }
 
+/* RESPONSIVO */
 @media(max-width:991px){
     .sidebar{position:relative;width:100%;height:auto;}
     .content{margin-left:0;}
@@ -283,14 +308,44 @@ body{
 
             </div>
 
+            <!-- GRID (SEM QUEBRAR TEXTO) -->
             <div class="pedido-grid">
-                <div><small>CPF</small><strong>{{ pedido.cpf }}</strong></div>
-                <div><small>Email</small><strong>{{ pedido.email }}</strong></div>
-                <div><small>Cidade</small><strong>{{ pedido.cidade }}</strong></div>
-                <div><small>Estado</small><strong>{{ pedido.estado }}</strong></div>
-                <div><small>IP</small><strong>{{ pedido.ip }}</strong></div>
-                <div><small>Valor</small><strong>R$ {{ pedido.valor }}</strong></div>
-                <div><small>Score</small><strong>{{ pedido.score_risco }}</strong></div>
+
+                <div class="item">
+                    <small>CPF</small>
+                    <div class="value">{{ pedido.cpf }}</div>
+                </div>
+
+                <div class="item">
+                    <small>Email</small>
+                    <div class="value">{{ pedido.email }}</div>
+                </div>
+
+                <div class="item">
+                    <small>Cidade</small>
+                    <div class="value">{{ pedido.cidade }}</div>
+                </div>
+
+                <div class="item">
+                    <small>Estado</small>
+                    <div class="value">{{ pedido.estado }}</div>
+                </div>
+
+                <div class="item">
+                    <small>IP</small>
+                    <div class="value">{{ pedido.ip }}</div>
+                </div>
+
+                <div class="item">
+                    <small>Valor</small>
+                    <div class="value">R$ {{ pedido.valor }}</div>
+                </div>
+
+                <div class="item">
+                    <small>Score</small>
+                    <div class="value">{{ pedido.score_risco }}</div>
+                </div>
+
             </div>
 
             <div class="footer-card">
@@ -318,7 +373,6 @@ body{
                         <p><b>CPF:</b> {{ pedido.cpf }}</p>
                         <p><b>Email:</b> {{ pedido.email }}</p>
                         <p><b>IP:</b> {{ pedido.ip }}</p>
-                        <p><b>Dispositivo:</b> {{ pedido.dispositivo }}</p>
                         <p><b>Valor:</b> R$ {{ pedido.valor }}</p>
                         <p><b>Score:</b> {{ pedido.score_risco }}</p>
                         <p><b>Status:</b> {{ pedido.status }}</p>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Eirilar - Dashboard</title>
+<title>Eirilar Dashboard</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -65,7 +65,7 @@ body{
     padding:30px;
 }
 
-/* TOPBAR SYSTEM HEADER */
+/* TOPBAR SYSTEM (SAFE) */
 .topbar{
     display:flex;
     justify-content:space-between;
@@ -73,6 +73,17 @@ body{
     margin-bottom:20px;
     padding-bottom:12px;
     border-bottom:1px solid var(--border);
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+/* SYSTEM INFO BAR */
+.system-bar{
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+    align-items:center;
+    font-size:12px;
 }
 
 /* KPI */
@@ -136,6 +147,7 @@ body{
     font-weight:700;
     color:white;
 }
+
 .aprovado{ background:var(--green); }
 .analise{ background:var(--yellow); color:#111; }
 .bloqueado{ background:var(--red); }
@@ -155,7 +167,7 @@ body{
     font-size:13px;
 }
 
-/* USER BOX */
+/* USER */
 .user-box{
     background:var(--red);
     color:white;
@@ -190,40 +202,41 @@ body{
 <!-- CONTENT -->
 <div class="content">
 
-    <!-- SYSTEM HEADER (SUBSTITUI TÍTULO) -->
+    <!-- TOPBAR SAFE SYSTEM -->
     <div class="topbar">
 
-        <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap;">
+        <!-- SYSTEM INFO (SAFE - NÃO QUEBRA SE NÃO EXISTIR) -->
+        <div class="system-bar">
 
-            <div style="font-size:14px;font-weight:900;color:#e11d48;">
+            <div style="font-weight:900;color:#e11d48;">
                 EIRILAR
             </div>
 
-            <div style="font-size:12px;color:#16a34a;font-weight:700;">
+            <div style="color:#16a34a;">
                 🟢 Online
             </div>
 
-            <div style="font-size:12px;color:#2563eb;">
-                🌐 {{ system_info.server_ip }}
+            <div style="color:#2563eb;">
+                🌐 {{ system_info.server_ip if system_info else 'n/a' }}
             </div>
 
-            <div style="font-size:12px;color:#6b7280;">
-                ⏱ {{ system_info.uptime }}s
+            <div style="color:#6b7280;">
+                ⏱ {{ system_info.uptime if system_info else 0 }}s
             </div>
 
-            <div style="font-size:12px;color:#111827;">
-                ⚙ {{ system_info.env }}
+            <div style="color:#111827;">
+                ⚙ {{ system_info.env if system_info else 'prod' }}
             </div>
 
-            <div style="font-size:12px;color:#f59e0b;">
-                📡 Port {{ system_info.port }}
+            <div style="color:#f59e0b;">
+                📡 {{ system_info.port if system_info else '8080' }}
             </div>
 
-            <div style="font-size:12px;color:#8b5cf6;">
+            <div style="color:#8b5cf6;">
                 🧠 Gunicorn
             </div>
 
-            <div style="font-size:12px;color:#ef4444;">
+            <div style="color:#ef4444;">
                 🕒 Live
             </div>
 
@@ -270,7 +283,7 @@ body{
 
     </div>
 
-    <!-- CLIENTES -->
+    <!-- PEDIDOS -->
     <div class="pedido-grid-wrapper">
 
         {% for pedido in pedidos %}
@@ -298,7 +311,6 @@ body{
 
                 <div class="item">CPF: {{ pedido.cpf }}</div>
                 <div class="item">Email: {{ pedido.email }}</div>
-                <div class="item">Telefone: {{ pedido.telefone }}</div>
                 <div class="item">IP: {{ pedido.ip }}</div>
                 <div class="item">Valor: R$ {{ pedido.valor }}</div>
                 <div class="item">Score: {{ pedido.score_risco }}</div>
@@ -312,18 +324,6 @@ body{
     </div>
 
 </div>
-
-<script>
-function bloquearIP(ip){
-    fetch("/bloquear-ip",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({ip})})
-    .then(()=>location.reload());
-}
-
-function desbloquearIP(ip){
-    fetch("/desbloquear-ip",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({ip})})
-    .then(()=>location.reload());
-}
-</script>
 
 </body>
 </html>

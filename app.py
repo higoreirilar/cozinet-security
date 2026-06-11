@@ -7,7 +7,7 @@ app.secret_key = "cozinet_saas_2026"
 
 
 # =========================
-# DB CONNECTION
+# DB
 # =========================
 def get_conn():
     return psycopg2.connect(
@@ -130,10 +130,8 @@ def dashboard():
     cur.close()
     conn.close()
 
-    pedidos = []
-
-    for r in rows:
-        pedidos.append({
+    pedidos = [
+        {
             "id": r[0],
             "order_id": r[1],
             "cliente": r[2],
@@ -151,7 +149,9 @@ def dashboard():
             "analisado_por": r[14],
             "data_analise": str(r[15]) if r[15] else "",
             "pais": r[16]
-        })
+        }
+        for r in rows
+    ]
 
     return render_template(
         "dashboard.html",
@@ -167,7 +167,7 @@ def dashboard():
 
 
 # =========================
-# BLOQUEAR IP + BLOQUEAR PEDIDOS
+# BLOQUEAR IP (COM STATUS PEDIDO)
 # =========================
 @app.route("/bloquear-ip", methods=["POST"])
 def bloquear_ip():
@@ -175,20 +175,18 @@ def bloquear_ip():
     if not login_required():
         return jsonify({"error": "unauthorized"}), 401
 
-    dados = request.get_json()
-    ip = dados.get("ip")
+    data = request.get_json()
+    ip = data.get("ip")
 
     conn = get_conn()
     cur = conn.cursor()
 
-    # insere bloqueio IP
     cur.execute("""
         INSERT INTO ips_bloqueados(ip, motivo)
         VALUES(%s,%s)
         ON CONFLICT(ip) DO NOTHING
     """, (ip, "Bloqueio manual"))
 
-    # bloqueia pedidos desse IP
     cur.execute("""
         UPDATE pedidos
         SET status='bloqueado'
@@ -199,31 +197,34 @@ def bloquear_ip():
     cur.close()
     conn.close()
 
-    return jsonify({"success": True, "message": f"IP {ip} bloqueado"})
+    return jsonify({"success": True, "message": "IP bloqueado"})
 
 
 # =========================
-# DESBLOQUEAR IP (CORRIGIDO)
+# DESBLOQUEAR IP (CORRIGIDO DEFINITIVO)
 # =========================
-@app.route("/desbloquear-ip", methods=["POST"])
-def desbloquear_ip():
+@app.route("/desbloquear-ip/<int:id>", methods=["POST"])
+def desbloquear_ip(id):
 
     if not login_required():
         return jsonify({"error": "unauthorized"}), 401
 
-    dados = request.get_json()
-    ip = dados.get("ip")
-
     conn = get_conn()
     cur = conn.cursor()
 
-    # remove bloqueio
-    cur.execute("""
-        DELETE FROM ips_bloqueados
-        WHERE ip=%s
-    """, (ip,))
+    # pega IP antes de remover
+    cur.execute("SELECT ip FROM ips_bloqueados WHERE id=%s", (id,))
+    row = cur.fetchone()
 
-    # reativa pedidos desse IP
+    if not row:
+        return jsonify({"error": "IP não encontrado"}), 404
+
+    ip = row[0]
+
+    # remove bloqueio
+    cur.execute("DELETE FROM ips_bloqueados WHERE id=%s", (id,))
+
+    # reativa pedidos
     cur.execute("""
         UPDATE pedidos
         SET status='analise'
@@ -235,6 +236,46 @@ def desbloquear_ip():
     conn.close()
 
     return jsonify({"success": True, "message": "IP desbloqueado"})
+
+
+# =========================
+# IPs CONFIÁVEIS (OK)
+# =========================
+@app.route("/ips-confiaveis")
+def ips_confiaveis():
+
+    if not login_required():
+        return redirect("/login")
+
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT id, ip, observacao, data_cadastro
+        FROM ips_confiaveis
+        ORDER BY data_cadastro DESC
+    """)
+
+    rows = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    dados = [
+        {
+            "id": r[0],
+            "ip": r[1],
+            "observacao": r[2],
+            "data": str(r[3]) if r[3] else ""
+        }
+        for r in rows
+    ]
+
+    return render_template(
+        "ips_confiaveis.html",
+        dados=dados,
+        usuario=session.get("nome")
+    )
 
 
 # =========================

@@ -2,107 +2,224 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Dashboard Antifraude</title>
+<title>Cozinet - Antifraude</title>
 
 <style>
 body {
-    font-family: Arial;
-    background: #0f172a;
-    color: white;
+    margin: 0;
+    font-family: 'Arial';
+    background: #0a0a0f;
+    color: #fff;
+}
+
+/* TOP BAR */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
+    background: #0f0f14;
+    border-bottom: 2px solid #ff6a00;
+    box-shadow: 0 0 15px rgba(255, 106, 0, 0.2);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.brand img {
+    width: 40px;
+    height: 40px;
+    filter: drop-shadow(0 0 8px #ff6a00);
+}
+
+.brand h2 {
+    color: #ff6a00;
+    margin: 0;
+    letter-spacing: 1px;
+}
+
+/* CARDS */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
     padding: 20px;
 }
 
-h1 { color: #38bdf8; }
-
-.cards {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+.card {
+    background: #12121a;
+    border: 1px solid #1f1f2a;
+    padding: 20px;
+    border-radius: 14px;
+    text-align: center;
+    transition: 0.3s;
+    position: relative;
+    overflow: hidden;
 }
 
-.card {
-    flex: 1;
-    padding: 15px;
-    background: #1e293b;
-    border-radius: 8px;
+.card:hover {
+    transform: translateY(-6px);
+    border-color: #ff6a00;
+    box-shadow: 0 0 25px rgba(255, 106, 0, 0.25);
+}
+
+.card b {
+    font-size: 24px;
+    color: #ff6a00;
+}
+
+/* TABLE */
+.table-container {
+    padding: 20px;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
-    background: #1e293b;
+    background: #12121a;
+    border-radius: 12px;
+    overflow: hidden;
 }
 
-th, td {
-    padding: 10px;
-    border-bottom: 1px solid #334155;
+th {
+    background: #0f0f14;
+    color: #ff6a00;
+    padding: 12px;
 }
 
-th { background: #0b1220; }
+td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #1f1f2a;
+}
 
+/* BUTTONS */
 button {
-    padding: 5px 8px;
+    padding: 6px 10px;
     border: none;
+    border-radius: 6px;
     cursor: pointer;
-    border-radius: 5px;
+    transition: 0.3s;
 }
 
-.block { background: #ef4444; color: white; }
-.unblock { background: #22c55e; color: white; }
+.block {
+    background: #ff3b30;
+    color: white;
+}
+
+.unblock {
+    background: #ff6a00;
+    color: black;
+    font-weight: bold;
+}
+
+button:hover {
+    transform: scale(1.08);
+}
+
+/* BACKGROUND EFFECT */
+body::before {
+    content: "";
+    position: fixed;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,106,0,0.08) 0%, transparent 60%);
+    animation: move 12s linear infinite;
+    z-index: -1;
+}
+
+@keyframes move {
+    from { transform: translate(0,0); }
+    to { transform: translate(-200px,-200px); }
+}
+
+/* TITLE EFFECT */
+.title {
+    text-align: center;
+    padding: 10px;
+    color: #ff6a00;
+    font-size: 18px;
+    opacity: 0.8;
+}
 </style>
 </head>
 
 <body>
 
-<h1>📊 Dashboard Antifraude</h1>
-<p>Bem-vindo, {{ usuario }}</p>
+<!-- TOP -->
+<div class="topbar">
+
+    <div class="brand">
+        <img src="/static/logo.png">
+        <h2>COZINET</h2>
+    </div>
+
+    <div>
+        👤 {{ usuario }}
+    </div>
+
+</div>
+
+<div class="title">
+    Painel Antifraude em tempo real
+</div>
 
 <!-- CARDS -->
 <div class="cards">
-    <div class="card">✔ Aprovados: {{ aprovados }}</div>
-    <div class="card">⏳ Análise: {{ analise }}</div>
-    <div class="card">🚫 Bloqueados: {{ bloqueados }}</div>
+
+    <div class="card">
+        ✔ APROVADOS<br>
+        <b>{{ aprovados }}</b>
+    </div>
+
+    <div class="card">
+        ⏳ ANÁLISE<br>
+        <b>{{ analise }}</b>
+    </div>
+
+    <div class="card">
+        🚫 BLOQUEADOS<br>
+        <b>{{ bloqueados }}</b>
+    </div>
+
 </div>
 
-<!-- TABELA -->
+<!-- TABLE -->
+<div class="table-container">
 <table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Pedido</th>
-            <th>IP</th>
-            <th>Valor</th>
-            <th>Status</th>
-            <th>Motivo</th>
-            <th>Ações</th>
-        </tr>
-    </thead>
 
-    <tbody>
-        {% for p in pedidos %}
-        <tr>
-            <td>{{ p.id }}</td>
-            <td>{{ p.order_id }}</td>
-            <td>{{ p.ip }}</td>
-            <td>R$ {{ p.valor }}</td>
-            <td>{{ p.status }}</td>
-            <td>{{ p.motivo }}</td>
-            <td>
+<tr>
+    <th>ID</th>
+    <th>Pedido</th>
+    <th>IP</th>
+    <th>Valor</th>
+    <th>Status</th>
+    <th>Motivo</th>
+    <th>Ações</th>
+</tr>
 
-                <button class="block" onclick="bloquear('{{ p.ip }}')">
-                    🚫 Bloquear
-                </button>
+{% for p in pedidos %}
 
-                <button class="unblock" onclick="desbloquear('{{ p.ip }}')">
-                    🔓 Desbloquear
-                </button>
+<tr>
+    <td>{{ p.id }}</td>
+    <td>{{ p.order_id }}</td>
+    <td>{{ p.ip }}</td>
+    <td>R$ {{ p.valor }}</td>
+    <td>{{ p.status }}</td>
+    <td>{{ p.motivo }}</td>
+    <td>
+        <button class="block" onclick="bloquear('{{ p.ip }}')">🚫 Bloquear</button>
+        <button class="unblock" onclick="desbloquear('{{ p.ip }}')">🔓 Desbloquear</button>
+    </td>
+</tr>
 
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
+{% endfor %}
+
 </table>
+</div>
 
 <script>
 function bloquear(ip){

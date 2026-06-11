@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Eirilar Shield - Dashboard</title>
+<title>Eirilar - Dashboard</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -18,7 +18,7 @@
     --green:#16a34a;
     --yellow:#f59e0b;
     --blue:#2563eb;
-    --dark:#111827;
+    --gray:#6b7280;
 }
 
 body{
@@ -65,40 +65,14 @@ body{
     padding:30px;
 }
 
-/* TOPBAR */
+/* TOPBAR SYSTEM HEADER */
 .topbar{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    margin-bottom:15px;
-}
-
-.brand{
-    font-size:26px;
-    font-weight:900;
-    color:var(--red);
-}
-
-.user-box{
-    background:var(--red);
-    color:white;
-    padding:10px 15px;
-    border-radius:12px;
-    font-weight:700;
-}
-
-/* SYSTEM PANEL */
-.system-panel{
-    background:white;
-    border:1px solid var(--border);
-    padding:15px;
-    border-radius:14px;
     margin-bottom:20px;
-
-    display:grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap:10px;
-    font-size:13px;
+    padding-bottom:12px;
+    border-bottom:1px solid var(--border);
 }
 
 /* KPI */
@@ -134,7 +108,6 @@ body{
 .red{ color:var(--red); }
 .yellow{ color:var(--yellow); }
 .blue{ color:var(--blue); }
-.dark{ color:var(--dark); }
 
 /* CLIENTES */
 .pedido-grid-wrapper{
@@ -156,7 +129,6 @@ body{
     padding:18px;
 }
 
-/* STATUS */
 .status{
     padding:6px 12px;
     border-radius:999px;
@@ -168,7 +140,6 @@ body{
 .analise{ background:var(--yellow); color:#111; }
 .bloqueado{ background:var(--red); }
 
-/* GRID */
 .pedido-grid{
     display:grid;
     grid-template-columns: repeat(2, 1fr);
@@ -181,6 +152,16 @@ body{
     border:1px solid #eee;
     padding:8px 10px;
     border-radius:10px;
+    font-size:13px;
+}
+
+/* USER BOX */
+.user-box{
+    background:var(--red);
+    color:white;
+    padding:8px 14px;
+    border-radius:12px;
+    font-weight:700;
     font-size:13px;
 }
 
@@ -209,38 +190,47 @@ body{
 <!-- CONTENT -->
 <div class="content">
 
-    <!-- TOP -->
+    <!-- SYSTEM HEADER (SUBSTITUI TÍTULO) -->
     <div class="topbar">
-        <div class="brand">Eirilar Shield</div>
-        <div class="user-box">👤 {{ usuario }}</div>
-    </div>
 
-    <!-- SYSTEM STATUS -->
-    <div class="system-panel">
+        <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap;">
 
-        <div>
-            <b>🟢 Status</b><br>
-            {{ system_info.status }}
+            <div style="font-size:14px;font-weight:900;color:#e11d48;">
+                EIRILAR
+            </div>
+
+            <div style="font-size:12px;color:#16a34a;font-weight:700;">
+                🟢 Online
+            </div>
+
+            <div style="font-size:12px;color:#2563eb;">
+                🌐 {{ system_info.server_ip }}
+            </div>
+
+            <div style="font-size:12px;color:#6b7280;">
+                ⏱ {{ system_info.uptime }}s
+            </div>
+
+            <div style="font-size:12px;color:#111827;">
+                ⚙ {{ system_info.env }}
+            </div>
+
+            <div style="font-size:12px;color:#f59e0b;">
+                📡 Port {{ system_info.port }}
+            </div>
+
+            <div style="font-size:12px;color:#8b5cf6;">
+                🧠 Gunicorn
+            </div>
+
+            <div style="font-size:12px;color:#ef4444;">
+                🕒 Live
+            </div>
+
         </div>
 
-        <div>
-            <b>🌐 Server</b><br>
-            {{ system_info.server_ip }}
-        </div>
-
-        <div>
-            <b>🖥 Host</b><br>
-            {{ system_info.hostname }}
-        </div>
-
-        <div>
-            <b>⚙ Env</b><br>
-            {{ system_info.env }}
-        </div>
-
-        <div>
-            <b>⏱ Uptime</b><br>
-            {{ system_info.uptime }}s
+        <div class="user-box">
+            👤 {{ usuario }}
         </div>
 
     </div>
@@ -250,7 +240,7 @@ body{
 
         <div class="kpi-card">
             <div class="kpi-title">Total</div>
-            <div class="kpi-value dark">{{ total_pedidos }}</div>
+            <div class="kpi-value">{{ total_pedidos }}</div>
         </div>
 
         <div class="kpi-card">
@@ -275,7 +265,7 @@ body{
 
         <div class="kpi-card">
             <div class="kpi-title">Score</div>
-            <div class="kpi-value yellow">{{ score_medio }}</div>
+            <div class="kpi-value">{{ score_medio }}</div>
         </div>
 
     </div>
@@ -315,14 +305,6 @@ body{
 
             </div>
 
-            <div style="margin-top:10px;">
-                <button class="btn btn-danger btn-sm" onclick="bloquearIP('{{ pedido.ip }}')">Bloquear</button>
-                <button class="btn btn-success btn-sm" onclick="desbloquearIP('{{ pedido.ip }}')">Desbloquear</button>
-                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modal{{ pedido.id }}">
-                    Detalhes
-                </button>
-            </div>
-
         </div>
 
         {% endfor %}
@@ -342,8 +324,6 @@ function desbloquearIP(ip){
     .then(()=>location.reload());
 }
 </script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

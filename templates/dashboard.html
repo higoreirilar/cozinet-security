@@ -86,34 +86,33 @@ body{
     border-radius:16px;
     padding:18px;
     text-align:center;
-    transition:0.2s;
-}
-
-.kpi-card:hover{
-    transform: translateY(-3px);
-    border-color:#ff7a00;
-}
-
-.kpi-title{
-    font-size:11px;
-    color:#aaa;
-    text-transform:uppercase;
 }
 
 .kpi-value{
-    color:#ff7a00;
+    color:var(--orange);
     font-size:22px;
     font-weight:800;
-    margin-top:6px;
 }
 
-/* ================= PEDIDOS ================= */
+/* ================= CLIENT GRID (2 COLUNAS) ================= */
+.pedido-grid-wrapper{
+    display:grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap:15px;
+}
+
+@media (max-width: 992px){
+    .pedido-grid-wrapper{
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ================= CARD ================= */
 .pedido-card{
     background:var(--card);
     border:1px solid var(--border);
     border-radius:16px;
     padding:18px;
-    margin-bottom:15px;
 }
 
 .status{
@@ -128,8 +127,8 @@ body{
 
 .pedido-grid{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-    gap:10px;
+    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:8px;
     margin-top:10px;
 }
 
@@ -138,6 +137,7 @@ body{
     padding:8px;
     border-radius:10px;
     border:1px solid #222;
+    font-size:13px;
 }
 
 /* ================= MODAL ================= */
@@ -182,103 +182,105 @@ body{
 
     <!-- KPI -->
     <div class="kpi-grid">
-
-        <div class="kpi-card"><div class="kpi-title">Total</div><div class="kpi-value">{{ total_pedidos }}</div></div>
-        <div class="kpi-card"><div class="kpi-title">Aprovados</div><div class="kpi-value">{{ aprovados }}</div></div>
-        <div class="kpi-card"><div class="kpi-title">Análise</div><div class="kpi-value">{{ analise }}</div></div>
-        <div class="kpi-card"><div class="kpi-title">Bloqueados</div><div class="kpi-value">{{ bloqueados }}</div></div>
-        <div class="kpi-card"><div class="kpi-title">Protegido</div><div class="kpi-value">R$ {{ valor_protegido }}</div></div>
-        <div class="kpi-card"><div class="kpi-title">Score Médio</div><div class="kpi-value">{{ score_medio }}</div></div>
-
+        <div class="kpi-card">Total<br><div class="kpi-value">{{ total_pedidos }}</div></div>
+        <div class="kpi-card">Aprovados<br><div class="kpi-value">{{ aprovados }}</div></div>
+        <div class="kpi-card">Análise<br><div class="kpi-value">{{ analise }}</div></div>
+        <div class="kpi-card">Bloqueados<br><div class="kpi-value">{{ bloqueados }}</div></div>
+        <div class="kpi-card">Protegido<br><div class="kpi-value">R$ {{ valor_protegido }}</div></div>
+        <div class="kpi-card">Score<br><div class="kpi-value">{{ score_medio }}</div></div>
     </div>
 
-    <!-- PEDIDOS -->
-    {% for pedido in pedidos %}
+    <!-- GRID CLIENTES -->
+    <div class="pedido-grid-wrapper">
 
-    <div class="pedido-card">
+        {% for pedido in pedidos %}
 
-        <div style="display:flex;justify-content:space-between;">
-            <div>
-                <b>#{{ pedido.order_id }}</b><br>
-                {{ pedido.cliente }}
-            </div>
+        <div class="pedido-card">
 
-            <div>
-                {% if pedido.status == 'aprovado' %}
-                    <span class="status aprovado">APROVADO</span>
-                {% elif pedido.status == 'analise' %}
-                    <span class="status analise">ANÁLISE</span>
-                {% else %}
-                    <span class="status bloqueado">BLOQUEADO</span>
-                {% endif %}
-            </div>
-        </div>
-
-        <div style="margin-top:10px;">
-            <button class="btn btn-danger btn-sm" onclick="bloquearIP('{{ pedido.ip }}')">Bloquear</button>
-            <button class="btn btn-success btn-sm" onclick="desbloquearIP('{{ pedido.ip }}')">Desbloquear</button>
-            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modal{{ pedido.id }}">Detalhes</button>
-        </div>
-
-        <div class="pedido-grid">
-
-            <div class="item">CPF: {{ pedido.cpf }}</div>
-            <div class="item">Email: {{ pedido.email }}</div>
-            <div class="item">Telefone: {{ pedido.telefone }}</div>
-            <div class="item">Rua: {{ pedido.rua }}</div>
-            <div class="item">CEP: {{ pedido.cep }}</div>
-            <div class="item">IP: {{ pedido.ip }}</div>
-            <div class="item">Valor: R$ {{ pedido.valor }}</div>
-            <div class="item">Score: {{ pedido.score_risco }}</div>
-
-        </div>
-
-    </div>
-
-    <!-- ================= MODAL ================= -->
-    <div class="modal fade" id="modal{{ pedido.id }}" tabindex="-1">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-
-                <div class="modal-header">
-                    <h5>Pedido #{{ pedido.order_id }}</h5>
-                    <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            <div style="display:flex;justify-content:space-between;">
+                <div>
+                    <b>#{{ pedido.order_id }}</b><br>
+                    {{ pedido.cliente }}
                 </div>
 
-                <div class="modal-body">
+                <div>
+                    {% if pedido.status == 'aprovado' %}
+                        <span class="status aprovado">APROVADO</span>
+                    {% elif pedido.status == 'analise' %}
+                        <span class="status analise">ANÁLISE</span>
+                    {% else %}
+                        <span class="status bloqueado">BLOQUEADO</span>
+                    {% endif %}
+                </div>
+            </div>
 
-                    <h6 class="section-title">Cliente</h6>
-                    <p>{{ pedido.cliente }} | {{ pedido.cpf }}</p>
-                    <p>{{ pedido.email }} | {{ pedido.telefone }}</p>
+            <div style="margin-top:10px;">
+                <button class="btn btn-danger btn-sm" onclick="bloquearIP('{{ pedido.ip }}')">Bloquear</button>
+                <button class="btn btn-success btn-sm" onclick="desbloquearIP('{{ pedido.ip }}')">Desbloquear</button>
+                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modal{{ pedido.id }}">
+                    Detalhes
+                </button>
+            </div>
 
-                    <h6 class="section-title">Endereço</h6>
-                    <p>{{ pedido.rua }} - CEP {{ pedido.cep }}</p>
+            <div class="pedido-grid">
+                <div class="item">CPF: {{ pedido.cpf }}</div>
+                <div class="item">Email: {{ pedido.email }}</div>
+                <div class="item">Telefone: {{ pedido.telefone }}</div>
+                <div class="item">Rua: {{ pedido.rua }}</div>
+                <div class="item">CEP: {{ pedido.cep }}</div>
+                <div class="item">IP: {{ pedido.ip }}</div>
+                <div class="item">Valor: R$ {{ pedido.valor }}</div>
+                <div class="item">Score: {{ pedido.score_risco }}</div>
+            </div>
 
-                    <h6 class="section-title">Pedido</h6>
-                    <p>R$ {{ pedido.valor }} | Score {{ pedido.score_risco }}</p>
+        </div>
 
-                    <h6 class="section-title">IP</h6>
-                    <p>{{ pedido.ip }}</p>
+        <!-- MODAL -->
+        <div class="modal fade" id="modal{{ pedido.id }}" tabindex="-1">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
 
-                    <hr>
+                    <div class="modal-header">
+                        <h5>Pedido #{{ pedido.order_id }}</h5>
+                        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
 
-                    <h6 class="section-title">Histórico CPF</h6>
-                    {% for h in pedido.hist_cpf %}
-                        <p>#{{ h[0] }} - R$ {{ h[1] }} - {{ h[2] }}</p>
-                    {% endfor %}
+                    <div class="modal-body">
 
-                    <h6 class="section-title">Histórico IP</h6>
-                    {% for h in pedido.hist_ip %}
-                        <p>#{{ h[0] }} - {{ h[1] }} - R$ {{ h[2] }}</p>
-                    {% endfor %}
+                        <h6 class="section-title">Cliente</h6>
+                        <p>{{ pedido.cliente }} | {{ pedido.cpf }}</p>
+                        <p>{{ pedido.email }} | {{ pedido.telefone }}</p>
+
+                        <h6 class="section-title">Endereço</h6>
+                        <p>{{ pedido.rua }} - CEP {{ pedido.cep }}</p>
+
+                        <h6 class="section-title">Pedido</h6>
+                        <p>R$ {{ pedido.valor }} | Score {{ pedido.score_risco }}</p>
+
+                        <h6 class="section-title">IP</h6>
+                        <p>{{ pedido.ip }}</p>
+
+                        <hr>
+
+                        <h6 class="section-title">Histórico CPF</h6>
+                        {% for h in pedido.hist_cpf %}
+                            <p>#{{ h[0] }} - R$ {{ h[1] }} - {{ h[2] }}</p>
+                        {% endfor %}
+
+                        <h6 class="section-title">Histórico IP</h6>
+                        {% for h in pedido.hist_ip %}
+                            <p>#{{ h[0] }} - {{ h[1] }} - R$ {{ h[2] }}</p>
+                        {% endfor %}
+
+                    </div>
 
                 </div>
-
             </div>
         </div>
-    </div>
 
-    {% endfor %}
+        {% endfor %}
+
+    </div>
 
 </div>
 

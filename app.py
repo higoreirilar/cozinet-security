@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, render_template, session, redirect
 import os
 import psycopg2
+from antifraude import calcular_score, should_block
 
 app = Flask(__name__)
 app.secret_key = "cozinet_saas_2026"
@@ -59,7 +60,7 @@ def login():
 
 
 # =========================
-# DASHBOARD (BLINDADO)
+# DASHBOARD
 # =========================
 @app.route("/dashboard")
 def dashboard():
@@ -99,7 +100,6 @@ def dashboard():
     """)
     score_medio = cur.fetchone()[0]
 
-    # 🔥 SELECT SEGURO (SEM CAMPOS EXTRAS)
     cur.execute("""
         SELECT id, order_id, cliente, cpf, email,
                ip, valor, score_risco, status,
@@ -144,7 +144,7 @@ def dashboard():
 
 
 # =========================
-# BLOQUEAR IP
+# BLOQUEAR (MANUAL + AUTO)
 # =========================
 @app.route("/bloquear-ip", methods=["POST"])
 def bloquear_ip():
@@ -178,7 +178,7 @@ def bloquear_ip():
 
 
 # =========================
-# DESBLOQUEAR IP
+# DESBLOQUEAR
 # =========================
 @app.route("/desbloquear-ip", methods=["POST"])
 def desbloquear_ip():
@@ -211,87 +211,45 @@ def desbloquear_ip():
 
 
 # =========================
-# BLOQUEADOS
+# EXEMPLO: quando criar pedido (AUTO BLOCK)
 # =========================
-@app.route("/bloqueados")
-def bloqueados():
+@app.route("/processar-pedido", methods=["POST"])
+def processar_pedido():
 
-    if not login_required():
-        return redirect("/login")
+    data = request.get_json()
 
-    conn = get_conn()
-    cur = conn.cursor()
+    ip = data.get("ip")
+    valor = data.get("valor")
+    cpf = data.get("cpf")
+    email = data.get("email")
 
-    cur.execute("""
-        SELECT id, ip, motivo, data_cadastro
-        FROM ips_bloqueados
-        ORDER BY id DESC
-    """)
+    score, motivos = calcular_score(ip, valor, cpf, email)
 
-    rows = cur.fetchall()
+    if should_block(score, motivos):
 
-    cur.close()
-    conn.close()
+        status = "bloqueado"
 
-    data = [{"id": r[0], "ip": r[1], "motivo": r[2], "data": str(r[3])} for r in rows]
+        conn = get_conn()
+        cur = conn.cursor()
 
-    return render_template("bloqueados.html", bloqueados=data, usuario=session.get("nome"))
+        cur.execute("""
+            INSERT INTO ips_bloqueados(ip, motivo)
+            VALUES(%s,%s)
+            ON CONFLICT(ip) DO NOTHING
+        """, (ip, "auto_score"))
 
+        conn.commit()
+        cur.close()
+        conn.close()
 
-# =========================
-# CONFIÁVEIS
-# =========================
-@app.route("/ips-confiaveis")
-def ips_confiaveis():
+    else:
+        status = "analise"
 
-    if not login_required():
-        return redirect("/login")
-
-    conn = get_conn()
-    cur = conn.cursor()
-
-    cur.execute("""
-        SELECT id, ip, observacao, data_cadastro
-        FROM ips_confiaveis
-        ORDER BY id DESC
-    """)
-
-    rows = cur.fetchall()
-
-    cur.close()
-    conn.close()
-
-    data = [{"id": r[0], "ip": r[1], "observacao": r[2], "data": str(r[3])} for r in rows]
-
-    return render_template("ips_confiaveis.html", ips=data, usuario=session.get("nome"))
-
-
-# =========================
-# LOGS
-# =========================
-@app.route("/logs")
-def logs():
-
-    if not login_required():
-        return redirect("/login")
-
-    conn = get_conn()
-    cur = conn.cursor()
-
-    cur.execute("""
-        SELECT id, tipo, mensagem, ip, created_at
-        FROM logs
-        ORDER BY id DESC
-    """)
-
-    rows = cur.fetchall()
-
-    cur.close()
-    conn.close()
-
-    data = [{"id": r[0], "tipo": r[1], "mensagem": r[2], "ip": r[3], "data": str(r[4])} for r in rows]
-
-    return render_template("logs.html", logs=data, usuario=session.get("nome"))
+    return jsonify({
+        "status": status,
+        "score": score,
+        "motivos": motivos
+    })
 
 
 # =========================

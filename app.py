@@ -24,10 +24,18 @@ def login_required():
     return "user_id" in session
 
 # =========================
+# ROOT
+# =========================
+@app.route("/")
+def root():
+    return redirect("/login")
+
+# =========================
 # LOGIN
 # =========================
 @app.route("/login", methods=["GET", "POST"])
 def login():
+
     if request.method == "POST":
         email = request.form.get("email")
         senha = request.form.get("senha")
@@ -60,12 +68,14 @@ def login():
 # =========================
 @app.route("/dashboard")
 def dashboard():
+
     if not login_required():
         return redirect("/login")
 
     conn = get_conn()
     cur = conn.cursor()
 
+    # KPIs
     cur.execute("SELECT COUNT(*) FROM pedidos")
     total = cur.fetchone()[0]
 
@@ -76,7 +86,8 @@ def dashboard():
     analise = cur.fetchone()[0]
 
     cur.execute("""
-        SELECT COUNT(*) FROM pedidos
+        SELECT COUNT(*)
+        FROM pedidos
         WHERE ip IN (SELECT ip FROM ips_bloqueados)
     """)
     bloqueados = cur.fetchone()[0]
@@ -94,21 +105,37 @@ def dashboard():
     """)
     score = cur.fetchone()[0]
 
+    # pedidos
     cur.execute("""
-        SELECT id, order_id, cliente, cpf, email, ip, valor, score_risco, status
+        SELECT id, order_id, cliente, cpf, email,
+               ip, valor, score_risco, status
         FROM pedidos
         ORDER BY id DESC
         LIMIT 50
     """)
 
-    pedidos = cur.fetchall()
+    rows = cur.fetchall()
 
     cur.close()
     conn.close()
 
+    pedidos = []
+    for r in rows:
+        pedidos.append({
+            "id": r[0],
+            "order_id": r[1],
+            "cliente": r[2],
+            "cpf": r[3],
+            "email": r[4],
+            "ip": r[5],
+            "valor": float(r[6]) if r[6] else 0,
+            "score_risco": r[7],
+            "status": r[8]
+        })
+
     return render_template(
         "dashboard.html",
-        usuario=session["nome"],
+        usuario=session.get("nome"),
         total=total,
         aprovados=aprovados,
         analise=analise,
@@ -119,38 +146,40 @@ def dashboard():
     )
 
 # =========================
-# BLOQUEADOS
+# BLOQUEAR IP
 # =========================
-@app.route("/bloqueados")
-def bloqueados():
+@app.route("/bloquear-ip", methods=["POST"])
+def bloquear_ip():
+
     if not login_required():
-        return redirect("/login")
+        return jsonify({"error": "unauthorized"}), 401
+
+    ip = request.get_json().get("ip")
 
     conn = get_conn()
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT id, ip, motivo, data_bloqueio
-        FROM ips_bloqueados
-        ORDER BY id DESC
-    """)
+        INSERT INTO ips_bloqueados(ip, motivo)
+        VALUES(%s, %s)
+        ON CONFLICT DO NOTHING
+    """, (ip, "manual"))
 
-    dados = cur.fetchall()
-
+    conn.commit()
     cur.close()
     conn.close()
 
-    return render_template(
-        "bloqueados.html",
-        usuario=session["nome"],
-        bloqueados=dados
-    )
+    return jsonify({"ok": True})
 
 # =========================
-# DESBLOQUEAR
+# DESBLOQUEAR IP
 # =========================
 @app.route("/desbloquear-ip", methods=["POST"])
-def desbloquear():
+def desbloquear_ip():
+
+    if not login_required():
+        return jsonify({"error": "unauthorized"}), 401
+
     ip = request.get_json().get("ip")
 
     conn = get_conn()

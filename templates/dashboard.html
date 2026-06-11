@@ -38,225 +38,161 @@ body{
 /* SIDEBAR */
 
 .sidebar{
-
     position:fixed;
     left:0;
     top:0;
-
     width:280px;
     height:100vh;
-
     background:var(--sidebar);
-
     border-right:1px solid var(--border);
-
     padding:25px;
-
     overflow-y:auto;
 }
 
 .logo{
-
     text-align:center;
-
     margin-bottom:35px;
 }
 
 .logo img{
-
     width:230px;
 }
 
 .menu a{
-
     display:block;
-
     text-decoration:none;
-
-    color:#cfcfcf;
-
+    color:#d1d5db;
     padding:14px;
-
     border-radius:14px;
-
     margin-bottom:10px;
-
     transition:.3s;
 }
 
 .menu a:hover{
-
     background:var(--orange);
-
     color:white;
 }
 
 /* CONTENT */
 
 .content{
-
     margin-left:280px;
-
     padding:30px;
 }
 
 .topbar{
-
     display:flex;
-
     justify-content:space-between;
-
     align-items:center;
-
     margin-bottom:25px;
+    flex-wrap:wrap;
+    gap:15px;
+}
+
+.title{
+    font-size:30px;
+    font-weight:800;
+}
+
+.subtitle{
+    color:var(--muted);
 }
 
 .user-box{
-
     background:linear-gradient(
         135deg,
         var(--orange),
         var(--orange2)
     );
-
     padding:12px 18px;
-
     border-radius:14px;
-
     font-weight:700;
 }
 
-.title{
-
-    font-size:30px;
-
-    font-weight:800;
-}
-
-.subtitle{
-
-    color:var(--muted);
-}
-
-/* CARDS KPIs */
+/* KPIs */
 
 .kpi-card{
-
     background:var(--card);
-
     border:1px solid var(--border);
-
-    border-radius:22px;
-
-    padding:22px;
-
-    transition:.3s;
-
+    border-radius:16px;
+    padding:12px;
+    text-align:center;
     height:100%;
+    transition:.3s;
 }
 
 .kpi-card:hover{
-
     border-color:var(--orange);
-
     transform:translateY(-2px);
 }
 
 .kpi-title{
-
-    color:#9c9c9c;
-
-    font-size:13px;
+    font-size:11px;
+    color:#999;
+    font-weight:600;
+    margin-bottom:6px;
+    text-transform:uppercase;
 }
 
 .kpi-value{
-
     color:var(--orange);
-
-    font-size:32px;
-
+    font-size:22px;
     font-weight:800;
-
-    margin-top:10px;
+    line-height:1.1;
 }
 
 /* PEDIDOS */
 
 .orders-section{
-
-    margin-top:35px;
+    margin-top:30px;
 }
 
 .section-title{
-
     color:var(--orange);
-
     font-size:24px;
-
     font-weight:700;
-
     margin-bottom:20px;
 }
 
 .pedido-card{
-
     background:var(--card);
-
     border:1px solid var(--border);
-
-    border-radius:22px;
-
-    padding:22px;
-
-    margin-bottom:18px;
-
+    border-radius:20px;
+    padding:20px;
+    margin-bottom:16px;
     transition:.3s;
 }
 
 .pedido-card:hover{
-
     border-color:var(--orange);
-
-    box-shadow:0 0 25px rgba(255,122,0,.15);
+    transform:translateY(-2px);
+    box-shadow:0 0 25px rgba(255,122,0,.12);
 }
 
 .pedido-header{
-
     display:flex;
-
     justify-content:space-between;
-
     align-items:center;
-
-    margin-bottom:20px;
-
+    margin-bottom:18px;
     flex-wrap:wrap;
+    gap:10px;
 }
 
 .pedido-id{
-
     color:var(--orange);
-
-    font-weight:800;
-
     font-size:18px;
+    font-weight:700;
 }
 
 .pedido-cliente{
-
     font-size:22px;
-
     font-weight:700;
 }
 
 .status{
-
     padding:8px 16px;
-
     border-radius:999px;
-
     font-size:12px;
-
     font-weight:700;
 }
 
@@ -273,49 +209,32 @@ body{
 }
 
 .pedido-grid{
-
     display:grid;
-
     grid-template-columns:
     repeat(auto-fit,minmax(220px,1fr));
-
-    gap:18px;
-
-    margin-bottom:20px;
+    gap:16px;
+    margin-bottom:18px;
 }
 
 .item small{
-
     display:block;
-
     color:#888;
-
     margin-bottom:4px;
 }
 
 .item strong{
-
     color:white;
 }
 
 .footer-card{
-
     border-top:1px solid var(--border);
-
     padding-top:15px;
-
     display:flex;
-
     justify-content:space-between;
-
     flex-wrap:wrap;
-
     gap:10px;
-
-    color:#bcbcbc;
+    color:#bbb;
 }
-
-/* RESPONSIVO */
 
 @media(max-width:991px){
 
@@ -334,29 +253,20 @@ body{
 </style>
 
 </head>
-
 <body>
 
 <div class="sidebar">
 
     <div class="logo">
-
         <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
-
     </div>
 
     <div class="menu">
-
         <a href="/dashboard">🏠 Dashboard</a>
-
         <a href="/bloqueados">🚫 IPs Bloqueados</a>
-
         <a href="/ips-confiaveis">🟢 IPs Confiáveis</a>
-
         <a href="/logs">📜 Logs</a>
-
         <a href="/logout">🚪 Sair</a>
-
     </div>
 
 </div>
@@ -366,15 +276,10 @@ body{
     <div class="topbar">
 
         <div>
-
-            <div class="title">
-                Cozinet Shield
-            </div>
-
+            <div class="title">Cozinet Shield</div>
             <div class="subtitle">
                 Plataforma Inteligente de Prevenção a Fraudes
             </div>
-
         </div>
 
         <div class="user-box">
@@ -383,49 +288,51 @@ body{
 
     </div>
 
-    <div class="row g-4">
+    <div class="row g-2">
 
-        <div class="col-lg-2 col-md-4">
+        <div class="col-xl-2 col-lg-2 col-md-4 col-6">
             <div class="kpi-card">
-                <div class="kpi-title">TOTAL PEDIDOS</div>
+                <div class="kpi-title">📦 Total Pedidos</div>
                 <div class="kpi-value">{{ total_pedidos }}</div>
             </div>
         </div>
 
-        <div class="col-lg-2 col-md-4">
+        <div class="col-xl-2 col-lg-2 col-md-4 col-6">
             <div class="kpi-card">
-                <div class="kpi-title">APROVADOS</div>
+                <div class="kpi-title">✅ Aprovados</div>
                 <div class="kpi-value">{{ aprovados }}</div>
             </div>
         </div>
 
-        <div class="col-lg-2 col-md-4">
+        <div class="col-xl-2 col-lg-2 col-md-4 col-6">
             <div class="kpi-card">
-                <div class="kpi-title">ANÁLISE</div>
+                <div class="kpi-title">🟡 Análise</div>
                 <div class="kpi-value">{{ analise }}</div>
             </div>
         </div>
 
-        <div class="col-lg-2 col-md-4">
+        <div class="col-xl-2 col-lg-2 col-md-4 col-6">
             <div class="kpi-card">
-                <div class="kpi-title">BLOQUEADOS</div>
+                <div class="kpi-title">🚫 Bloqueados</div>
                 <div class="kpi-value">{{ bloqueados }}</div>
             </div>
         </div>
 
-        <div class="col-lg-2 col-md-4">
+        <div class="col-xl-2 col-lg-2 col-md-4 col-6">
             <div class="kpi-card">
-                <div class="kpi-title">VALOR PROTEGIDO</div>
+                <div class="kpi-title">💰 Valor Protegido</div>
                 <div class="kpi-value">
                     R$ {{ valor_protegido }}
                 </div>
             </div>
         </div>
 
-        <div class="col-lg-2 col-md-4">
+        <div class="col-xl-2 col-lg-2 col-md-4 col-6">
             <div class="kpi-card">
-                <div class="kpi-title">SCORE MÉDIO</div>
-                <div class="kpi-value">{{ score_medio }}</div>
+                <div class="kpi-title">📊 Score Médio</div>
+                <div class="kpi-value">
+                    {{ score_medio }}
+                </div>
             </div>
         </div>
 
@@ -458,19 +365,19 @@ body{
                 <div>
 
                     {% if pedido.status == 'aprovado' %}
-                    <span class="status aprovado">
-                        APROVADO
-                    </span>
+                        <span class="status aprovado">
+                            APROVADO
+                        </span>
 
                     {% elif pedido.status == 'analise' %}
-                    <span class="status analise">
-                        EM ANÁLISE
-                    </span>
+                        <span class="status analise">
+                            EM ANÁLISE
+                        </span>
 
                     {% else %}
-                    <span class="status bloqueado">
-                        BLOQUEADO
-                    </span>
+                        <span class="status bloqueado">
+                            BLOQUEADO
+                        </span>
                     {% endif %}
 
                 </div>
@@ -516,9 +423,7 @@ body{
 
                 <div class="item">
                     <small>Valor</small>
-                    <strong>
-                        R$ {{ pedido.valor }}
-                    </strong>
+                    <strong>R$ {{ pedido.valor }}</strong>
                 </div>
 
                 <div class="item">

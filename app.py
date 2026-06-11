@@ -9,7 +9,7 @@ app.secret_key = "cozinet_saas_2026"
 START_TIME = time.time()
 
 # =========================
-# DB SAFE
+# DB CONNECTION
 # =========================
 def get_conn():
     return psycopg2.connect(
@@ -25,7 +25,14 @@ def login_required():
     return "user_id" in session
 
 # =========================
-# LOGIN (OK)
+# ROOT ROUTE (FIX 404)
+# =========================
+@app.route("/")
+def home():
+    return redirect("/dashboard")
+
+# =========================
+# LOGIN
 # =========================
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -59,7 +66,7 @@ def login():
     return render_template("login.html")
 
 # =========================
-# DASHBOARD 100% SAFE
+# DASHBOARD SAFE
 # =========================
 @app.route("/dashboard")
 def dashboard():
@@ -70,17 +77,19 @@ def dashboard():
     conn = get_conn()
     cur = conn.cursor()
 
-    # SAFE COUNTS
+    # TOTAL
     cur.execute("SELECT COUNT(*) FROM pedidos")
     total_pedidos = cur.fetchone()[0]
 
+    # APROVADOS
     cur.execute("SELECT COUNT(*) FROM pedidos WHERE status='aprovado'")
     aprovados = cur.fetchone()[0]
 
+    # ANALISE
     cur.execute("SELECT COUNT(*) FROM pedidos WHERE status='analise'")
     analise = cur.fetchone()[0]
 
-    # SAFE BLOQUEADOS (SEM JOIN)
+    # BLOQUEADOS (SAFE)
     cur.execute("""
         SELECT COUNT(*)
         FROM pedidos
@@ -88,6 +97,7 @@ def dashboard():
     """)
     bloqueados = cur.fetchone()[0]
 
+    # VALOR PROTEGIDO
     cur.execute("""
         SELECT COALESCE(SUM(valor),0)
         FROM pedidos
@@ -95,13 +105,14 @@ def dashboard():
     """)
     valor_protegido = float(cur.fetchone()[0] or 0)
 
+    # SCORE MÉDIO
     cur.execute("""
         SELECT COALESCE(ROUND(AVG(score_risco),2),0)
         FROM pedidos
     """)
     score_medio = cur.fetchone()[0]
 
-    # SAFE LIST
+    # LISTA PEDIDOS
     cur.execute("""
         SELECT id, order_id, cliente, cpf, email,
                ip, valor, score_risco, status,
@@ -145,14 +156,19 @@ def dashboard():
     )
 
 # =========================
-# BLOCK / UNBLOCK SAFE
+# BLOQUEAR IP
 # =========================
 @app.route("/bloquear-ip", methods=["POST"])
 def bloquear_ip():
+
     if not login_required():
         return jsonify({"error": "unauthorized"}), 401
 
-    ip = request.get_json().get("ip")
+    data = request.get_json() or {}
+    ip = data.get("ip")
+
+    if not ip:
+        return jsonify({"error": "ip missing"}), 400
 
     conn = get_conn()
     cur = conn.cursor()
@@ -175,12 +191,20 @@ def bloquear_ip():
 
     return jsonify({"ok": True})
 
+# =========================
+# DESBLOQUEAR IP
+# =========================
 @app.route("/desbloquear-ip", methods=["POST"])
 def desbloquear_ip():
+
     if not login_required():
         return jsonify({"error": "unauthorized"}), 401
 
-    ip = request.get_json().get("ip")
+    data = request.get_json() or {}
+    ip = data.get("ip")
+
+    if not ip:
+        return jsonify({"error": "ip missing"}), 400
 
     conn = get_conn()
     cur = conn.cursor()
@@ -198,6 +222,14 @@ def desbloquear_ip():
     conn.close()
 
     return jsonify({"ok": True})
+
+# =========================
+# LOGOUT
+# =========================
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/login")
 
 # =========================
 if __name__ == "__main__":

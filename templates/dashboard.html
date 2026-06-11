@@ -64,7 +64,7 @@ body{
     padding:25px;
 }
 
-/* TOP */
+/* TOPBAR */
 .topbar{
     display:flex;
     justify-content:space-between;
@@ -72,10 +72,11 @@ body{
     margin-bottom:20px;
 }
 
-.system{
+/* SYSTEM BAR */
+.system-bar{
     display:flex;
-    gap:10px;
     flex-wrap:wrap;
+    gap:10px;
     font-size:12px;
 }
 
@@ -89,17 +90,22 @@ body{
 /* KPIs */
 .kpi-grid{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-    gap:10px;
+    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:12px;
     margin-bottom:20px;
 }
 
 .kpi{
     background:#fff;
     border:1px solid var(--border);
-    padding:15px;
     border-radius:12px;
+    padding:15px;
     text-align:center;
+}
+
+.kpi-title{
+    font-size:12px;
+    color:#666;
 }
 
 .kpi-value{
@@ -107,20 +113,20 @@ body{
     font-weight:900;
 }
 
-.green{color:var(--green);}
-.red{color:var(--red);}
-.yellow{color:var(--yellow);}
-.blue{color:var(--blue);}
+.green{ color:var(--green); }
+.red{ color:var(--red); }
+.yellow{ color:var(--yellow); }
+.blue{ color:var(--blue); }
 
-/* GRID PEDIDOS */
+/* GRID 2 COLUNAS */
 .grid{
     display:grid;
-    grid-template-columns:repeat(2,1fr);
+    grid-template-columns:repeat(2, 1fr);
     gap:15px;
 }
 
 @media(max-width:900px){
-    .grid{grid-template-columns:1fr;}
+    .grid{ grid-template-columns:1fr; }
 }
 
 /* CARD PEDIDO */
@@ -131,38 +137,36 @@ body{
     padding:15px;
 }
 
-.card-header{
-    display:flex;
-    justify-content:space-between;
-    margin-bottom:10px;
-}
-
+/* STATUS */
 .status{
-    padding:4px 10px;
+    padding:5px 10px;
     border-radius:999px;
-    font-size:11px;
+    font-size:12px;
     font-weight:700;
+    color:#fff;
 }
 
-.aprovado{background:var(--green);color:#fff;}
-.analise{background:var(--yellow);}
-.bloqueado{background:var(--red);color:#fff;}
+.aprovado{ background:var(--green); }
+.analise{ background:var(--yellow); color:#111; }
+.bloqueado{ background:var(--red); }
 
-/* GRID DADOS 2 COLUNAS */
-.dados{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:8px;
+/* ITEMS */
+.item{
+    background:#f9fafb;
+    border:1px solid #eee;
+    padding:7px 10px;
+    border-radius:10px;
     font-size:13px;
+    margin-top:5px;
 }
 
+/* ACTIONS */
 .actions{
     margin-top:10px;
     display:flex;
     gap:8px;
 }
 
-/* MODAL */
 </style>
 </head>
 
@@ -170,6 +174,7 @@ body{
 
 <!-- SIDEBAR -->
 <div class="sidebar">
+
     <img src="https://i.ibb.co/vxN1xS0R/logo-vermelho.png">
 
     <div class="menu">
@@ -179,15 +184,16 @@ body{
         <a href="/logs">📜 Logs</a>
         <a href="/logout">🚪 Sair</a>
     </div>
+
 </div>
 
 <!-- CONTENT -->
 <div class="content">
 
-    <!-- TOP -->
+    <!-- TOP SYSTEM -->
     <div class="topbar">
 
-        <div class="system">
+        <div class="system-bar">
             <div class="pill">🟢 {{ system.status }}</div>
             <div class="pill">🌐 {{ system.host }}</div>
             <div class="pill">⏱ {{ system.uptime }}s</div>
@@ -196,24 +202,42 @@ body{
             <div class="pill">⚙ {{ system.env }}</div>
         </div>
 
-        <div><b>👤 {{ usuario }}</b></div>
+        <div class="pill">👤 {{ usuario }}</div>
     </div>
 
-    <!-- KPI -->
+    <!-- KPIs -->
     <div class="kpi-grid">
-        <div class="kpi"><div>Total</div><div class="kpi-value">{{ total }}</div></div>
-        <div class="kpi"><div class="green">Aprovados</div><div class="kpi-value green">{{ aprovados }}</div></div>
-        <div class="kpi"><div class="yellow">Análise</div><div class="kpi-value yellow">{{ analise }}</div></div>
-        <div class="kpi"><div class="red">Bloqueados</div><div class="kpi-value red">{{ bloqueados }}</div></div>
+
+        <div class="kpi">
+            <div class="kpi-title">Total</div>
+            <div class="kpi-value">{{ total }}</div>
+        </div>
+
+        <div class="kpi">
+            <div class="kpi-title">Aprovados</div>
+            <div class="kpi-value green">{{ aprovados }}</div>
+        </div>
+
+        <div class="kpi">
+            <div class="kpi-title">Análise</div>
+            <div class="kpi-value yellow">{{ analise }}</div>
+        </div>
+
+        <div class="kpi">
+            <div class="kpi-title">Bloqueados</div>
+            <div class="kpi-value red">{{ bloqueados }}</div>
+        </div>
+
     </div>
 
     <!-- PEDIDOS -->
     <div class="grid">
 
         {% for pedido in pedidos %}
+
         <div class="card">
 
-            <div class="card-header">
+            <div style="display:flex;justify-content:space-between;">
                 <div>
                     <b>#{{ pedido.order_id }}</b><br>
                     {{ pedido.cliente }}
@@ -230,26 +254,13 @@ body{
                 </div>
             </div>
 
-            <!-- 2 COLUNAS DE DADOS -->
-            <div class="dados">
-                <div>
-                    CPF: {{ pedido.cpf }}<br>
-                    Email: {{ pedido.email }}<br>
-                    Telefone: {{ pedido.telefone }}<br>
-                    Rua: {{ pedido.rua }}<br>
-                    Bairro: {{ pedido.bairro }}<br>
-                    Cidade: {{ pedido.cidade }}
-                </div>
-
-                <div>
-                    Estado: {{ pedido.estado }}<br>
-                    País: {{ pedido.pais }}<br>
-                    CEP: {{ pedido.cep }}<br>
-                    IP: {{ pedido.ip }}<br>
-                    Valor: R$ {{ pedido.valor }}<br>
-                    Score: {{ pedido.score_risco }}
-                </div>
-            </div>
+            <div class="item">CPF: {{ pedido.cpf }}</div>
+            <div class="item">Email: {{ pedido.email }}</div>
+            <div class="item">Telefone: {{ pedido.telefone }}</div>
+            <div class="item">IP: {{ pedido.ip }}</div>
+            <div class="item">Cidade: {{ pedido.cidade }}</div>
+            <div class="item">Valor: R$ {{ pedido.valor }}</div>
+            <div class="item">Score: {{ pedido.score_risco }}</div>
 
             <div class="actions">
                 <button class="btn btn-sm btn-primary"
@@ -270,12 +281,13 @@ body{
             </div>
 
         </div>
+
         {% endfor %}
 
     </div>
 </div>
 
-<!-- MODAIS -->
+<!-- MODAIS SIMPLES -->
 {% for pedido in pedidos %}
 <div class="modal fade" id="modalPedido{{ pedido.id }}" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -288,34 +300,20 @@ body{
 
       <div class="modal-body">
 
-        <div class="row">
-            <div class="col-md-6">
-                <p><b>Cliente:</b> {{ pedido.cliente }}</p>
-                <p><b>CPF:</b> {{ pedido.cpf }}</p>
-                <p><b>Email:</b> {{ pedido.email }}</p>
-                <p><b>Telefone:</b> {{ pedido.telefone }}</p>
-                <p><b>IP:</b> {{ pedido.ip }}</p>
-            </div>
+        <p><b>Cliente:</b> {{ pedido.cliente }}</p>
+        <p><b>CPF:</b> {{ pedido.cpf }}</p>
+        <p><b>Email:</b> {{ pedido.email }}</p>
+        <p><b>Telefone:</b> {{ pedido.telefone }}</p>
+        <p><b>Rua:</b> {{ pedido.rua }}</p>
+        <p><b>Bairro:</b> {{ pedido.bairro }}</p>
+        <p><b>Cidade:</b> {{ pedido.cidade }}</p>
+        <p><b>Estado:</b> {{ pedido.estado }}</p>
+        <p><b>País:</b> {{ pedido.pais }}</p>
+        <p><b>CEP:</b> {{ pedido.cep }}</p>
+        <p><b>IP:</b> {{ pedido.ip }}</p>
+        <p><b>Valor:</b> R$ {{ pedido.valor }}</p>
+        <p><b>Score:</b> {{ pedido.score_risco }}</p>
 
-            <div class="col-md-6">
-                <p><b>Rua:</b> {{ pedido.rua }}</p>
-                <p><b>Cidade:</b> {{ pedido.cidade }}</p>
-                <p><b>Estado:</b> {{ pedido.estado }}</p>
-                <p><b>País:</b> {{ pedido.pais }}</p>
-                <p><b>CEP:</b> {{ pedido.cep }}</p>
-            </div>
-        </div>
-
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-danger"
-                onclick="bloquearIP('{{ pedido.ip }}')">Bloquear</button>
-
-        <button class="btn btn-success"
-                onclick="desbloquearIP('{{ pedido.ip }}')">Desbloquear</button>
-
-        <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
       </div>
 
     </div>

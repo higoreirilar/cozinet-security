@@ -195,12 +195,12 @@ body{
     <div class="topbar">
 
 <div class="system">
-<div class="pill">🟢 {{ system.status if system is defined else 'offline' }}</div>
-<div class="pill">🌐 {{ system.host if system is defined else '-' }}</div>
-<div class="pill">⏱ {{ system.uptime if system is defined else 0 }}s</div>
-<div class="pill">🖥 {{ system.hostname if system is defined else '-' }}</div>
-<div class="pill">📡 {{ system.port if system is defined else '-' }}</div>
-<div class="pill">⚙ {{ system.env if system is defined else '-' }}</div>
+<div class="pill">🟢 {{ system.status }}</div>
+<div class="pill">🌐 {{ system.host }}</div>
+<div class="pill">⏱ {{ system.uptime }}s</div>
+<div class="pill">🖥 {{ system.hostname }}</div>
+<div class="pill">📡 {{ system.port }}</div>
+<div class="pill">⚙ {{ system.env }}</div>
 </div>
 
         <div class="user">

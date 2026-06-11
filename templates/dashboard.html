@@ -16,7 +16,6 @@
     --border:#292929;
     --orange:#ff7a00;
     --orange2:#ff9333;
-    --muted:#8f8f8f;
 }
 
 body{
@@ -94,7 +93,7 @@ body{
     font-weight:800;
 }
 
-/* ================= CLIENT GRID (2 COLUNAS) ================= */
+/* ================= GRID 2 COLUNAS ================= */
 .pedido-grid-wrapper{
     display:grid;
     grid-template-columns: repeat(2, 1fr);
@@ -115,29 +114,45 @@ body{
     padding:18px;
 }
 
+/* status */
 .status{
     padding:6px 12px;
     border-radius:999px;
     font-size:12px;
 }
-
 .aprovado{background:#15803d;}
 .analise{background:#d97706;}
 .bloqueado{background:#dc2626;}
 
+/* ================= 🔥 FIX DEFINITIVO GRID ================= */
 .pedido-grid{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap:8px;
     margin-top:10px;
 }
 
+/* item compacto sem esticar altura */
 .item{
     background:#121212;
-    padding:8px;
+    padding:8px 10px;
     border-radius:10px;
     border:1px solid #222;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
     font-size:13px;
+    min-height:38px;
+}
+
+/* evita email estourar layout */
+.item span{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    max-width:140px;
 }
 
 /* ================= MODAL ================= */
@@ -190,7 +205,7 @@ body{
         <div class="kpi-card">Score<br><div class="kpi-value">{{ score_medio }}</div></div>
     </div>
 
-    <!-- GRID CLIENTES -->
+    <!-- CLIENTES -->
     <div class="pedido-grid-wrapper">
 
         {% for pedido in pedidos %}
@@ -222,15 +237,18 @@ body{
                 </button>
             </div>
 
+            <!-- GRID LIMPO -->
             <div class="pedido-grid">
-                <div class="item">CPF: {{ pedido.cpf }}</div>
-                <div class="item">Email: {{ pedido.email }}</div>
-                <div class="item">Telefone: {{ pedido.telefone }}</div>
-                <div class="item">Rua: {{ pedido.rua }}</div>
-                <div class="item">CEP: {{ pedido.cep }}</div>
-                <div class="item">IP: {{ pedido.ip }}</div>
-                <div class="item">Valor: R$ {{ pedido.valor }}</div>
-                <div class="item">Score: {{ pedido.score_risco }}</div>
+
+                <div class="item"><b>CPF:</b><span>{{ pedido.cpf }}</span></div>
+                <div class="item"><b>Email:</b><span>{{ pedido.email }}</span></div>
+                <div class="item"><b>Telefone:</b><span>{{ pedido.telefone }}</span></div>
+                <div class="item"><b>Rua:</b><span>{{ pedido.rua }}</span></div>
+                <div class="item"><b>CEP:</b><span>{{ pedido.cep }}</span></div>
+                <div class="item"><b>IP:</b><span>{{ pedido.ip }}</span></div>
+                <div class="item"><b>Valor:</b><span>R$ {{ pedido.valor }}</span></div>
+                <div class="item"><b>Score:</b><span>{{ pedido.score_risco }}</span></div>
+
             </div>
 
         </div>

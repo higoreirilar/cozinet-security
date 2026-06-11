@@ -2,185 +2,178 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Cozinet Premium Dashboard</title>
+<title>Cozinet • Control Center</title>
 
 <style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #07070c;
-    color: white;
-    display: flex;
+body{
+    margin:0;
+    font-family: Arial;
+    background:#07070c;
+    color:#fff;
+    display:flex;
 }
 
-/* SIDEBAR */
-.sidebar {
-    width: 260px;
-    height: 100vh;
-    background: #0e0e14;
-    border-right: 2px solid #ff6a00;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 25px;
+/* SIDEBAR GLASS */
+.sidebar{
+    width:260px;
+    height:100vh;
+    background:rgba(15,15,20,0.7);
+    backdrop-filter: blur(12px);
+    border-right:1px solid rgba(255,106,0,0.3);
+    padding:20px;
 }
 
-.sidebar img {
-    width: 170px;
-    margin-bottom: 20px;
-    filter: drop-shadow(0 0 12px #ff6a00);
+.logo{
+    width:100%;
+    text-align:center;
+    margin-bottom:20px;
 }
 
-.menu {
-    width: 100%;
+.logo img{
+    width:170px;
+    filter: drop-shadow(0 0 15px #ff6a00);
 }
 
-.menu a {
-    display: block;
-    padding: 12px 20px;
-    color: white;
-    text-decoration: none;
-    transition: 0.3s;
+.menu a{
+    display:block;
+    padding:12px;
+    margin:5px 0;
+    color:#bbb;
+    text-decoration:none;
+    border-radius:8px;
+    transition:0.3s;
 }
 
-.menu a:hover {
-    background: rgba(255,106,0,0.1);
-    border-left: 3px solid #ff6a00;
-    color: #ff6a00;
+.menu a:hover{
+    background:rgba(255,106,0,0.1);
+    color:#ff6a00;
 }
 
 /* MAIN */
-.main {
-    flex: 1;
-    padding: 20px;
+.main{
+    flex:1;
+    padding:25px;
 }
 
-/* TOPBAR */
-.topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    background: #0f0f18;
-    border-bottom: 1px solid #1f1f2a;
+/* HEADER */
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px;
+    background:rgba(20,20,30,0.6);
+    backdrop-filter: blur(10px);
+    border-radius:12px;
+    border:1px solid rgba(255,106,0,0.2);
 }
 
-.topbar h2 {
-    margin: 0;
-    color: #ff6a00;
+.header h2{
+    margin:0;
+    color:#ff6a00;
 }
 
 /* CARDS */
-.cards {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    margin-top: 20px;
+.cards{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:15px;
+    margin-top:20px;
 }
 
-/* CARD BASE */
-.card {
-    padding: 22px;
-    border-radius: 14px;
-    text-align: center;
-    background: #11111a;
-    border: 1px solid #1f1f2a;
-    transition: 0.3s;
-    position: relative;
-    overflow: hidden;
+.card{
+    padding:18px;
+    border-radius:14px;
+    background:rgba(18,18,26,0.8);
+    border:1px solid #1f1f2a;
+    transition:0.3s;
+    position:relative;
+    overflow:hidden;
 }
 
-.card:hover {
-    transform: translateY(-6px);
+.card:hover{
+    transform:translateY(-5px);
+    border-color:#ff6a00;
 }
 
-/* CORES PREMIUM */
-.green {
-    border-color: #22c55e;
-    box-shadow: 0 0 18px rgba(34,197,94,0.2);
+/* COLORS */
+.green{ border-left:4px solid #22c55e; }
+.orange{ border-left:4px solid #ff6a00; }
+.red{ border-left:4px solid #ef4444; }
+
+.card b{
+    font-size:26px;
+    display:block;
+    margin-top:5px;
 }
 
-.orange {
-    border-color: #ff6a00;
-    box-shadow: 0 0 18px rgba(255,106,0,0.2);
+/* TABLE */
+table{
+    width:100%;
+    margin-top:25px;
+    border-collapse:collapse;
+    background:rgba(18,18,26,0.8);
+    border-radius:12px;
+    overflow:hidden;
 }
 
-.red {
-    border-color: #ef4444;
-    box-shadow: 0 0 18px rgba(239,68,68,0.2);
+th{
+    background:#0f0f14;
+    color:#ff6a00;
+    padding:12px;
+    text-transform:uppercase;
+    font-size:12px;
 }
 
-/* NUMEROS */
-.card b {
-    font-size: 28px;
-    display: block;
-    margin-top: 8px;
+td{
+    padding:12px;
+    text-align:center;
+    border-bottom:1px solid #1f1f2a;
 }
 
-/* cores texto */
-.green b { color: #22c55e; }
-.orange b { color: #ff6a00; }
-.red b { color: #ef4444; }
-
-/* TABELA */
-table {
-    width: 100%;
-    margin-top: 25px;
-    border-collapse: collapse;
-    background: #11111a;
-    border-radius: 12px;
-    overflow: hidden;
+/* BADGES */
+.badge{
+    padding:4px 8px;
+    border-radius:6px;
+    font-size:12px;
 }
 
-th, td {
-    padding: 12px;
-    text-align: center;
-    border-bottom: 1px solid #1f1f2a;
+.aprovado{ background:#14532d; color:#22c55e; }
+.analise{ background:#3b2f12; color:#ffb020; }
+.bloqueado{ background:#3b1212; color:#ef4444; }
+
+/* BUTTONS */
+button{
+    padding:6px 10px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    transition:0.3s;
 }
 
-th {
-    background: #0f0f14;
-    color: #ff6a00;
+.block{ background:#ef4444; color:#fff; }
+.unblock{ background:#22c55e; color:#000; }
+
+button:hover{ transform:scale(1.1); }
+
+/* GLASS BACKGROUND */
+body::before{
+    content:"";
+    position:fixed;
+    width:200%;
+    height:200%;
+    background:radial-gradient(circle, rgba(255,106,0,0.05), transparent 60%);
+    animation:move 15s linear infinite;
+    z-index:-1;
 }
 
-/* BOTÕES */
-button {
-    padding: 6px 10px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: 0.3s;
+@keyframes move{
+    from{transform:translate(0,0);}
+    to{transform:translate(-200px,-200px);}
 }
 
-.block {
-    background: #ef4444;
-    color: white;
-}
-
-.unblock {
-    background: #22c55e;
-    color: black;
-    font-weight: bold;
-}
-
-button:hover {
-    transform: scale(1.08);
-}
-
-/* FUNDO ANIMADO */
-body::before {
-    content: "";
-    position: fixed;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,106,0,0.06), transparent 60%);
-    animation: move 14s linear infinite;
-    z-index: -1;
-}
-
-@keyframes move {
-    from { transform: translate(0,0); }
-    to { transform: translate(-200px,-200px); }
+.small{
+    font-size:12px;
+    color:#888;
 }
 </style>
 </head>
@@ -190,7 +183,9 @@ body::before {
 <!-- SIDEBAR -->
 <div class="sidebar">
 
-    <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
+    <div class="logo">
+        <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
+    </div>
 
     <div class="menu">
         <a href="/dashboard">📊 Dashboard</a>
@@ -203,8 +198,8 @@ body::before {
 <!-- MAIN -->
 <div class="main">
 
-    <div class="topbar">
-        <h2>COZINET • ANTIFRAUDE PREMIUM</h2>
+    <div class="header">
+        <h2>COZINET CONTROL CENTER</h2>
         <div>👤 {{ usuario }}</div>
     </div>
 
@@ -214,16 +209,19 @@ body::before {
         <div class="card green">
             ✔ APROVADOS
             <b>{{ aprovados }}</b>
+            <div class="small">Pedidos liberados com sucesso</div>
         </div>
 
         <div class="card orange">
             ⏳ ANÁLISE
             <b>{{ analise }}</b>
+            <div class="small">Em verificação antifraude</div>
         </div>
 
         <div class="card red">
             🚫 BLOQUEADOS
             <b>{{ bloqueados }}</b>
+            <div class="small">IPs ou pedidos suspeitos</div>
         </div>
 
     </div>
@@ -241,18 +239,27 @@ body::before {
         </tr>
 
         {% for p in pedidos %}
+
         <tr>
             <td>{{ p.id }}</td>
             <td>{{ p.order_id }}</td>
             <td>{{ p.ip }}</td>
             <td>R$ {{ p.valor }}</td>
-            <td>{{ p.status }}</td>
+
+            <td>
+                <span class="badge {{ p.status }}">
+                    {{ p.status }}
+                </span>
+            </td>
+
             <td>{{ p.motivo }}</td>
+
             <td>
                 <button class="block" onclick="bloquear('{{ p.ip }}')">🚫</button>
                 <button class="unblock" onclick="desbloquear('{{ p.ip }}')">🔓</button>
             </td>
         </tr>
+
         {% endfor %}
     </table>
 
@@ -261,10 +268,10 @@ body::before {
 <script>
 function bloquear(ip){
     fetch("/bloquear-ip", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ip})
-    }).then(r => r.json()).then(d => {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({ip})
+    }).then(r=>r.json()).then(d=>{
         alert(d.message);
         location.reload();
     });
@@ -272,10 +279,10 @@ function bloquear(ip){
 
 function desbloquear(ip){
     fetch("/desbloquear-ip", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ip})
-    }).then(r => r.json()).then(d => {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({ip})
+    }).then(r=>r.json()).then(d=>{
         alert(d.message);
         location.reload();
     });

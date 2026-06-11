@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>IPs Bloqueados</title>
+
     <style>
         body {
             font-family: Arial;
             background: #0f172a;
-            color: #fff;
+            color: white;
             padding: 20px;
         }
 
@@ -17,15 +18,14 @@
 
         table {
             width: 100%;
-            border-collapse: collapse;
             margin-top: 20px;
+            border-collapse: collapse;
             background: #1e293b;
         }
 
         th, td {
             padding: 12px;
             border-bottom: 1px solid #334155;
-            text-align: left;
         }
 
         th {
@@ -36,7 +36,7 @@
             background: #334155;
         }
 
-        .btn {
+        button {
             padding: 6px 10px;
             border: none;
             cursor: pointer;
@@ -44,25 +44,25 @@
         }
 
         .desbloquear {
-            background: #ef4444;
+            background: #22c55e;
             color: white;
         }
 
-        .search {
-            margin-top: 10px;
-            padding: 10px;
-            width: 300px;
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
     </style>
 </head>
 
 <body>
 
-<h1>🔒 IPs Bloqueados</h1>
+<div class="topbar">
+    <h1>🔒 IPs Bloqueados</h1>
+</div>
 
-<input type="text" class="search" id="search" placeholder="Pesquisar IP..." onkeyup="filtrarTabela()">
-
-<table id="tabela">
+<table>
     <thead>
         <tr>
             <th>ID</th>
@@ -81,9 +81,9 @@
             <td>{{ ip.motivo }}</td>
             <td>{{ ip.data }}</td>
             <td>
-                <a href="/desbloquear/{{ ip.id }}">
-                    <button class="btn desbloquear">Desbloquear</button>
-                </a>
+                <button class="desbloquear" onclick="desbloquear({{ ip.id }})">
+                    Desbloquear
+                </button>
             </td>
         </tr>
         {% endfor %}
@@ -91,13 +91,18 @@
 </table>
 
 <script>
-function filtrarTabela() {
-    let input = document.getElementById("search").value.toLowerCase();
-    let linhas = document.querySelectorAll("#tabela tbody tr");
-
-    linhas.forEach(linha => {
-        let ip = linha.children[1].innerText.toLowerCase();
-        linha.style.display = ip.includes(input) ? "" : "none";
+function desbloquear(id) {
+    fetch("/desbloquear-ip/" + id, {
+        method: "POST"
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.message);
+        location.reload();
+    })
+    .catch(err => {
+        alert("Erro ao desbloquear IP");
+        console.log(err);
     });
 }
 </script>

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Dashboard | Shield</title>
+<title>Dashboard - Cozinet Shield</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -40,7 +40,7 @@ body{
 }
 
 .sidebar img{
-    width:180px;
+    width:160px;
     margin-bottom:20px;
 }
 
@@ -65,21 +65,28 @@ body{
     padding:25px;
 }
 
-/* TOP BAR */
+/* TOPBAR */
 .topbar{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    margin-bottom:20px;
+    margin-bottom:15px;
 }
 
-/* SYSTEM MINI PANEL */
-.system{
+.user-box{
+    background:var(--red);
+    color:#fff;
+    padding:10px 15px;
+    border-radius:12px;
+    font-weight:700;
+}
+
+/* SYSTEM PILL */
+.system-bar{
     display:flex;
     flex-wrap:wrap;
-    gap:10px;
-    font-size:12px;
-    color:#333;
+    gap:8px;
+    margin-bottom:15px;
 }
 
 .pill{
@@ -87,18 +94,10 @@ body{
     border:1px solid var(--border);
     padding:6px 10px;
     border-radius:999px;
+    font-size:12px;
 }
 
-/* USER */
-.user{
-    background:var(--red);
-    color:white;
-    padding:8px 14px;
-    border-radius:12px;
-    font-weight:700;
-}
-
-/* KPI GRID */
+/* KPIS */
 .kpi-grid{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
@@ -111,11 +110,7 @@ body{
     border:1px solid var(--border);
     border-radius:12px;
     padding:15px;
-}
-
-.kpi-title{
-    font-size:12px;
-    color:#666;
+    text-align:center;
 }
 
 .kpi-value{
@@ -123,23 +118,13 @@ body{
     font-weight:900;
 }
 
-.green{color:var(--green);}
-.red{color:var(--red);}
-.yellow{color:var(--yellow);}
-.blue{color:var(--blue);}
-
-/* GRID */
+/* CARDS */
 .grid{
     display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:15px;
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+    gap:12px;
 }
 
-@media(max-width:900px){
-    .grid{grid-template-columns:1fr;}
-}
-
-/* CARD PEDIDO */
 .card{
     background:#fff;
     border:1px solid var(--border);
@@ -160,15 +145,18 @@ body{
 .analise{background:var(--yellow); color:#111;}
 .bloqueado{background:var(--red);}
 
-/* ITEM */
-.item{
-    background:#f9fafb;
-    border:1px solid #eee;
-    padding:7px 10px;
-    border-radius:10px;
-    margin-top:5px;
-    font-size:13px;
+/* BUTTONS */
+.btn{
+    font-size:12px;
+    padding:6px 10px;
+    border-radius:8px;
+    border:none;
+    cursor:pointer;
 }
+
+.btn-blue{background:var(--blue); color:#fff;}
+.btn-red{background:var(--red); color:#fff;}
+.btn-green{background:var(--green); color:#fff;}
 
 </style>
 </head>
@@ -177,7 +165,8 @@ body{
 
 <!-- SIDEBAR -->
 <div class="sidebar">
-    <img src="https://i.ibb.co/vxN1xS0R/logo-vermelho.png">
+
+    <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
 
     <div class="menu">
         <a href="/dashboard">🏠 Dashboard</a>
@@ -186,93 +175,119 @@ body{
         <a href="/logs">📜 Logs</a>
         <a href="/logout">🚪 Sair</a>
     </div>
+
 </div>
 
 <!-- CONTENT -->
 <div class="content">
 
-    <!-- TOP SYSTEM BAR -->
+    <!-- TOP -->
     <div class="topbar">
-
-<div class="system">
-<div class="pill">🟢 {{ system.status }}</div>
-<div class="pill">🌐 {{ system.host }}</div>
-<div class="pill">⏱ {{ system.uptime }}s</div>
-<div class="pill">🖥 {{ system.hostname }}</div>
-<div class="pill">📡 {{ system.port }}</div>
-<div class="pill">⚙ {{ system.env }}</div>
-</div>
-
-        <div class="user">
-            👤 {{ usuario }}
-        </div>
-
+        <h4>Dashboard</h4>
+        <div class="user-box">👤 {{ usuario }}</div>
     </div>
 
-    <!-- KPI -->
+    <!-- SYSTEM -->
+    <div class="system-bar">
+        <div class="pill">🟢 {{ system.status }}</div>
+        <div class="pill">🌐 {{ system.host }}</div>
+        <div class="pill">⏱ {{ system.uptime }}s</div>
+        <div class="pill">🖥 {{ system.hostname }}</div>
+        <div class="pill">📡 {{ system.port }}</div>
+        <div class="pill">⚙ {{ system.env }}</div>
+    </div>
+
+    <!-- KPIS -->
     <div class="kpi-grid">
-
-        <div class="kpi">
-            <div class="kpi-title">Total Pedidos</div>
-            <div class="kpi-value">{{ total_pedidos }}</div>
-        </div>
-
-        <div class="kpi">
-            <div class="kpi-title">Aprovados</div>
-            <div class="kpi-value green">{{ aprovados }}</div>
-        </div>
-
-        <div class="kpi">
-            <div class="kpi-title">Em Análise</div>
-            <div class="kpi-value yellow">{{ analise }}</div>
-        </div>
-
-        <div class="kpi">
-            <div class="kpi-title">Bloqueados</div>
-            <div class="kpi-value red">{{ bloqueados }}</div>
-        </div>
-
-        <div class="kpi">
-            <div class="kpi-title">Protegido</div>
-            <div class="kpi-value blue">R$ {{ valor_protegido }}</div>
-        </div>
-
-        <div class="kpi">
-            <div class="kpi-title">Score Médio</div>
-            <div class="kpi-value">{{ score_medio }}</div>
-        </div>
-
+        <div class="kpi"><div>Total</div><div class="kpi-value">{{ total_pedidos }}</div></div>
+        <div class="kpi"><div>Aprovados</div><div class="kpi-value">{{ aprovados }}</div></div>
+        <div class="kpi"><div>Análise</div><div class="kpi-value">{{ analise }}</div></div>
+        <div class="kpi"><div>Bloqueados</div><div class="kpi-value">{{ bloqueados }}</div></div>
+        <div class="kpi"><div>Protegido</div><div class="kpi-value">R$ {{ valor_protegido }}</div></div>
+        <div class="kpi"><div>Score</div><div class="kpi-value">{{ score_medio }}</div></div>
     </div>
 
     <!-- PEDIDOS -->
     <div class="grid">
 
-        {% for p in pedidos %}
+    {% for pedido in pedidos %}
+
         <div class="card">
 
             <div style="display:flex;justify-content:space-between;">
-                <b>#{{ p.order_id }}</b>
+                <div>
+                    <b>#{{ pedido.order_id }}</b><br>
+                    {{ pedido.cliente }}
+                </div>
 
-                {% if p.status == 'aprovado' %}
-                    <span class="status aprovado">APROVADO</span>
-                {% elif p.status == 'analise' %}
-                    <span class="status analise">ANÁLISE</span>
-                {% else %}
-                    <span class="status bloqueado">BLOQUEADO</span>
-                {% endif %}
+                <div>
+                    {% if pedido.status == 'aprovado' %}
+                        <span class="status aprovado">APROVADO</span>
+                    {% elif pedido.status == 'analise' %}
+                        <span class="status analise">ANÁLISE</span>
+                    {% else %}
+                        <span class="status bloqueado">BLOQUEADO</span>
+                    {% endif %}
+                </div>
             </div>
 
-            <div class="item">Cliente: {{ p.cliente }}</div>
-            <div class="item">IP: {{ p.ip }}</div>
-            <div class="item">Valor: R$ {{ p.valor }}</div>
-            <div class="item">Score: {{ p.score_risco }}</div>
+            <hr>
+
+            <small>CPF: {{ pedido.cpf }}</small><br>
+            <small>Email: {{ pedido.email }}</small><br>
+            <small>IP: {{ pedido.ip }}</small><br>
+            <small>Valor: R$ {{ pedido.valor }}</small><br>
+            <small>Score: {{ pedido.score_risco }}</small>
+
+            <div style="margin-top:10px; display:flex; gap:6px; flex-wrap:wrap;">
+
+                <button class="btn btn-blue" onclick="detalhes('{{ pedido.id }}')">
+                    Detalhes
+                </button>
+
+                {% if pedido.status != 'bloqueado' %}
+                <button class="btn btn-red" onclick="bloquear('{{ pedido.ip }}')">
+                    Bloquear
+                </button>
+                {% else %}
+                <button class="btn btn-green" onclick="desbloquear('{{ pedido.ip }}')">
+                    Desbloquear
+                </button>
+                {% endif %}
+
+            </div>
 
         </div>
-        {% endfor %}
+
+    {% endfor %}
 
     </div>
 
 </div>
+
+<script>
+
+function bloquear(ip){
+    fetch('/bloquear-ip', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ip})
+    }).then(()=>location.reload());
+}
+
+function desbloquear(ip){
+    fetch('/desbloquear-ip', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ip})
+    }).then(()=>location.reload());
+}
+
+function detalhes(id){
+    alert("Abrir modal ou rota: /pedido/" + id);
+}
+
+</script>
 
 </body>
 </html>

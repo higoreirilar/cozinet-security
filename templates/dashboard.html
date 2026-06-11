@@ -1,345 +1,232 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
+
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard Antifraude</title>
 
-<title>Eirilar Shield - Dashboard</title>
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
 <style>
-
-:root{
-    --bg:#f4f6fb;
-    --card:#ffffff;
-    --border:#e5e7eb;
-
-    --red:#e11d48;
-    --green:#16a34a;
-    --yellow:#f59e0b;
-    --blue:#2563eb;
-}
-
 body{
-    background:var(--bg);
-    font-family:Arial;
-}
-
-/* SIDEBAR */
-.sidebar{
-    position:fixed;
-    left:0;
-    top:0;
-    width:260px;
-    height:100vh;
-    background:#fff;
-    border-right:1px solid var(--border);
-    padding:20px;
-}
-
-.sidebar img{
-    width:180px;
-    margin-bottom:20px;
-}
-
-.menu a{
-    display:block;
-    text-decoration:none;
-    color:#333;
-    padding:12px;
-    border-radius:10px;
-    margin-bottom:8px;
-    font-weight:600;
-}
-
-.menu a:hover{
-    background:var(--red);
-    color:#fff;
-}
-
-/* CONTENT */
-.content{
-    margin-left:260px;
-    padding:25px;
+    background:#f4f6f9;
+    font-family: Arial;
 }
 
 /* TOPBAR */
 .topbar{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:20px;
-}
-
-/* SYSTEM BAR */
-.system-bar{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    font-size:12px;
-}
-
-.pill{
     background:#fff;
-    border:1px solid var(--border);
-    padding:6px 10px;
-    border-radius:999px;
+    padding:12px 20px;
+    border-bottom:1px solid #eee;
 }
 
-/* KPIs */
-.kpi-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-    gap:12px;
-    margin-bottom:20px;
-}
-
-.kpi{
+/* CARD */
+.card-pedido{
     background:#fff;
-    border:1px solid var(--border);
     border-radius:12px;
     padding:15px;
-    text-align:center;
-}
-
-.kpi-title{
-    font-size:12px;
-    color:#666;
-}
-
-.kpi-value{
-    font-size:22px;
-    font-weight:900;
-}
-
-.green{ color:var(--green); }
-.red{ color:var(--red); }
-.yellow{ color:var(--yellow); }
-.blue{ color:var(--blue); }
-
-/* GRID 2 COLUNAS */
-.grid{
-    display:grid;
-    grid-template-columns:repeat(2, 1fr);
-    gap:15px;
-}
-
-@media(max-width:900px){
-    .grid{ grid-template-columns:1fr; }
-}
-
-/* CARD PEDIDO */
-.card{
-    background:#fff;
-    border:1px solid var(--border);
-    border-radius:14px;
-    padding:15px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.06);
+    height:100%;
 }
 
 /* STATUS */
-.status{
-    padding:5px 10px;
-    border-radius:999px;
+.badge-status{
     font-size:12px;
-    font-weight:700;
-    color:#fff;
+    padding:5px 10px;
+    border-radius:8px;
+    background:#ddd;
 }
-
-.aprovado{ background:var(--green); }
-.analise{ background:var(--yellow); color:#111; }
-.bloqueado{ background:var(--red); }
-
-/* ITEMS */
-.item{
-    background:#f9fafb;
-    border:1px solid #eee;
-    padding:7px 10px;
-    border-radius:10px;
-    font-size:13px;
-    margin-top:5px;
-}
-
-/* ACTIONS */
-.actions{
-    margin-top:10px;
-    display:flex;
-    gap:8px;
-}
-
 </style>
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
+<!-- TOPBAR -->
+<div class="topbar d-flex justify-content-between align-items-center">
 
-    <img src="https://i.ibb.co/vxN1xS0R/logo-vermelho.png">
+    <!-- LOGO ESQUERDA -->
+    <div class="d-flex align-items-center gap-2">
+        <img src="https://i.ibb.co/vxN1xS0R/logo-vermelho.png" height="38">
+        <b>Antifraude Dashboard</b>
+    </div>
 
-    <div class="menu">
-        <a href="/dashboard">🏠 Dashboard</a>
-        <a href="/bloqueados">🚫 Bloqueados</a>
-        <a href="/ips-confiaveis">🟢 Confiáveis</a>
-        <a href="/logs">📜 Logs</a>
-        <a href="/logout">🚪 Sair</a>
+    <!-- USER DIREITA -->
+    <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-person-circle" style="font-size:22px;"></i>
+        <span>{{ session['user'] }}</span>
     </div>
 
 </div>
 
-<!-- CONTENT -->
-<div class="content">
 
-    <!-- TOP SYSTEM -->
-    <div class="topbar">
+<div class="container mt-4">
 
-        <div class="system-bar">
-            <div class="pill">🟢 {{ system.status }}</div>
-            <div class="pill">🌐 {{ system.host }}</div>
-            <div class="pill">⏱ {{ system.uptime }}s</div>
-            <div class="pill">🖥 {{ system.hostname }}</div>
-            <div class="pill">📡 {{ system.port }}</div>
-            <div class="pill">⚙ {{ system.env }}</div>
+<!-- STATS -->
+<div class="row mb-3">
+
+    <div class="col">
+        <div class="p-3 bg-white rounded shadow-sm">
+            Total<br><b>{{ total }}</b>
         </div>
-
-        <div class="pill">👤 {{ usuario }}</div>
     </div>
 
-    <!-- KPIs -->
-    <div class="kpi-grid">
-
-        <div class="kpi">
-            <div class="kpi-title">Total</div>
-            <div class="kpi-value">{{ total }}</div>
+    <div class="col">
+        <div class="p-3 bg-success text-white rounded shadow-sm">
+            Aprovados<br><b>{{ aprovados }}</b>
         </div>
-
-        <div class="kpi">
-            <div class="kpi-title">Aprovados</div>
-            <div class="kpi-value green">{{ aprovados }}</div>
-        </div>
-
-        <div class="kpi">
-            <div class="kpi-title">Análise</div>
-            <div class="kpi-value yellow">{{ analise }}</div>
-        </div>
-
-        <div class="kpi">
-            <div class="kpi-title">Bloqueados</div>
-            <div class="kpi-value red">{{ bloqueados }}</div>
-        </div>
-
     </div>
 
-    <!-- PEDIDOS -->
-    <div class="grid">
-
-        {% for pedido in pedidos %}
-
-        <div class="card">
-
-            <div style="display:flex;justify-content:space-between;">
-                <div>
-                    <b>#{{ pedido.order_id }}</b><br>
-                    {{ pedido.cliente }}
-                </div>
-
-                <div>
-                    {% if pedido.status == 'aprovado' %}
-                        <span class="status aprovado">OK</span>
-                    {% elif pedido.status == 'analise' %}
-                        <span class="status analise">ANÁLISE</span>
-                    {% else %}
-                        <span class="status bloqueado">BLOCK</span>
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="item">CPF: {{ pedido.cpf }}</div>
-            <div class="item">Email: {{ pedido.email }}</div>
-            <div class="item">Telefone: {{ pedido.telefone }}</div>
-            <div class="item">IP: {{ pedido.ip }}</div>
-            <div class="item">Cidade: {{ pedido.cidade }}</div>
-            <div class="item">Valor: R$ {{ pedido.valor }}</div>
-            <div class="item">Score: {{ pedido.score_risco }}</div>
-
-            <div class="actions">
-                <button class="btn btn-sm btn-primary"
-                        data-bs-toggle="modal"
-                        data-bs-target="#modalPedido{{ pedido.id }}">
-                    Detalhes
-                </button>
-
-                <button class="btn btn-sm btn-danger"
-                        onclick="bloquearIP('{{ pedido.ip }}')">
-                    Bloquear
-                </button>
-
-                <button class="btn btn-sm btn-success"
-                        onclick="desbloquearIP('{{ pedido.ip }}')">
-                    Desbloquear
-                </button>
-            </div>
-
+    <div class="col">
+        <div class="p-3 bg-warning rounded shadow-sm">
+            Análise<br><b>{{ analise }}</b>
         </div>
-
-        {% endfor %}
-
     </div>
+
+    <div class="col">
+        <div class="p-3 bg-danger text-white rounded shadow-sm">
+            Recusados<br><b>{{ recusados }}</b>
+        </div>
+    </div>
+
 </div>
 
-<!-- MODAIS SIMPLES -->
-{% for pedido in pedidos %}
-<div class="modal fade" id="modalPedido{{ pedido.id }}" tabindex="-1">
+
+<!-- PEDIDOS -->
+<div class="row">
+
+{% for p in pedidos %}
+
+<div class="col-md-6 mb-3">
+
+<div class="card-pedido">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between">
+        <b>#{{ p.order_id }}</b>
+        <span class="badge-status">{{ p.status }}</span>
+    </div>
+
+    <hr>
+
+    <!-- 2 COLUNAS FIXAS -->
+    <div class="row">
+
+        <!-- ESQUERDA -->
+        <div class="col-6 border-end">
+
+            <p><b>Cidade:</b> {{ p.cidade or '-' }}</p>
+            <p><b>Valor:</b> R$ {{ p.valor }}</p>
+            <p><b>Score:</b> {{ p.score_risco }}</p>
+
+        </div>
+
+        <!-- DIREITA -->
+        <div class="col-6">
+
+            <p><b>CPF:</b> {{ p.cpf }}</p>
+            <p><b>Email:</b> {{ p.email }}</p>
+            <p><b>Telefone:</b> {{ p.telefone or 'None' }}</p>
+            <p><b>IP:</b> {{ p.ip }}</p>
+
+        </div>
+
+    </div>
+
+    <!-- BOTÕES -->
+    <div class="mt-3 d-flex gap-2">
+
+        <button class="btn btn-primary btn-sm"
+                data-bs-toggle="modal"
+                data-bs-target="#modal{{ p.id }}">
+            Detalhes
+        </button>
+
+        <button class="btn btn-danger btn-sm"
+                onclick="bloquear('{{ p.ip }}')">
+            Bloquear
+        </button>
+
+        <button class="btn btn-success btn-sm"
+                onclick="desbloquear('{{ p.ip }}')">
+            Desbloquear
+        </button>
+
+    </div>
+
+</div>
+
+</div>
+
+
+<!-- MODAL -->
+<div class="modal fade" id="modal{{ p.id }}" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
 
       <div class="modal-header">
-        <h5 class="modal-title">Pedido #{{ pedido.order_id }}</h5>
+        <h5 class="modal-title">Pedido #{{ p.order_id }}</h5>
         <button class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
       <div class="modal-body">
 
-        <p><b>Cliente:</b> {{ pedido.cliente }}</p>
-        <p><b>CPF:</b> {{ pedido.cpf }}</p>
-        <p><b>Email:</b> {{ pedido.email }}</p>
-        <p><b>Telefone:</b> {{ pedido.telefone }}</p>
-        <p><b>Rua:</b> {{ pedido.rua }}</p>
-        <p><b>Bairro:</b> {{ pedido.bairro }}</p>
-        <p><b>Cidade:</b> {{ pedido.cidade }}</p>
-        <p><b>Estado:</b> {{ pedido.estado }}</p>
-        <p><b>País:</b> {{ pedido.pais }}</p>
-        <p><b>CEP:</b> {{ pedido.cep }}</p>
-        <p><b>IP:</b> {{ pedido.ip }}</p>
-        <p><b>Valor:</b> R$ {{ pedido.valor }}</p>
-        <p><b>Score:</b> {{ pedido.score_risco }}</p>
+        <div class="row">
+
+          <div class="col-md-6">
+            <p><b>Cliente:</b> {{ p.cliente }}</p>
+            <p><b>CPF:</b> {{ p.cpf }}</p>
+            <p><b>Email:</b> {{ p.email }}</p>
+            <p><b>Telefone:</b> {{ p.telefone }}</p>
+            <p><b>IP:</b> {{ p.ip }}</p>
+            <p><b>Valor:</b> R$ {{ p.valor }}</p>
+            <p><b>Score:</b> {{ p.score_risco }}</p>
+          </div>
+
+          <div class="col-md-6">
+            <p><b>Rua:</b> {{ p.rua }}</p>
+            <p><b>Bairro:</b> {{ p.bairro }}</p>
+            <p><b>Cidade:</b> {{ p.cidade }}</p>
+            <p><b>Estado:</b> {{ p.estado }}</p>
+            <p><b>País:</b> {{ p.pais }}</p>
+            <p><b>CEP:</b> {{ p.cep }}</p>
+            <p><b>Status:</b> {{ p.status }}</p>
+          </div>
+
+        </div>
 
       </div>
 
     </div>
   </div>
 </div>
+
 {% endfor %}
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</div>
+</div>
 
+
+<!-- JS -->
 <script>
-function bloquearIP(ip){
-    fetch("/bloquear-ip", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({ip})
-    }).then(()=>location.reload());
+function bloquear(ip){
+fetch("/bloquear_ip", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({ip})
+}).then(()=>location.reload());
 }
 
-function desbloquearIP(ip){
-    fetch("/desbloquear-ip", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({ip})
-    }).then(()=>location.reload());
+function desbloquear(ip){
+fetch("/desbloquear_ip", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({ip})
+}).then(()=>location.reload());
 }
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

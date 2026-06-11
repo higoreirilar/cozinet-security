@@ -18,13 +18,12 @@
     --green:#16a34a;
     --yellow:#f59e0b;
     --blue:#2563eb;
-    --gray:#6b7280;
+    --purple:#8b5cf6;
 }
 
 body{
     background:var(--bg);
     font-family:Arial;
-    color:#111;
 }
 
 /* SIDEBAR */
@@ -32,15 +31,15 @@ body{
     position:fixed;
     left:0;
     top:0;
-    width:270px;
+    width:260px;
     height:100vh;
     background:#fff;
     border-right:1px solid var(--border);
-    padding:25px;
+    padding:20px;
 }
 
-.logo img{
-    width:200px;
+.sidebar img{
+    width:180px;
     margin-bottom:20px;
 }
 
@@ -61,58 +60,62 @@ body{
 
 /* CONTENT */
 .content{
-    margin-left:270px;
-    padding:30px;
+    margin-left:260px;
+    padding:25px;
 }
 
-/* TOPBAR SYSTEM (SAFE) */
+/* TOPBAR SYSTEM */
 .topbar{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    margin-bottom:20px;
-    padding-bottom:12px;
-    border-bottom:1px solid var(--border);
     flex-wrap:wrap;
     gap:10px;
+    margin-bottom:20px;
+    padding-bottom:10px;
+    border-bottom:1px solid var(--border);
 }
 
-/* SYSTEM INFO BAR */
 .system-bar{
     display:flex;
-    gap:14px;
     flex-wrap:wrap;
+    gap:12px;
     align-items:center;
     font-size:12px;
 }
 
-/* KPI */
-.kpi-grid{
-    display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    gap:15px;
-    margin-bottom:25px;
+.user-box{
+    background:var(--red);
+    color:white;
+    padding:8px 14px;
+    border-radius:12px;
+    font-weight:700;
 }
 
-.kpi-card{
-    background:white;
+/* KPIS */
+.kpi-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:12px;
+    margin-bottom:20px;
+}
+
+.kpi{
+    background:#fff;
     border:1px solid var(--border);
-    border-radius:14px;
-    padding:18px;
+    border-radius:12px;
+    padding:15px;
     text-align:center;
-    box-shadow:0 2px 10px rgba(0,0,0,0.04);
 }
 
 .kpi-title{
     font-size:12px;
-    font-weight:700;
     color:#666;
 }
 
 .kpi-value{
-    font-size:22px;
-    font-weight:900;
-    margin-top:5px;
+    font-size:20px;
+    font-weight:800;
 }
 
 .green{ color:var(--green); }
@@ -120,61 +123,43 @@ body{
 .yellow{ color:var(--yellow); }
 .blue{ color:var(--blue); }
 
-/* CLIENTES */
-.pedido-grid-wrapper{
+/* PEDIDOS */
+.grid{
     display:grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns:repeat(2, 1fr);
     gap:15px;
 }
 
-@media(max-width: 992px){
-    .pedido-grid-wrapper{
-        grid-template-columns: 1fr;
-    }
+@media(max-width:900px){
+    .grid{ grid-template-columns:1fr; }
 }
 
-.pedido-card{
-    background:white;
+.card{
+    background:#fff;
     border:1px solid var(--border);
     border-radius:14px;
-    padding:18px;
+    padding:15px;
 }
 
 .status{
-    padding:6px 12px;
+    padding:5px 10px;
     border-radius:999px;
     font-size:12px;
     font-weight:700;
-    color:white;
+    color:#fff;
 }
 
 .aprovado{ background:var(--green); }
 .analise{ background:var(--yellow); color:#111; }
 .bloqueado{ background:var(--red); }
 
-.pedido-grid{
-    display:grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap:8px;
-    margin-top:10px;
-}
-
 .item{
     background:#f9fafb;
     border:1px solid #eee;
-    padding:8px 10px;
+    padding:6px 10px;
     border-radius:10px;
     font-size:13px;
-}
-
-/* USER */
-.user-box{
-    background:var(--red);
-    color:white;
-    padding:8px 14px;
-    border-radius:12px;
-    font-weight:700;
-    font-size:13px;
+    margin-top:5px;
 }
 
 </style>
@@ -185,9 +170,7 @@ body{
 <!-- SIDEBAR -->
 <div class="sidebar">
 
-    <div class="logo">
-        <img src="https://i.ibb.co/vxN1xS0R/logo-vermelho.png">
-    </div>
+    <img src="https://i.ibb.co/vxN1xS0R/logo-vermelho.png">
 
     <div class="menu">
         <a href="/dashboard">🏠 Dashboard</a>
@@ -202,14 +185,13 @@ body{
 <!-- CONTENT -->
 <div class="content">
 
-    <!-- TOPBAR SAFE SYSTEM -->
+    <!-- TOP SYSTEM BAR (SEU NOVO "TÍTULO") -->
     <div class="topbar">
 
-        <!-- SYSTEM INFO (SAFE - NÃO QUEBRA SE NÃO EXISTIR) -->
         <div class="system-bar">
 
-            <div style="font-weight:900;color:#e11d48;">
-                EIRILAR
+            <div style="font-weight:900;color:#e11d48;font-size:14px;">
+                🖥️ Sistema rodando
             </div>
 
             <div style="color:#16a34a;">
@@ -217,19 +199,19 @@ body{
             </div>
 
             <div style="color:#2563eb;">
-                🌐 {{ system_info.server_ip if system_info else 'n/a' }}
+                🌐 {{ request.host }}
             </div>
 
             <div style="color:#6b7280;">
-                ⏱ {{ system_info.uptime if system_info else 0 }}s
+                ⏱ ativo
             </div>
 
             <div style="color:#111827;">
-                ⚙ {{ system_info.env if system_info else 'prod' }}
+                ⚙ Production
             </div>
 
             <div style="color:#f59e0b;">
-                📡 {{ system_info.port if system_info else '8080' }}
+                📡 8080
             </div>
 
             <div style="color:#8b5cf6;">
@@ -248,35 +230,35 @@ body{
 
     </div>
 
-    <!-- KPI -->
+    <!-- KPIS -->
     <div class="kpi-grid">
 
-        <div class="kpi-card">
+        <div class="kpi">
             <div class="kpi-title">Total</div>
             <div class="kpi-value">{{ total_pedidos }}</div>
         </div>
 
-        <div class="kpi-card">
+        <div class="kpi">
             <div class="kpi-title">Aprovados</div>
             <div class="kpi-value green">{{ aprovados }}</div>
         </div>
 
-        <div class="kpi-card">
+        <div class="kpi">
             <div class="kpi-title">Análise</div>
             <div class="kpi-value yellow">{{ analise }}</div>
         </div>
 
-        <div class="kpi-card">
+        <div class="kpi">
             <div class="kpi-title">Bloqueados</div>
             <div class="kpi-value red">{{ bloqueados }}</div>
         </div>
 
-        <div class="kpi-card">
+        <div class="kpi">
             <div class="kpi-title">Protegido</div>
             <div class="kpi-value blue">R$ {{ valor_protegido }}</div>
         </div>
 
-        <div class="kpi-card">
+        <div class="kpi">
             <div class="kpi-title">Score</div>
             <div class="kpi-value">{{ score_medio }}</div>
         </div>
@@ -284,11 +266,11 @@ body{
     </div>
 
     <!-- PEDIDOS -->
-    <div class="pedido-grid-wrapper">
+    <div class="grid">
 
         {% for pedido in pedidos %}
 
-        <div class="pedido-card">
+        <div class="card">
 
             <div style="display:flex;justify-content:space-between;">
                 <div>
@@ -307,15 +289,11 @@ body{
                 </div>
             </div>
 
-            <div class="pedido-grid">
-
-                <div class="item">CPF: {{ pedido.cpf }}</div>
-                <div class="item">Email: {{ pedido.email }}</div>
-                <div class="item">IP: {{ pedido.ip }}</div>
-                <div class="item">Valor: R$ {{ pedido.valor }}</div>
-                <div class="item">Score: {{ pedido.score_risco }}</div>
-
-            </div>
+            <div class="item">CPF: {{ pedido.cpf }}</div>
+            <div class="item">Email: {{ pedido.email }}</div>
+            <div class="item">IP: {{ pedido.ip }}</div>
+            <div class="item">Valor: R$ {{ pedido.valor }}</div>
+            <div class="item">Score: {{ pedido.score_risco }}</div>
 
         </div>
 

@@ -1,14 +1,15 @@
 from flask import Flask, request, jsonify, render_template, session, redirect
 import os
 import psycopg2
-import socket
 import time
 
 app = Flask(__name__)
 app.secret_key = "cozinet_saas_2026"
 
+START_TIME = time.time()
+
 # =========================
-# DB
+# DB SAFE
 # =========================
 def get_conn():
     return psycopg2.connect(
@@ -20,38 +21,11 @@ def get_conn():
     )
 
 # =========================
-# LOGIN CHECK
-# =========================
 def login_required():
     return "user_id" in session
 
 # =========================
-# SYSTEM INFO (SEGURO)
-# =========================
-START_TIME = time.time()
-
-def get_system_info():
-    try:
-        return {
-            "server_ip": request.host,
-            "hostname": socket.gethostname(),
-            "uptime": round(time.time() - START_TIME, 2),
-            "env": os.getenv("ENV", "production"),
-            "port": request.environ.get("SERVER_PORT", "8000"),
-            "status": "online"
-        }
-    except:
-        return {
-            "server_ip": "unknown",
-            "hostname": "unknown",
-            "uptime": 0,
-            "env": "production",
-            "port": "8000",
-            "status": "online"
-        }
-
-# =========================
-# LOGIN
+# LOGIN (OK)
 # =========================
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -85,7 +59,7 @@ def login():
     return render_template("login.html")
 
 # =========================
-# DASHBOARD (ROBUSTO)
+# DASHBOARD 100% SAFE
 # =========================
 @app.route("/dashboard")
 def dashboard():
@@ -106,17 +80,18 @@ def dashboard():
     cur.execute("SELECT COUNT(*) FROM pedidos WHERE status='analise'")
     analise = cur.fetchone()[0]
 
+    # SAFE BLOQUEADOS (SEM JOIN)
     cur.execute("""
         SELECT COUNT(*)
-        FROM pedidos p
-        JOIN ips_bloqueados b ON b.ip = p.ip
+        FROM pedidos
+        WHERE ip IN (SELECT ip FROM ips_bloqueados)
     """)
     bloqueados = cur.fetchone()[0]
 
     cur.execute("""
         SELECT COALESCE(SUM(valor),0)
-        FROM pedidos p
-        JOIN ips_bloqueados b ON b.ip = p.ip
+        FROM pedidos
+        WHERE ip IN (SELECT ip FROM ips_bloqueados)
     """)
     valor_protegido = float(cur.fetchone()[0] or 0)
 
@@ -126,7 +101,7 @@ def dashboard():
     """)
     score_medio = cur.fetchone()[0]
 
-    # SAFE SELECT (SEM TELEFONE/CEP/RUA OBRIGATÓRIO)
+    # SAFE LIST
     cur.execute("""
         SELECT id, order_id, cliente, cpf, email,
                ip, valor, score_risco, status,
@@ -166,16 +141,14 @@ def dashboard():
         bloqueados=bloqueados,
         valor_protegido=valor_protegido,
         score_medio=score_medio,
-        pedidos=pedidos,
-        system_info=get_system_info()
+        pedidos=pedidos
     )
 
 # =========================
-# BLOQUEAR IP
+# BLOCK / UNBLOCK SAFE
 # =========================
 @app.route("/bloquear-ip", methods=["POST"])
 def bloquear_ip():
-
     if not login_required():
         return jsonify({"error": "unauthorized"}), 401
 
@@ -186,7 +159,7 @@ def bloquear_ip():
 
     cur.execute("""
         INSERT INTO ips_bloqueados(ip, motivo)
-        VALUES(%s, %s)
+        VALUES(%s,%s)
         ON CONFLICT(ip) DO NOTHING
     """, (ip, "manual"))
 
@@ -202,12 +175,8 @@ def bloquear_ip():
 
     return jsonify({"ok": True})
 
-# =========================
-# DESBLOQUEAR IP
-# =========================
 @app.route("/desbloquear-ip", methods=["POST"])
 def desbloquear_ip():
-
     if not login_required():
         return jsonify({"error": "unauthorized"}), 401
 

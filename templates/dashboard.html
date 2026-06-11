@@ -21,16 +21,12 @@
     --muted:#8f8f8f;
 }
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
+*{margin:0;padding:0;box-sizing:border-box;}
 
 body{
     background:var(--bg);
     color:white;
-    font-family:Inter,Arial,sans-serif;
+    font-family:Arial;
 }
 
 /* SIDEBAR */
@@ -50,9 +46,7 @@ body{
     margin-bottom:35px;
 }
 
-.logo img{
-    width:230px;
-}
+.logo img{width:230px;}
 
 .menu a{
     display:block;
@@ -61,7 +55,6 @@ body{
     padding:14px;
     border-radius:14px;
     margin-bottom:10px;
-    transition:.3s;
 }
 
 .menu a:hover{
@@ -82,14 +75,8 @@ body{
     margin-bottom:25px;
 }
 
-.title{
-    font-size:30px;
-    font-weight:800;
-}
-
-.subtitle{
-    color:var(--muted);
-}
+.title{font-size:30px;font-weight:800;}
+.subtitle{color:var(--muted);}
 
 .user-box{
     background:linear-gradient(135deg,var(--orange),var(--orange2));
@@ -111,8 +98,6 @@ body{
     font-size:11px;
     color:#999;
     font-weight:600;
-    margin-bottom:6px;
-    text-transform:uppercase;
 }
 
 .kpi-value{
@@ -122,9 +107,7 @@ body{
 }
 
 /* PEDIDOS */
-.orders-section{
-    margin-top:30px;
-}
+.orders-section{margin-top:30px;}
 
 .section-title{
     color:var(--orange);
@@ -145,14 +128,10 @@ body{
     display:flex;
     justify-content:space-between;
     flex-wrap:wrap;
-    gap:10px;
     margin-bottom:15px;
 }
 
-.pedido-id{
-    color:var(--orange);
-    font-weight:800;
-}
+.pedido-id{color:var(--orange);font-weight:800;}
 
 .pedido-cliente{
     font-size:20px;
@@ -170,47 +149,41 @@ body{
 .analise{background:#d97706;}
 .bloqueado{background:#dc2626;}
 
-.pedido-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-    gap:14px;
-    margin-top:10px;
-}
-
-.item small{
-    color:#888;
-    display:block;
-}
-
-.item strong{
-    color:white;
-}
-
 /* ACTIONS */
 .pedido-actions{
     display:flex;
     gap:10px;
-    flex-wrap:wrap;
     margin:15px 0;
+    flex-wrap:wrap;
 }
 
-.pedido-actions button{
-    border-radius:10px;
-    font-weight:600;
+/* GRID */
+.pedido-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:12px;
 }
+
+.item small{color:#888;}
+.item strong{color:white;}
 
 /* FOOTER */
 .footer-card{
-    border-top:1px solid #2b2b2b;
-    margin-top:15px;
+    margin-top:10px;
     padding-top:10px;
+    border-top:1px solid #2b2b2b;
     display:flex;
     justify-content:space-between;
     flex-wrap:wrap;
     color:#bbb;
 }
 
-/* RESPONSIVO */
+/* MODAL */
+.modal-content{
+    background:#111;
+    color:white;
+}
+
 @media(max-width:991px){
     .sidebar{position:relative;width:100%;height:auto;}
     .content{margin-left:0;}
@@ -246,59 +219,22 @@ body{
 
         <div>
             <div class="title">Cozinet Shield</div>
-            <div class="subtitle">Plataforma Antifraude</div>
+            <div class="subtitle">Sistema Antifraude</div>
         </div>
 
-        <div class="user-box">
-            👤 {{ usuario }}
-        </div>
+        <div class="user-box">👤 {{ usuario }}</div>
 
     </div>
 
-    <!-- KPIs -->
+    <!-- KPI -->
     <div class="row g-2 mb-4">
 
-        <div class="col-xl-2 col-lg-2 col-md-4 col-6">
-            <div class="kpi-card">
-                <div class="kpi-title">Total Pedidos</div>
-                <div class="kpi-value">{{ total_pedidos }}</div>
-            </div>
-        </div>
-
-        <div class="col-xl-2 col-lg-2 col-md-4 col-6">
-            <div class="kpi-card">
-                <div class="kpi-title">Aprovados</div>
-                <div class="kpi-value">{{ aprovados }}</div>
-            </div>
-        </div>
-
-        <div class="col-xl-2 col-lg-2 col-md-4 col-6">
-            <div class="kpi-card">
-                <div class="kpi-title">Análise</div>
-                <div class="kpi-value">{{ analise }}</div>
-            </div>
-        </div>
-
-        <div class="col-xl-2 col-lg-2 col-md-4 col-6">
-            <div class="kpi-card">
-                <div class="kpi-title">Bloqueados</div>
-                <div class="kpi-value">{{ bloqueados }}</div>
-            </div>
-        </div>
-
-        <div class="col-xl-2 col-lg-2 col-md-4 col-6">
-            <div class="kpi-card">
-                <div class="kpi-title">Valor Protegido</div>
-                <div class="kpi-value">R$ {{ valor_protegido }}</div>
-            </div>
-        </div>
-
-        <div class="col-xl-2 col-lg-2 col-md-4 col-6">
-            <div class="kpi-card">
-                <div class="kpi-title">Score Médio</div>
-                <div class="kpi-value">{{ score_medio }}</div>
-            </div>
-        </div>
+        <div class="col-6 col-md-2"><div class="kpi-card"><div class="kpi-title">Total</div><div class="kpi-value">{{ total_pedidos }}</div></div></div>
+        <div class="col-6 col-md-2"><div class="kpi-card"><div class="kpi-title">Aprovados</div><div class="kpi-value">{{ aprovados }}</div></div></div>
+        <div class="col-6 col-md-2"><div class="kpi-card"><div class="kpi-title">Análise</div><div class="kpi-value">{{ analise }}</div></div></div>
+        <div class="col-6 col-md-2"><div class="kpi-card"><div class="kpi-title">Bloqueados</div><div class="kpi-value">{{ bloqueados }}</div></div></div>
+        <div class="col-6 col-md-2"><div class="kpi-card"><div class="kpi-title">Protegido</div><div class="kpi-value">R$ {{ valor_protegido }}</div></div></div>
+        <div class="col-6 col-md-2"><div class="kpi-card"><div class="kpi-title">Score</div><div class="kpi-value">{{ score_medio }}</div></div></div>
 
     </div>
 
@@ -333,40 +269,64 @@ body{
             <!-- ACTIONS -->
             <div class="pedido-actions">
 
-                <button class="btn btn-danger btn-sm"
-                        onclick="bloquearIP('{{ pedido.ip }}')">
+                <button class="btn btn-danger btn-sm" onclick="bloquearIP('{{ pedido.ip }}')">
                     🚫 Bloquear IP
                 </button>
 
-                <button class="btn btn-success btn-sm"
-                        onclick="desbloquearIP('{{ pedido.id }}')">
+                <button class="btn btn-success btn-sm" onclick="desbloquearIP('{{ pedido.ip }}')">
                     🔓 Desbloquear
                 </button>
 
-                <button class="btn btn-warning btn-sm"
-                        data-bs-toggle="modal"
-                        data-bs-target="#modal{{ pedido.id }}">
+                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modal{{ pedido.id }}">
                     👁 Detalhes
                 </button>
 
             </div>
 
             <div class="pedido-grid">
-
-                <div class="item"><small>CPF</small><strong>{{ pedido.cpf }}</strong></div>
-                <div class="item"><small>Email</small><strong>{{ pedido.email }}</strong></div>
-                <div class="item"><small>Cidade</small><strong>{{ pedido.cidade }}</strong></div>
-                <div class="item"><small>Estado</small><strong>{{ pedido.estado }}</strong></div>
-                <div class="item"><small>IP</small><strong>{{ pedido.ip }}</strong></div>
-                <div class="item"><small>Valor</small><strong>R$ {{ pedido.valor }}</strong></div>
-                <div class="item"><small>Score</small><strong>{{ pedido.score_risco }}</strong></div>
-
+                <div><small>CPF</small><strong>{{ pedido.cpf }}</strong></div>
+                <div><small>Email</small><strong>{{ pedido.email }}</strong></div>
+                <div><small>Cidade</small><strong>{{ pedido.cidade }}</strong></div>
+                <div><small>Estado</small><strong>{{ pedido.estado }}</strong></div>
+                <div><small>IP</small><strong>{{ pedido.ip }}</strong></div>
+                <div><small>Valor</small><strong>R$ {{ pedido.valor }}</strong></div>
+                <div><small>Score</small><strong>{{ pedido.score_risco }}</strong></div>
             </div>
 
             <div class="footer-card">
-
                 <div><b>Motivo:</b> {{ pedido.motivo }}</div>
                 <div>{{ pedido.created_at }}</div>
+            </div>
+
+        </div>
+
+        <!-- MODAL -->
+        <div class="modal fade" id="modal{{ pedido.id }}" tabindex="-1">
+
+            <div class="modal-dialog modal-lg">
+
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">Pedido #{{ pedido.order_id }}</h5>
+                        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <p><b>Cliente:</b> {{ pedido.cliente }}</p>
+                        <p><b>CPF:</b> {{ pedido.cpf }}</p>
+                        <p><b>Email:</b> {{ pedido.email }}</p>
+                        <p><b>IP:</b> {{ pedido.ip }}</p>
+                        <p><b>Dispositivo:</b> {{ pedido.dispositivo }}</p>
+                        <p><b>Valor:</b> R$ {{ pedido.valor }}</p>
+                        <p><b>Score:</b> {{ pedido.score_risco }}</p>
+                        <p><b>Status:</b> {{ pedido.status }}</p>
+                        <p><b>Motivo:</b> {{ pedido.motivo }}</p>
+
+                    </div>
+
+                </div>
 
             </div>
 
@@ -378,35 +338,22 @@ body{
 
 </div>
 
-<!-- JS -->
 <script>
 
 function bloquearIP(ip){
-
     fetch("/bloquear-ip",{
         method:"POST",
-        headers:{
-            "Content-Type":"application/json"
-        },
+        headers:{"Content-Type":"application/json"},
         body:JSON.stringify({ip})
-    })
-    .then(r=>r.json())
-    .then(data=>{
-        alert(data.message);
-        location.reload();
-    });
+    }).then(()=>location.reload());
 }
 
-function desbloquearIP(id){
-
-    fetch("/desbloquear-ip/"+id,{
-        method:"POST"
-    })
-    .then(r=>r.json())
-    .then(data=>{
-        alert(data.message);
-        location.reload();
-    });
+function desbloquearIP(ip){
+    fetch("/desbloquear-ip",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({ip})
+    }).then(()=>location.reload());
 }
 
 </script>

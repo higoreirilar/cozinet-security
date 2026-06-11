@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard Antifraude</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #0f172a;
+    color: white;
+    padding: 20px;
+}
+
+h1 { color: #38bdf8; }
+
+.cards {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.card {
+    flex: 1;
+    padding: 15px;
+    background: #1e293b;
+    border-radius: 8px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: #1e293b;
+}
+
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid #334155;
+}
+
+th { background: #0b1220; }
+
+button {
+    padding: 5px 8px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.block { background: #ef4444; color: white; }
+.unblock { background: #22c55e; color: white; }
+</style>
+</head>
+
+<body>
+
+<h1>📊 Dashboard Antifraude</h1>
+<p>Bem-vindo, {{ usuario }}</p>
+
+<!-- CARDS -->
+<div class="cards">
+    <div class="card">✔ Aprovados: {{ aprovados }}</div>
+    <div class="card">⏳ Análise: {{ analise }}</div>
+    <div class="card">🚫 Bloqueados: {{ bloqueados }}</div>
+</div>
+
+<!-- TABELA -->
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Pedido</th>
+            <th>IP</th>
+            <th>Valor</th>
+            <th>Status</th>
+            <th>Motivo</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for p in pedidos %}
+        <tr>
+            <td>{{ p.id }}</td>
+            <td>{{ p.order_id }}</td>
+            <td>{{ p.ip }}</td>
+            <td>R$ {{ p.valor }}</td>
+            <td>{{ p.status }}</td>
+            <td>{{ p.motivo }}</td>
+            <td>
+
+                <button class="block" onclick="bloquear('{{ p.ip }}')">
+                    🚫 Bloquear
+                </button>
+
+                <button class="unblock" onclick="desbloquear('{{ p.ip }}')">
+                    🔓 Desbloquear
+                </button>
+
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+function bloquear(ip){
+    fetch("/bloquear-ip", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ip: ip})
+    })
+    .then(r => r.json())
+    .then(data => {
+        alert(data.message);
+        location.reload();
+    });
+}
+
+function desbloquear(ip){
+    fetch("/desbloquear-ip", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ip: ip})
+    })
+    .then(r => r.json())
+    .then(data => {
+        alert(data.message);
+        location.reload();
+    });
+}
+</script>
+
+</body>
+</html>

@@ -3,25 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cozinet Shield - Dashboard</title>
+<title>Eirilar - AntiFraude Dashboard</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
 
 :root{
-    --bg:#0b0b0b;
-    --sidebar:#111;
-    --card:#171717;
-    --border:#292929;
-    --orange:#ff7a00;
-    --orange2:#ff9333;
+    --bg:#f6f7fb;
+    --card:#ffffff;
+    --border:#e6e6e6;
+
+    --red:#e11d48;
+    --green:#16a34a;
+    --yellow:#f59e0b;
+    --blue:#2563eb;
+    --dark:#111827;
 }
 
 body{
     background:var(--bg);
-    color:white;
     font-family:Arial;
+    color:#111;
 }
 
 /* ================= SIDEBAR ================= */
@@ -29,31 +32,36 @@ body{
     position:fixed;
     left:0;
     top:0;
-    width:280px;
+    width:270px;
     height:100vh;
-    background:var(--sidebar);
+    background:#ffffff;
     border-right:1px solid var(--border);
     padding:25px;
 }
 
-.logo img{width:220px;}
+.logo img{
+    width:200px;
+    margin-bottom:20px;
+}
 
 .menu a{
     display:block;
-    color:#ccc;
     text-decoration:none;
+    color:#333;
     padding:12px;
-    border-radius:12px;
+    border-radius:10px;
+    margin-bottom:8px;
+    font-weight:600;
 }
 
 .menu a:hover{
-    background:var(--orange);
+    background:var(--red);
     color:white;
 }
 
 /* ================= CONTENT ================= */
 .content{
-    margin-left:280px;
+    margin-left:270px;
     padding:30px;
 }
 
@@ -64,66 +72,89 @@ body{
     margin-bottom:25px;
 }
 
+.brand{
+    font-size:24px;
+    font-weight:800;
+    color:var(--red);
+}
+
 .user-box{
-    background:linear-gradient(135deg,var(--orange),var(--orange2));
+    background:var(--red);
+    color:white;
     padding:10px 15px;
     border-radius:12px;
-    font-weight:bold;
+    font-weight:700;
 }
 
 /* ================= KPI ================= */
 .kpi-grid{
     display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
     gap:15px;
     margin-bottom:25px;
 }
 
 .kpi-card{
-    background: linear-gradient(145deg, #171717, #101010);
-    border:1px solid #2a2a2a;
-    border-radius:16px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
     padding:18px;
     text-align:center;
+    box-shadow:0 2px 10px rgba(0,0,0,0.05);
+}
+
+.kpi-title{
+    font-size:12px;
+    font-weight:700;
+    color:#666;
 }
 
 .kpi-value{
-    color:var(--orange);
     font-size:22px;
     font-weight:800;
+    margin-top:5px;
 }
 
-/* ================= GRID CLIENTES 2 COLUNAS ================= */
+/* CORES DOS KPIs */
+.green{ color:var(--green); }
+.red{ color:var(--red); }
+.yellow{ color:var(--yellow); }
+.blue{ color:var(--blue); }
+.dark{ color:var(--dark); }
+
+/* ================= CARDS CLIENTES ================= */
 .pedido-grid-wrapper{
     display:grid;
     grid-template-columns: repeat(2, 1fr);
     gap:15px;
 }
 
-@media (max-width: 992px){
+@media(max-width: 992px){
     .pedido-grid-wrapper{
         grid-template-columns: 1fr;
     }
 }
 
-/* ================= CARD ================= */
 .pedido-card{
     background:var(--card);
     border:1px solid var(--border);
-    border-radius:16px;
+    border-radius:14px;
     padding:18px;
 }
 
+/* STATUS */
 .status{
     padding:6px 12px;
     border-radius:999px;
     font-size:12px;
+    font-weight:700;
+    color:white;
 }
-.aprovado{background:#15803d;}
-.analise{background:#d97706;}
-.bloqueado{background:#dc2626;}
+.aprovado{ background:var(--green); }
+.analise{ background:var(--yellow); color:#111; }
+.bloqueado{ background:var(--red); }
 
-/* ================= GRID INTERNO LIMPO ================= */
+/* GRID INTERNO */
 .pedido-grid{
     display:grid;
     grid-template-columns: repeat(2, 1fr);
@@ -132,48 +163,21 @@ body{
 }
 
 .item{
-    background:#121212;
-    border:1px solid #222;
+    background:#f9fafb;
+    border:1px solid #eee;
     padding:8px 10px;
     border-radius:10px;
-
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-
     font-size:13px;
-    min-height:38px;
 }
 
-.item span{
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-    max-width:140px;
-}
-
-/* ================= MODAL ================= */
+/* MODAL */
 .modal-content{
-    background:#111;
-    color:white;
-}
-
-.info-box{
-    background:#121212;
-    border:1px solid #2a2a2a;
-    padding:10px;
-    border-radius:10px;
-    font-size:13px;
-    min-height:55px;
-}
-
-.info-box b{
-    color:#ff7a00;
-    font-size:12px;
+    border-radius:12px;
 }
 
 .section-title{
-    color:#ff7a00;
+    color:var(--red);
+    font-weight:800;
     margin-top:15px;
 }
 
@@ -186,7 +190,7 @@ body{
 <div class="sidebar">
 
     <div class="logo">
-        <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
+        <img src="https://i.ibb.co/vxN1xS0R/logo-vermelho.png">
     </div>
 
     <div class="menu">
@@ -202,20 +206,44 @@ body{
 <!-- CONTENT -->
 <div class="content">
 
-    <!-- TOP -->
     <div class="topbar">
-        <h3>Cozinet Shield</h3>
+        <div class="brand">Eirilar Shield</div>
         <div class="user-box">👤 {{ usuario }}</div>
     </div>
 
     <!-- KPI -->
     <div class="kpi-grid">
-        <div class="kpi-card">Total<br><div class="kpi-value">{{ total_pedidos }}</div></div>
-        <div class="kpi-card">Aprovados<br><div class="kpi-value">{{ aprovados }}</div></div>
-        <div class="kpi-card">Análise<br><div class="kpi-value">{{ analise }}</div></div>
-        <div class="kpi-card">Bloqueados<br><div class="kpi-value">{{ bloqueados }}</div></div>
-        <div class="kpi-card">Protegido<br><div class="kpi-value">R$ {{ valor_protegido }}</div></div>
-        <div class="kpi-card">Score<br><div class="kpi-value">{{ score_medio }}</div></div>
+
+        <div class="kpi-card">
+            <div class="kpi-title">Total</div>
+            <div class="kpi-value dark">{{ total_pedidos }}</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-title">Aprovados</div>
+            <div class="kpi-value green">{{ aprovados }}</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-title">Análise</div>
+            <div class="kpi-value yellow">{{ analise }}</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-title">Bloqueados</div>
+            <div class="kpi-value red">{{ bloqueados }}</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-title">Protegido</div>
+            <div class="kpi-value blue">R$ {{ valor_protegido }}</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-title">Score</div>
+            <div class="kpi-value yellow">{{ score_medio }}</div>
+        </div>
+
     </div>
 
     <!-- CLIENTES -->
@@ -242,6 +270,17 @@ body{
                 </div>
             </div>
 
+            <div class="pedido-grid">
+
+                <div class="item">CPF: {{ pedido.cpf }}</div>
+                <div class="item">Email: {{ pedido.email }}</div>
+                <div class="item">Telefone: {{ pedido.telefone }}</div>
+                <div class="item">IP: {{ pedido.ip }}</div>
+                <div class="item">Valor: R$ {{ pedido.valor }}</div>
+                <div class="item">Score: {{ pedido.score_risco }}</div>
+
+            </div>
+
             <div style="margin-top:10px;">
                 <button class="btn btn-danger btn-sm" onclick="bloquearIP('{{ pedido.ip }}')">Bloquear</button>
                 <button class="btn btn-success btn-sm" onclick="desbloquearIP('{{ pedido.ip }}')">Desbloquear</button>
@@ -250,71 +289,6 @@ body{
                 </button>
             </div>
 
-            <!-- GRID LIMPO -->
-            <div class="pedido-grid">
-
-                <div class="item"><b>CPF:</b><span>{{ pedido.cpf }}</span></div>
-                <div class="item"><b>Email:</b><span>{{ pedido.email }}</span></div>
-                <div class="item"><b>Telefone:</b><span>{{ pedido.telefone }}</span></div>
-                <div class="item"><b>Rua:</b><span>{{ pedido.rua }}</span></div>
-                <div class="item"><b>CEP:</b><span>{{ pedido.cep }}</span></div>
-                <div class="item"><b>IP:</b><span>{{ pedido.ip }}</span></div>
-                <div class="item"><b>Valor:</b><span>R$ {{ pedido.valor }}</span></div>
-                <div class="item"><b>Score:</b><span>{{ pedido.score_risco }}</span></div>
-
-            </div>
-
-        </div>
-
-        <!-- MODAL COMPLETO -->
-        <div class="modal fade" id="modal{{ pedido.id }}" tabindex="-1">
-            <div class="modal-dialog modal-xl">
-                <div class="modal-content">
-
-                    <div class="modal-header">
-                        <h5>Pedido #{{ pedido.order_id }}</h5>
-                        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-
-                    <div class="modal-body">
-
-                        <h5 class="section-title">Dados do Cliente</h5>
-
-                        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
-
-                            <div class="info-box"><b>CPF</b><br>{{ pedido.cpf }}</div>
-                            <div class="info-box"><b>Email</b><br>{{ pedido.email }}</div>
-                            <div class="info-box"><b>Telefone</b><br>{{ pedido.telefone }}</div>
-
-                            <div class="info-box"><b>IP</b><br>{{ pedido.ip }}</div>
-                            <div class="info-box"><b>Valor</b><br>R$ {{ pedido.valor }}</div>
-                            <div class="info-box"><b>Score</b><br>{{ pedido.score_risco }}</div>
-
-                            <div class="info-box"><b>Status</b><br>{{ pedido.status }}</div>
-                            <div class="info-box"><b>CEP</b><br>{{ pedido.cep }}</div>
-                            <div class="info-box"><b>Rua</b><br>{{ pedido.rua }}</div>
-
-                        </div>
-
-                        <h5 class="section-title">Motivo</h5>
-                        <div style="background:#1a1a1a;padding:10px;border-radius:10px;">
-                            {{ pedido.motivo }}
-                        </div>
-
-                        <h5 class="section-title">Histórico CPF</h5>
-                        {% for h in pedido.hist_cpf %}
-                            <div>#{{ h[0] }} | R$ {{ h[1] }} | {{ h[2] }}</div>
-                        {% endfor %}
-
-                        <h5 class="section-title">Histórico IP</h5>
-                        {% for h in pedido.hist_ip %}
-                            <div>#{{ h[0] }} | {{ h[1] }} | R$ {{ h[2] }}</div>
-                        {% endfor %}
-
-                    </div>
-
-                </div>
-            </div>
         </div>
 
         {% endfor %}

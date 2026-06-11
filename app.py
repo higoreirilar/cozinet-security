@@ -7,7 +7,7 @@ app.secret_key = "cozinet_saas_2026"
 
 
 # =========================
-# DATABASE CONNECTION
+# DB CONNECTION
 # =========================
 def get_conn():
     return psycopg2.connect(
@@ -27,14 +27,16 @@ def login_required():
 
 
 # =========================
-# ROUTES
+# HOME
 # =========================
-
 @app.route("/")
 def home():
     return redirect("/login")
 
 
+# =========================
+# LOGIN
+# =========================
 @app.route("/login", methods=["GET", "POST"])
 def login():
 
@@ -68,6 +70,9 @@ def login():
     return render_template("login.html")
 
 
+# =========================
+# LOGOUT
+# =========================
 @app.route("/logout")
 def logout():
     session.clear()
@@ -112,9 +117,9 @@ def dashboard():
     score_medio = cur.fetchone()[0]
 
     cur.execute("""
-        SELECT id,order_id,cliente,cpf,email,cidade,estado,
-               ip,dispositivo,valor,score_risco,status,
-               motivo,created_at,analisado_por,data_analise,pais
+        SELECT id, order_id, cliente, cpf, email, cidade, estado,
+               ip, dispositivo, valor, score_risco, status,
+               motivo, created_at, analisado_por, data_analise, pais
         FROM pedidos
         ORDER BY id DESC
         LIMIT 100
@@ -162,7 +167,7 @@ def dashboard():
 
 
 # =========================
-# BLOQUEAR IP
+# BLOQUEAR IP + BLOQUEAR PEDIDOS
 # =========================
 @app.route("/bloquear-ip", methods=["POST"])
 def bloquear_ip():
@@ -176,14 +181,14 @@ def bloquear_ip():
     conn = get_conn()
     cur = conn.cursor()
 
-    # bloqueia IP
+    # insere bloqueio IP
     cur.execute("""
         INSERT INTO ips_bloqueados(ip, motivo)
         VALUES(%s,%s)
         ON CONFLICT(ip) DO NOTHING
     """, (ip, "Bloqueio manual"))
 
-    # também atualiza pedidos com esse IP
+    # bloqueia pedidos desse IP
     cur.execute("""
         UPDATE pedidos
         SET status='bloqueado'
@@ -198,18 +203,32 @@ def bloquear_ip():
 
 
 # =========================
-# DESBLOQUEAR IP
+# DESBLOQUEAR IP (CORRIGIDO)
 # =========================
-@app.route("/desbloquear-ip/<int:id>", methods=["POST"])
-def desbloquear_ip(id):
+@app.route("/desbloquear-ip", methods=["POST"])
+def desbloquear_ip():
 
     if not login_required():
         return jsonify({"error": "unauthorized"}), 401
 
+    dados = request.get_json()
+    ip = dados.get("ip")
+
     conn = get_conn()
     cur = conn.cursor()
 
-    cur.execute("DELETE FROM ips_bloqueados WHERE id=%s", (id,))
+    # remove bloqueio
+    cur.execute("""
+        DELETE FROM ips_bloqueados
+        WHERE ip=%s
+    """, (ip,))
+
+    # reativa pedidos desse IP
+    cur.execute("""
+        UPDATE pedidos
+        SET status='analise'
+        WHERE ip=%s
+    """, (ip,))
 
     conn.commit()
     cur.close()
@@ -219,38 +238,7 @@ def desbloquear_ip(id):
 
 
 # =========================
-# MUDAR STATUS PEDIDO (NOVO)
-# =========================
-@app.route("/mudar-status-pedido", methods=["POST"])
-def mudar_status_pedido():
-
-    if not login_required():
-        return jsonify({"error": "unauthorized"}), 401
-
-    dados = request.get_json()
-
-    pedido_id = dados.get("id")
-    status = dados.get("status")
-
-    conn = get_conn()
-    cur = conn.cursor()
-
-    # atualiza status do pedido
-    cur.execute("""
-        UPDATE pedidos
-        SET status=%s
-        WHERE id=%s
-    """, (status, pedido_id))
-
-    conn.commit()
-    cur.close()
-    conn.close()
-
-    return jsonify({"success": True, "message": "Status atualizado"})
-
-
-# =========================
-# RUN APP
+# RUN
 # =========================
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)

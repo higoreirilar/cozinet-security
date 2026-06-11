@@ -62,17 +62,14 @@ def painel():
     if not login_required():
         return redirect("/login")
 
-    return render_template(
-        "painel.html",
-        usuario=session.get("nome")
-    )
+    return render_template("painel.html", usuario=session.get("nome"))
 
 # ---------------- HOME ----------------
 @app.route("/")
 def home():
     return redirect("/login")
 
-# ---------------- DASHBOARD (API) ----------------
+# ---------------- DASHBOARD API ----------------
 @app.route("/dashboard")
 def dashboard():
 
@@ -93,10 +90,8 @@ def dashboard():
     cur.close()
     conn.close()
 
-    data = []
-
-    for r in rows:
-        data.append({
+    return jsonify([
+        {
             "id": r[0],
             "order_id": r[1],
             "ip": r[2],
@@ -104,9 +99,9 @@ def dashboard():
             "status": r[4],
             "motivo": r[5],
             "created_at": str(r[6])
-        })
-
-    return jsonify(data)
+        }
+        for r in rows
+    ])
 
 # ---------------- STATS ----------------
 @app.route("/stats")
@@ -124,14 +119,10 @@ def stats():
     cur.close()
     conn.close()
 
-    aprovados = sum(1 for r in rows if r[0] == "aprovado")
-    analise = sum(1 for r in rows if r[0] == "analise")
-    bloqueados = sum(1 for r in rows if r[0] == "bloqueado")
-
     return jsonify({
-        "aprovados": aprovados,
-        "analise": analise,
-        "bloqueados": bloqueados
+        "aprovados": sum(1 for r in rows if r[0] == "aprovado"),
+        "analise": sum(1 for r in rows if r[0] == "analise"),
+        "bloqueados": sum(1 for r in rows if r[0] == "bloqueado")
     })
 
 # ---------------- BLOQUEAR IP ----------------
@@ -213,8 +204,33 @@ def bloqueados():
     if not login_required():
         return redirect("/login")
 
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT id, ip, motivo, data_bloqueio
+        FROM ips_bloqueados
+        ORDER BY data_bloqueio DESC
+    """)
+
+    rows = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    bloqueados = [
+        {
+            "id": r[0],
+            "ip": r[1],
+            "motivo": r[2],
+            "data": str(r[3])
+        }
+        for r in rows
+    ]
+
     return render_template(
         "bloqueados.html",
+        bloqueados=bloqueados,
         usuario=session.get("nome")
     )
 

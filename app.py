@@ -79,7 +79,7 @@ def logout():
 
 
 # =========================
-# DASHBOARD (CONSISTENTE)
+# DASHBOARD (CORRIGIDO E CONSISTENTE)
 # =========================
 @app.route("/dashboard")
 def dashboard():
@@ -90,7 +90,7 @@ def dashboard():
     conn = get_conn()
     cur = conn.cursor()
 
-    # TOTAL
+    # TOTAL PEDIDOS
     cur.execute("SELECT COUNT(*) FROM pedidos")
     total_pedidos = cur.fetchone()[0]
 
@@ -98,23 +98,23 @@ def dashboard():
     cur.execute("SELECT COUNT(*) FROM pedidos WHERE status='aprovado'")
     aprovados = cur.fetchone()[0]
 
-    # ANALISE
+    # ANÁLISE
     cur.execute("SELECT COUNT(*) FROM pedidos WHERE status='analise'")
     analise = cur.fetchone()[0]
 
-    # BLOQUEADOS (CORRETO: por IP bloqueado)
+    # 🚨 BLOQUEADOS (CORRETO E REAL)
     cur.execute("""
         SELECT COUNT(*)
-        FROM pedidos p
-        JOIN ips_bloqueados b ON b.ip = p.ip
+        FROM pedidos
+        WHERE ip IN (SELECT ip FROM ips_bloqueados)
     """)
     bloqueados = cur.fetchone()[0]
 
-    # VALOR PROTEGIDO
+    # 💰 VALOR PROTEGIDO
     cur.execute("""
-        SELECT COALESCE(SUM(p.valor),0)
-        FROM pedidos p
-        JOIN ips_bloqueados b ON b.ip = p.ip
+        SELECT COALESCE(SUM(valor),0)
+        FROM pedidos
+        WHERE ip IN (SELECT ip FROM ips_bloqueados)
     """)
     valor_protegido = float(cur.fetchone()[0] or 0)
 
@@ -197,7 +197,7 @@ def bloquear_ip():
         ON CONFLICT(ip) DO NOTHING
     """, (ip, "Bloqueio manual"))
 
-    # bloqueia pedidos
+    # marca pedidos
     cur.execute("""
         UPDATE pedidos
         SET status='bloqueado'
@@ -212,7 +212,7 @@ def bloquear_ip():
 
 
 # =========================
-# DESBLOQUEAR IP
+# DESBLOQUEAR IP (CORRIGIDO)
 # =========================
 @app.route("/desbloquear-ip", methods=["POST"])
 def desbloquear_ip():
@@ -232,7 +232,7 @@ def desbloquear_ip():
         WHERE ip=%s
     """, (ip,))
 
-    # reclassifica pedidos
+    # volta pra análise
     cur.execute("""
         UPDATE pedidos
         SET status='analise'
@@ -244,6 +244,76 @@ def desbloquear_ip():
     conn.close()
 
     return jsonify({"success": True, "message": "IP desbloqueado"})
+
+
+# =========================
+# IPS BLOQUEADOS (ROTA QUE FALTAVA)
+# =========================
+@app.route("/bloqueados")
+def bloqueados():
+
+    if not login_required():
+        return redirect("/login")
+
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT id, ip, motivo, data_cadastro
+        FROM ips_bloqueados
+        ORDER BY data_cadastro DESC
+    """)
+
+    rows = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    bloqueados = []
+    for r in rows:
+        bloqueados.append({
+            "id": r[0],
+            "ip": r[1],
+            "motivo": r[2],
+            "data": str(r[3]) if r[3] else ""
+        })
+
+    return render_template("bloqueados.html", bloqueados=bloqueados)
+
+
+# =========================
+# IPS CONFIÁVEIS (ROTA NOVA)
+# =========================
+@app.route("/ips-confiaveis")
+def ips_confiaveis():
+
+    if not login_required():
+        return redirect("/login")
+
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT id, ip, observacao, data_cadastro
+        FROM ips_confiaveis
+        ORDER BY data_cadastro DESC
+    """)
+
+    rows = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    ips = []
+    for r in rows:
+        ips.append({
+            "id": r[0],
+            "ip": r[1],
+            "observacao": r[2],
+            "data": str(r[3])
+        })
+
+    return render_template("ips_confiaveis.html", ips=ips)
 
 
 # =========================

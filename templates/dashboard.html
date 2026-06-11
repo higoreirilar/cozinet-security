@@ -93,7 +93,7 @@ body{
     font-weight:800;
 }
 
-/* ================= GRID 2 COLUNAS ================= */
+/* ================= GRID CLIENTES 2 COLUNAS ================= */
 .pedido-grid-wrapper{
     display:grid;
     grid-template-columns: repeat(2, 1fr);
@@ -114,7 +114,6 @@ body{
     padding:18px;
 }
 
-/* status */
 .status{
     padding:6px 12px;
     border-radius:999px;
@@ -124,7 +123,7 @@ body{
 .analise{background:#d97706;}
 .bloqueado{background:#dc2626;}
 
-/* ================= 🔥 FIX DEFINITIVO GRID ================= */
+/* ================= GRID INTERNO LIMPO ================= */
 .pedido-grid{
     display:grid;
     grid-template-columns: repeat(2, 1fr);
@@ -132,12 +131,11 @@ body{
     margin-top:10px;
 }
 
-/* item compacto sem esticar altura */
 .item{
     background:#121212;
+    border:1px solid #222;
     padding:8px 10px;
     border-radius:10px;
-    border:1px solid #222;
 
     display:flex;
     justify-content:space-between;
@@ -147,7 +145,6 @@ body{
     min-height:38px;
 }
 
-/* evita email estourar layout */
 .item span{
     overflow:hidden;
     text-overflow:ellipsis;
@@ -161,9 +158,23 @@ body{
     color:white;
 }
 
+.info-box{
+    background:#121212;
+    border:1px solid #2a2a2a;
+    padding:10px;
+    border-radius:10px;
+    font-size:13px;
+    min-height:55px;
+}
+
+.info-box b{
+    color:#ff7a00;
+    font-size:12px;
+}
+
 .section-title{
-    color:var(--orange);
-    margin-top:10px;
+    color:#ff7a00;
+    margin-top:15px;
 }
 
 </style>
@@ -173,6 +184,7 @@ body{
 
 <!-- SIDEBAR -->
 <div class="sidebar">
+
     <div class="logo">
         <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
     </div>
@@ -184,6 +196,7 @@ body{
         <a href="/logs">📜 Logs</a>
         <a href="/logout">🚪 Sair</a>
     </div>
+
 </div>
 
 <!-- CONTENT -->
@@ -253,7 +266,7 @@ body{
 
         </div>
 
-        <!-- MODAL -->
+        <!-- MODAL COMPLETO -->
         <div class="modal fade" id="modal{{ pedido.id }}" tabindex="-1">
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
@@ -265,29 +278,37 @@ body{
 
                     <div class="modal-body">
 
-                        <h6 class="section-title">Cliente</h6>
-                        <p>{{ pedido.cliente }} | {{ pedido.cpf }}</p>
-                        <p>{{ pedido.email }} | {{ pedido.telefone }}</p>
+                        <h5 class="section-title">Dados do Cliente</h5>
 
-                        <h6 class="section-title">Endereço</h6>
-                        <p>{{ pedido.rua }} - CEP {{ pedido.cep }}</p>
+                        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
 
-                        <h6 class="section-title">Pedido</h6>
-                        <p>R$ {{ pedido.valor }} | Score {{ pedido.score_risco }}</p>
+                            <div class="info-box"><b>CPF</b><br>{{ pedido.cpf }}</div>
+                            <div class="info-box"><b>Email</b><br>{{ pedido.email }}</div>
+                            <div class="info-box"><b>Telefone</b><br>{{ pedido.telefone }}</div>
 
-                        <h6 class="section-title">IP</h6>
-                        <p>{{ pedido.ip }}</p>
+                            <div class="info-box"><b>IP</b><br>{{ pedido.ip }}</div>
+                            <div class="info-box"><b>Valor</b><br>R$ {{ pedido.valor }}</div>
+                            <div class="info-box"><b>Score</b><br>{{ pedido.score_risco }}</div>
 
-                        <hr>
+                            <div class="info-box"><b>Status</b><br>{{ pedido.status }}</div>
+                            <div class="info-box"><b>CEP</b><br>{{ pedido.cep }}</div>
+                            <div class="info-box"><b>Rua</b><br>{{ pedido.rua }}</div>
 
-                        <h6 class="section-title">Histórico CPF</h6>
+                        </div>
+
+                        <h5 class="section-title">Motivo</h5>
+                        <div style="background:#1a1a1a;padding:10px;border-radius:10px;">
+                            {{ pedido.motivo }}
+                        </div>
+
+                        <h5 class="section-title">Histórico CPF</h5>
                         {% for h in pedido.hist_cpf %}
-                            <p>#{{ h[0] }} - R$ {{ h[1] }} - {{ h[2] }}</p>
+                            <div>#{{ h[0] }} | R$ {{ h[1] }} | {{ h[2] }}</div>
                         {% endfor %}
 
-                        <h6 class="section-title">Histórico IP</h6>
+                        <h5 class="section-title">Histórico IP</h5>
                         {% for h in pedido.hist_ip %}
-                            <p>#{{ h[0] }} - {{ h[1] }} - R$ {{ h[2] }}</p>
+                            <div>#{{ h[0] }} | {{ h[1] }} | R$ {{ h[2] }}</div>
                         {% endfor %}
 
                     </div>

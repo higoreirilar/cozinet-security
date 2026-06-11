@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify, render_template, session, redirect
 import os
 import psycopg2
 import time
-from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = "cozinet_saas_2026"
@@ -10,7 +9,7 @@ app.secret_key = "cozinet_saas_2026"
 START_TIME = time.time()
 
 # =========================
-# DB
+# DB CONNECTION
 # =========================
 def get_conn():
     return psycopg2.connect(
@@ -22,12 +21,14 @@ def get_conn():
     )
 
 # =========================
+# LOGIN CHECK
+# =========================
 def login_required():
     return "user_id" in session
 
 
 # =========================
-# SYSTEM INFO (PAINEL TOPO)
+# SYSTEM INFO (TOPO DASH)
 # =========================
 def get_system_info():
     return {
@@ -38,6 +39,14 @@ def get_system_info():
         "port": 8080,
         "env": "production"
     }
+
+
+# =========================
+# ROOT ROUTE
+# =========================
+@app.route("/")
+def root():
+    return redirect("/dashboard")
 
 
 # =========================
@@ -130,8 +139,9 @@ def dashboard():
     cur.close()
     conn.close()
 
-    pedidos = [
-        {
+    pedidos = []
+    for r in rows:
+        pedidos.append({
             "id": r[0],
             "order_id": r[1],
             "cliente": r[2],
@@ -143,9 +153,7 @@ def dashboard():
             "status": r[8],
             "motivo": r[9],
             "created_at": str(r[10])
-        }
-        for r in rows
-    ]
+        })
 
     system = get_system_info()
 
@@ -161,6 +169,68 @@ def dashboard():
         pedidos=pedidos,
         system=system
     )
+
+
+# =========================
+# BLOQUEAR IP
+# =========================
+@app.route("/bloquear-ip", methods=["POST"])
+def bloquear_ip():
+
+    if not login_required():
+        return jsonify({"error": "unauthorized"}), 401
+
+    ip = request.get_json().get("ip")
+
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute("""
+        INSERT INTO ips_bloqueados(ip, motivo, data_cadastro)
+        VALUES(%s,%s, NOW())
+        ON CONFLICT DO NOTHING
+    """, (ip, "manual"))
+
+    cur.execute("""
+        UPDATE pedidos
+        SET status='bloqueado'
+        WHERE ip=%s
+    """, (ip,))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return jsonify({"ok": True})
+
+
+# =========================
+# DESBLOQUEAR IP
+# =========================
+@app.route("/desbloquear-ip", methods=["POST"])
+def desbloquear_ip():
+
+    if not login_required():
+        return jsonify({"error": "unauthorized"}), 401
+
+    ip = request.get_json().get("ip")
+
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute("DELETE FROM ips_bloqueados WHERE ip=%s", (ip,))
+
+    cur.execute("""
+        UPDATE pedidos
+        SET status='analise'
+        WHERE ip=%s
+    """, (ip,))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return jsonify({"ok": True})
 
 
 # =========================

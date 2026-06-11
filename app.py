@@ -143,7 +143,7 @@ return render_template(
     valor_protegido=valor_protegido,
     score_medio=score_medio,
     pedidos=pedidos,
-    system=get_system_info()   # <<< ISSO É O QUE FALTAVA
+    system=get_system_info()   # <<<<<< ISSO TEM QUE EXISTIR
 )
 
 # =========================

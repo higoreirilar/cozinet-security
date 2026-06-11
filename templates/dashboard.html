@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Eirilar Shield</title>
+
+<title>Eirilar Shield - Dashboard</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -64,7 +65,7 @@ body{
     padding:25px;
 }
 
-/* TOP SYSTEM BAR */
+/* SYSTEM TOPBAR */
 .topbar{
     display:flex;
     justify-content:space-between;
@@ -92,7 +93,7 @@ body{
     font-weight:700;
 }
 
-/* KPIs */
+/* KPI */
 .kpi-grid{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
@@ -134,7 +135,7 @@ body{
     .grid{ grid-template-columns:1fr; }
 }
 
-/* CARD */
+/* CARD PEDIDO */
 .card{
     background:#fff;
     border:1px solid var(--border);
@@ -155,7 +156,7 @@ body{
 .analise{ background:var(--yellow); color:#111; }
 .bloqueado{ background:var(--red); }
 
-/* ITEMS */
+/* ITEM */
 .item{
     background:#f9fafb;
     border:1px solid #eee;
@@ -188,7 +189,7 @@ body{
 <!-- CONTENT -->
 <div class="content">
 
-    <!-- TOP SYSTEM (SEGURO) -->
+    <!-- SYSTEM STATUS (SEU NOVO TOPO) -->
     <div class="topbar">
 
         <div class="system-bar">
@@ -198,31 +199,27 @@ body{
             </div>
 
             <div style="color:#16a34a;">
-                🟢 Online
+                🟢 {{ system.status }}
             </div>
 
             <div style="color:#2563eb;">
-                🌐 {{ request.host }}
+                🌐 {{ system.host }}
             </div>
 
             <div style="color:#6b7280;">
-                ⏱ ativo
+                ⏱ {{ system.uptime }}s
             </div>
 
             <div style="color:#111827;">
-                ⚙ Production
+                ⚙ {{ system.env }}
             </div>
 
             <div style="color:#f59e0b;">
-                📡 8080
+                📡 {{ system.port }}
             </div>
 
             <div style="color:#8b5cf6;">
-                🧠 Gunicorn
-            </div>
-
-            <div style="color:#ef4444;">
-                🕒 Live
+                🧠 {{ system.worker }}
             </div>
 
         </div>
@@ -238,7 +235,7 @@ body{
 
         <div class="kpi">
             <div class="kpi-title">Total</div>
-            <div class="kpi-value">{{ total_pedidos }}</div>
+            <div class="kpi-value">{{ total }}</div>
         </div>
 
         <div class="kpi">
@@ -258,12 +255,12 @@ body{
 
         <div class="kpi">
             <div class="kpi-title">Protegido</div>
-            <div class="kpi-value blue">R$ {{ valor_protegido }}</div>
+            <div class="kpi-value blue">R$ {{ valor }}</div>
         </div>
 
         <div class="kpi">
-            <div class="kpi-title">Score</div>
-            <div class="kpi-value">{{ score_medio }}</div>
+            <div class="kpi-title">Score Médio</div>
+            <div class="kpi-value">{{ score }}</div>
         </div>
 
     </div>
@@ -271,20 +268,20 @@ body{
     <!-- PEDIDOS -->
     <div class="grid">
 
-        {% for pedido in pedidos %}
+        {% for p in pedidos %}
 
         <div class="card">
 
             <div style="display:flex;justify-content:space-between;">
                 <div>
-                    <b>#{{ pedido.order_id }}</b><br>
-                    {{ pedido.cliente }}
+                    <b>#{{ p.order_id }}</b><br>
+                    {{ p.cliente }}
                 </div>
 
                 <div>
-                    {% if pedido.status == 'aprovado' %}
+                    {% if p.status == 'aprovado' %}
                         <span class="status aprovado">APROVADO</span>
-                    {% elif pedido.status == 'analise' %}
+                    {% elif p.status == 'analise' %}
                         <span class="status analise">ANÁLISE</span>
                     {% else %}
                         <span class="status bloqueado">BLOQUEADO</span>
@@ -292,11 +289,11 @@ body{
                 </div>
             </div>
 
-            <div class="item">CPF: {{ pedido.cpf }}</div>
-            <div class="item">Email: {{ pedido.email }}</div>
-            <div class="item">IP: {{ pedido.ip }}</div>
-            <div class="item">Valor: R$ {{ pedido.valor }}</div>
-            <div class="item">Score: {{ pedido.score_risco }}</div>
+            <div class="item">CPF: {{ p.cpf }}</div>
+            <div class="item">Email: {{ p.email }}</div>
+            <div class="item">IP: {{ p.ip }}</div>
+            <div class="item">Valor: R$ {{ p.valor }}</div>
+            <div class="item">Score: {{ p.score_risco }}</div>
 
         </div>
 

@@ -1,10 +1,11 @@
 from flask import Flask, request, jsonify, render_template, session, redirect
 import os
 import psycopg2
+import socket
+import time
 
 app = Flask(__name__)
 app.secret_key = "cozinet_saas_2026"
-
 
 # =========================
 # DB
@@ -18,10 +19,36 @@ def get_conn():
         port=os.getenv("PGPORT")
     )
 
-
+# =========================
+# LOGIN CHECK
+# =========================
 def login_required():
     return "user_id" in session
 
+# =========================
+# SYSTEM INFO (SEGURO)
+# =========================
+START_TIME = time.time()
+
+def get_system_info():
+    try:
+        return {
+            "server_ip": request.host,
+            "hostname": socket.gethostname(),
+            "uptime": round(time.time() - START_TIME, 2),
+            "env": os.getenv("ENV", "production"),
+            "port": request.environ.get("SERVER_PORT", "8000"),
+            "status": "online"
+        }
+    except:
+        return {
+            "server_ip": "unknown",
+            "hostname": "unknown",
+            "uptime": 0,
+            "env": "production",
+            "port": "8000",
+            "status": "online"
+        }
 
 # =========================
 # LOGIN
@@ -57,18 +84,8 @@ def login():
 
     return render_template("login.html")
 
-
 # =========================
-# LOGOUT
-# =========================
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect("/login")
-
-
-# =========================
-# DASHBOARD
+# DASHBOARD (ROBUSTO)
 # =========================
 @app.route("/dashboard")
 def dashboard():
@@ -79,7 +96,7 @@ def dashboard():
     conn = get_conn()
     cur = conn.cursor()
 
-    # KPIs
+    # SAFE COUNTS
     cur.execute("SELECT COUNT(*) FROM pedidos")
     total_pedidos = cur.fetchone()[0]
 
@@ -97,7 +114,7 @@ def dashboard():
     bloqueados = cur.fetchone()[0]
 
     cur.execute("""
-        SELECT COALESCE(SUM(p.valor),0)
+        SELECT COALESCE(SUM(valor),0)
         FROM pedidos p
         JOIN ips_bloqueados b ON b.ip = p.ip
     """)
@@ -109,13 +126,11 @@ def dashboard():
     """)
     score_medio = cur.fetchone()[0]
 
-    # PEDIDOS COMPLETO
+    # SAFE SELECT (SEM TELEFONE/CEP/RUA OBRIGATÓRIO)
     cur.execute("""
         SELECT id, order_id, cliente, cpf, email,
-               telefone, rua, cep,
-               cidade, estado,
-               ip, valor, score_risco,
-               status, motivo, created_at
+               ip, valor, score_risco, status,
+               motivo, created_at
         FROM pedidos
         ORDER BY id DESC
         LIMIT 100
@@ -123,59 +138,24 @@ def dashboard():
 
     rows = cur.fetchall()
 
+    cur.close()
+    conn.close()
+
     pedidos = []
-
     for r in rows:
-
-        cpf = r[3]
-        ip = r[10]
-
-        # histórico CPF
-        cur.execute("""
-            SELECT order_id, valor, status, created_at
-            FROM pedidos
-            WHERE cpf=%s
-            ORDER BY id DESC
-            LIMIT 5
-        """, (cpf,))
-        hist_cpf = cur.fetchall()
-
-        # histórico IP
-        cur.execute("""
-            SELECT order_id, cliente, valor, status, created_at
-            FROM pedidos
-            WHERE ip=%s
-            ORDER BY id DESC
-            LIMIT 5
-        """, (ip,))
-        hist_ip = cur.fetchall()
-
         pedidos.append({
             "id": r[0],
             "order_id": r[1],
             "cliente": r[2],
             "cpf": r[3],
             "email": r[4],
-
-            "telefone": r[5],
-            "rua": r[6],
-            "cep": r[7],
-            "cidade": r[8],
-            "estado": r[9],
-
-            "ip": r[10],
-            "valor": float(r[11] or 0),
-            "score_risco": r[12],
-            "status": r[13],
-            "motivo": r[14],
-            "created_at": str(r[15]),
-
-            "hist_cpf": hist_cpf,
-            "hist_ip": hist_ip
+            "ip": r[5],
+            "valor": float(r[6]) if r[6] else 0,
+            "score_risco": r[7],
+            "status": r[8],
+            "motivo": r[9],
+            "created_at": str(r[10])
         })
-
-    cur.close()
-    conn.close()
 
     return render_template(
         "dashboard.html",
@@ -186,9 +166,9 @@ def dashboard():
         bloqueados=bloqueados,
         valor_protegido=valor_protegido,
         score_medio=score_medio,
-        pedidos=pedidos
+        pedidos=pedidos,
+        system_info=get_system_info()
     )
-
 
 # =========================
 # BLOQUEAR IP
@@ -199,15 +179,14 @@ def bloquear_ip():
     if not login_required():
         return jsonify({"error": "unauthorized"}), 401
 
-    data = request.get_json()
-    ip = data.get("ip")
+    ip = request.get_json().get("ip")
 
     conn = get_conn()
     cur = conn.cursor()
 
     cur.execute("""
         INSERT INTO ips_bloqueados(ip, motivo)
-        VALUES(%s,%s)
+        VALUES(%s, %s)
         ON CONFLICT(ip) DO NOTHING
     """, (ip, "manual"))
 
@@ -221,8 +200,7 @@ def bloquear_ip():
     cur.close()
     conn.close()
 
-    return jsonify({"message": "bloqueado"})
-
+    return jsonify({"ok": True})
 
 # =========================
 # DESBLOQUEAR IP
@@ -233,8 +211,7 @@ def desbloquear_ip():
     if not login_required():
         return jsonify({"error": "unauthorized"}), 401
 
-    data = request.get_json()
-    ip = data.get("ip")
+    ip = request.get_json().get("ip")
 
     conn = get_conn()
     cur = conn.cursor()
@@ -251,90 +228,8 @@ def desbloquear_ip():
     cur.close()
     conn.close()
 
-    return jsonify({"message": "desbloqueado"})
+    return jsonify({"ok": True})
 
-
-# =========================
-# BLOQUEADOS
-# =========================
-@app.route("/bloqueados")
-def bloqueados():
-
-    if not login_required():
-        return redirect("/login")
-
-    conn = get_conn()
-    cur = conn.cursor()
-
-    cur.execute("""
-        SELECT id, ip, motivo, data_cadastro
-        FROM ips_bloqueados
-        ORDER BY id DESC
-    """)
-
-    rows = cur.fetchall()
-
-    cur.close()
-    conn.close()
-
-    return render_template("bloqueados.html", bloqueados=rows)
-
-
-# =========================
-# CONFIÁVEIS
-# =========================
-@app.route("/ips-confiaveis")
-def confiaveis():
-
-    if not login_required():
-        return redirect("/login")
-
-    conn = get_conn()
-    cur = conn.cursor()
-
-    cur.execute("""
-        SELECT id, ip, observacao, data_cadastro
-        FROM ips_confiaveis
-        ORDER BY id DESC
-    """)
-
-    rows = cur.fetchall()
-
-    cur.close()
-    conn.close()
-
-    return render_template("ips_confiaveis.html", ips=rows)
-
-
-# =========================
-# LOGS
-# =========================
-@app.route("/logs")
-def logs():
-
-    if not login_required():
-        return redirect("/login")
-
-    conn = get_conn()
-    cur = conn.cursor()
-
-    cur.execute("""
-        SELECT id, ip, acao, detalhes, created_at
-        FROM logs
-        ORDER BY id DESC
-        LIMIT 200
-    """)
-
-    rows = cur.fetchall()
-
-    cur.close()
-    conn.close()
-
-    return render_template("logs.html", logs=rows)
-
-
-# =========================
-# RUN
 # =========================
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)

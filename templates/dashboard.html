@@ -21,7 +21,11 @@
     --muted:#8f8f8f;
 }
 
-*{margin:0;padding:0;box-sizing:border-box;}
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
 body{
     background:var(--bg);
@@ -41,7 +45,11 @@ body{
     padding:25px;
 }
 
-.logo{text-align:center;margin-bottom:35px;}
+.logo{
+    text-align:center;
+    margin-bottom:35px;
+}
+
 .logo img{width:230px;}
 
 .menu a{
@@ -103,7 +111,9 @@ body{
 }
 
 /* PEDIDOS */
-.orders-section{margin-top:30px;}
+.orders-section{
+    margin-top:30px;
+}
 
 .section-title{
     color:var(--orange);
@@ -120,6 +130,7 @@ body{
     margin-bottom:16px;
 }
 
+/* HEADER */
 .pedido-header{
     display:flex;
     justify-content:space-between;
@@ -145,20 +156,21 @@ body{
 .pedido-actions{
     display:flex;
     gap:10px;
-    margin:15px 0;
     flex-wrap:wrap;
+    margin:15px 0;
 }
 
-/* GRID CORRIGIDO (ANTI-GRUDAR TEXTO) */
+/* GRID */
 .pedido-grid{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
     gap:12px;
 }
 
 .item{
     display:flex;
-    flex-direction:column;
+    justify-content:space-between;
+    align-items:center;
     padding:10px;
     background:#121212;
     border:1px solid #2a2a2a;
@@ -167,14 +179,12 @@ body{
 
 .item small{
     color:#888;
-    font-size:11px;
-    margin-bottom:4px;
 }
 
 .item .value{
     color:white;
     font-weight:600;
-    word-break:break-word;
+    white-space:nowrap;
 }
 
 /* FOOTER */
@@ -192,11 +202,6 @@ body{
 .modal-content{
     background:#111;
     color:white;
-}
-
-@media(max-width:991px){
-    .sidebar{position:relative;width:100%;height:auto;}
-    .content{margin-left:0;}
 }
 
 </style>
@@ -283,6 +288,7 @@ body{
                     🚫 Bloquear IP
                 </button>
 
+                <!-- FIX: desbloqueia via IP (corrigido backend padrão) -->
                 <button class="btn btn-success btn-sm" onclick="desbloquearIP('{{ pedido.ip }}')">
                     🔓 Desbloquear
                 </button>
@@ -293,43 +299,16 @@ body{
 
             </div>
 
-            <!-- GRID CORRIGIDO -->
+            <!-- GRID -->
             <div class="pedido-grid">
 
-                <div class="item">
-                    <small>CPF</small>
-                    <div class="value">{{ pedido.cpf }}</div>
-                </div>
-
-                <div class="item">
-                    <small>Email</small>
-                    <div class="value">{{ pedido.email }}</div>
-                </div>
-
-                <div class="item">
-                    <small>Cidade</small>
-                    <div class="value">{{ pedido.cidade }}</div>
-                </div>
-
-                <div class="item">
-                    <small>Estado</small>
-                    <div class="value">{{ pedido.estado }}</div>
-                </div>
-
-                <div class="item">
-                    <small>IP</small>
-                    <div class="value">{{ pedido.ip }}</div>
-                </div>
-
-                <div class="item">
-                    <small>Valor</small>
-                    <div class="value">R$ {{ pedido.valor }}</div>
-                </div>
-
-                <div class="item">
-                    <small>Score</small>
-                    <div class="value">{{ pedido.score_risco }}</div>
-                </div>
+                <div class="item"><small>CPF</small><div class="value">{{ pedido.cpf }}</div></div>
+                <div class="item"><small>Email</small><div class="value">{{ pedido.email }}</div></div>
+                <div class="item"><small>Cidade</small><div class="value">{{ pedido.cidade }}</div></div>
+                <div class="item"><small>Estado</small><div class="value">{{ pedido.estado }}</div></div>
+                <div class="item"><small>IP</small><div class="value">{{ pedido.ip }}</div></div>
+                <div class="item"><small>Valor</small><div class="value">R$ {{ pedido.valor }}</div></div>
+                <div class="item"><small>Score</small><div class="value">{{ pedido.score_risco }}</div></div>
 
             </div>
 
@@ -342,18 +321,13 @@ body{
 
         <!-- MODAL -->
         <div class="modal fade" id="modal{{ pedido.id }}" tabindex="-1">
-
             <div class="modal-dialog modal-lg">
-
                 <div class="modal-content">
-
                     <div class="modal-header">
                         <h5 class="modal-title">Pedido #{{ pedido.order_id }}</h5>
                         <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
-
                     <div class="modal-body">
-
                         <p><b>Cliente:</b> {{ pedido.cliente }}</p>
                         <p><b>CPF:</b> {{ pedido.cpf }}</p>
                         <p><b>Email:</b> {{ pedido.email }}</p>
@@ -362,13 +336,9 @@ body{
                         <p><b>Score:</b> {{ pedido.score_risco }}</p>
                         <p><b>Status:</b> {{ pedido.status }}</p>
                         <p><b>Motivo:</b> {{ pedido.motivo }}</p>
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
 
         {% endfor %}

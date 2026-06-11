@@ -1,22 +1,26 @@
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Cozinet Shield</title>
+<title>Cozinet Shield - Dashboard</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
 
 :root{
-    --bg:#0a0a0a;
+    --bg:#0b0b0b;
     --sidebar:#111111;
-    --card:#181818;
-    --border:#2b2b2b;
+    --card:#171717;
+    --border:#292929;
     --orange:#ff7a00;
-    --orange-dark:#e76f00;
+    --orange2:#ff9333;
+    --text:#ffffff;
+    --muted:#8f8f8f;
 }
 
 *{
@@ -31,112 +35,300 @@ body{
     font-family:Inter,Arial,sans-serif;
 }
 
+/* SIDEBAR */
+
 .sidebar{
+
     position:fixed;
     left:0;
     top:0;
+
     width:280px;
     height:100vh;
+
     background:var(--sidebar);
+
     border-right:1px solid var(--border);
-    padding:20px;
+
+    padding:25px;
+
+    overflow-y:auto;
 }
 
 .logo{
+
     text-align:center;
-    margin-bottom:30px;
+
+    margin-bottom:35px;
 }
 
 .logo img{
+
     width:230px;
 }
 
 .menu a{
+
     display:block;
+
     text-decoration:none;
-    color:#d1d5db;
+
+    color:#cfcfcf;
+
     padding:14px;
-    margin-bottom:8px;
-    border-radius:12px;
+
+    border-radius:14px;
+
+    margin-bottom:10px;
+
     transition:.3s;
 }
 
 .menu a:hover{
+
     background:var(--orange);
+
     color:white;
 }
 
+/* CONTENT */
+
 .content{
+
     margin-left:280px;
-    padding:25px;
+
+    padding:30px;
 }
 
 .topbar{
+
     display:flex;
+
     justify-content:space-between;
+
     align-items:center;
+
     margin-bottom:25px;
 }
 
-.welcome h2{
-    margin:0;
-}
+.user-box{
 
-.welcome small{
-    color:#888;
-}
+    background:linear-gradient(
+        135deg,
+        var(--orange),
+        var(--orange2)
+    );
 
-.card-dashboard{
-    background:var(--card);
-    border:1px solid var(--border);
-    border-radius:18px;
-    padding:20px;
-    height:100%;
-}
+    padding:12px 18px;
 
-.card-dashboard h6{
-    color:#999;
-}
+    border-radius:14px;
 
-.card-dashboard h2{
-    color:var(--orange);
-    margin-top:10px;
     font-weight:700;
 }
 
-.table-box{
-    margin-top:25px;
+.title{
+
+    font-size:30px;
+
+    font-weight:800;
+}
+
+.subtitle{
+
+    color:var(--muted);
+}
+
+/* CARDS KPIs */
+
+.kpi-card{
+
     background:var(--card);
+
     border:1px solid var(--border);
-    border-radius:18px;
-    padding:20px;
+
+    border-radius:22px;
+
+    padding:22px;
+
+    transition:.3s;
+
+    height:100%;
 }
 
-.table-dark{
-    --bs-table-bg:#181818;
+.kpi-card:hover{
+
+    border-color:var(--orange);
+
+    transform:translateY(-2px);
 }
 
-.badge-aprovado{
-    background:#16a34a;
+.kpi-title{
+
+    color:#9c9c9c;
+
+    font-size:13px;
 }
 
-.badge-analise{
-    background:#f59e0b;
+.kpi-value{
+
+    color:var(--orange);
+
+    font-size:32px;
+
+    font-weight:800;
+
+    margin-top:10px;
 }
 
-.badge-bloqueado{
+/* PEDIDOS */
+
+.orders-section{
+
+    margin-top:35px;
+}
+
+.section-title{
+
+    color:var(--orange);
+
+    font-size:24px;
+
+    font-weight:700;
+
+    margin-bottom:20px;
+}
+
+.pedido-card{
+
+    background:var(--card);
+
+    border:1px solid var(--border);
+
+    border-radius:22px;
+
+    padding:22px;
+
+    margin-bottom:18px;
+
+    transition:.3s;
+}
+
+.pedido-card:hover{
+
+    border-color:var(--orange);
+
+    box-shadow:0 0 25px rgba(255,122,0,.15);
+}
+
+.pedido-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:20px;
+
+    flex-wrap:wrap;
+}
+
+.pedido-id{
+
+    color:var(--orange);
+
+    font-weight:800;
+
+    font-size:18px;
+}
+
+.pedido-cliente{
+
+    font-size:22px;
+
+    font-weight:700;
+}
+
+.status{
+
+    padding:8px 16px;
+
+    border-radius:999px;
+
+    font-size:12px;
+
+    font-weight:700;
+}
+
+.aprovado{
+    background:#15803d;
+}
+
+.analise{
+    background:#d97706;
+}
+
+.bloqueado{
     background:#dc2626;
 }
 
-.table thead{
-    color:var(--orange);
+.pedido-grid{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(220px,1fr));
+
+    gap:18px;
+
+    margin-bottom:20px;
 }
 
-.user-box{
-    background:var(--orange);
-    padding:10px 15px;
-    border-radius:12px;
-    font-weight:600;
+.item small{
+
+    display:block;
+
+    color:#888;
+
+    margin-bottom:4px;
+}
+
+.item strong{
+
+    color:white;
+}
+
+.footer-card{
+
+    border-top:1px solid var(--border);
+
+    padding-top:15px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    flex-wrap:wrap;
+
+    gap:10px;
+
+    color:#bcbcbc;
+}
+
+/* RESPONSIVO */
+
+@media(max-width:991px){
+
+    .sidebar{
+        position:relative;
+        width:100%;
+        height:auto;
+    }
+
+    .content{
+        margin-left:0;
+    }
+
 }
 
 </style>
@@ -148,7 +340,9 @@ body{
 <div class="sidebar">
 
     <div class="logo">
+
         <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
+
     </div>
 
     <div class="menu">
@@ -171,9 +365,16 @@ body{
 
     <div class="topbar">
 
-        <div class="welcome">
-            <h2>Painel Antifraude</h2>
-            <small>Monitoramento em tempo real</small>
+        <div>
+
+            <div class="title">
+                Cozinet Shield
+            </div>
+
+            <div class="subtitle">
+                Plataforma Inteligente de Prevenção a Fraudes
+            </div>
+
         </div>
 
         <div class="user-box">
@@ -184,151 +385,170 @@ body{
 
     <div class="row g-4">
 
-        <div class="col-md-2">
-            <div class="card-dashboard">
-                <h6>Total Pedidos</h6>
-                <h2>{{ total_pedidos }}</h2>
+        <div class="col-lg-2 col-md-4">
+            <div class="kpi-card">
+                <div class="kpi-title">TOTAL PEDIDOS</div>
+                <div class="kpi-value">{{ total_pedidos }}</div>
             </div>
         </div>
 
-        <div class="col-md-2">
-            <div class="card-dashboard">
-                <h6>Aprovados</h6>
-                <h2>{{ aprovados }}</h2>
+        <div class="col-lg-2 col-md-4">
+            <div class="kpi-card">
+                <div class="kpi-title">APROVADOS</div>
+                <div class="kpi-value">{{ aprovados }}</div>
             </div>
         </div>
 
-        <div class="col-md-2">
-            <div class="card-dashboard">
-                <h6>Em Análise</h6>
-                <h2>{{ analise }}</h2>
+        <div class="col-lg-2 col-md-4">
+            <div class="kpi-card">
+                <div class="kpi-title">ANÁLISE</div>
+                <div class="kpi-value">{{ analise }}</div>
             </div>
         </div>
 
-        <div class="col-md-2">
-            <div class="card-dashboard">
-                <h6>Bloqueados</h6>
-                <h2>{{ bloqueados }}</h2>
+        <div class="col-lg-2 col-md-4">
+            <div class="kpi-card">
+                <div class="kpi-title">BLOQUEADOS</div>
+                <div class="kpi-value">{{ bloqueados }}</div>
             </div>
         </div>
 
-        <div class="col-md-2">
-            <div class="card-dashboard">
-                <h6>Valor Protegido</h6>
-                <h2>R$ {{ valor_protegido }}</h2>
+        <div class="col-lg-2 col-md-4">
+            <div class="kpi-card">
+                <div class="kpi-title">VALOR PROTEGIDO</div>
+                <div class="kpi-value">
+                    R$ {{ valor_protegido }}
+                </div>
             </div>
         </div>
 
-        <div class="col-md-2">
-            <div class="card-dashboard">
-                <h6>Score Médio</h6>
-                <h2>{{ score_medio }}</h2>
+        <div class="col-lg-2 col-md-4">
+            <div class="kpi-card">
+                <div class="kpi-title">SCORE MÉDIO</div>
+                <div class="kpi-value">{{ score_medio }}</div>
             </div>
         </div>
 
     </div>
 
-    <div class="table-box">
+    <div class="orders-section">
 
-        <h4 style="color:#ff7a00;">
+        <div class="section-title">
             Pedidos Recentes
-        </h4>
+        </div>
 
-        <br>
+        {% for pedido in pedidos %}
 
-        <div class="table-responsive">
+        <div class="pedido-card">
 
-            <table class="table table-dark table-hover align-middle">
+            <div class="pedido-header">
 
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Order</th>
-                        <th>Cliente</th>
-                        <th>CPF</th>
-                        <th>Email</th>
-                        <th>Cidade</th>
-                        <th>UF</th>
-                        <th>IP</th>
-                        <th>Dispositivo</th>
-                        <th>Valor</th>
-                        <th>Score</th>
-                        <th>Status</th>
-                        <th>Motivo</th>
-                        <th>Data</th>
-                        <th>Analista</th>
-                        <th>Data Análise</th>
-                        <th>País</th>
-                    </tr>
-                </thead>
+                <div>
 
-                <tbody>
+                    <div class="pedido-id">
+                        Pedido #{{ pedido.order_id }}
+                    </div>
 
-                {% for pedido in pedidos %}
+                    <div class="pedido-cliente">
+                        {{ pedido.cliente }}
+                    </div>
 
-                <tr>
+                </div>
 
-                    <td>{{ pedido.id }}</td>
+                <div>
 
-                    <td>{{ pedido.order_id }}</td>
+                    {% if pedido.status == 'aprovado' %}
+                    <span class="status aprovado">
+                        APROVADO
+                    </span>
 
-                    <td>{{ pedido.cliente }}</td>
+                    {% elif pedido.status == 'analise' %}
+                    <span class="status analise">
+                        EM ANÁLISE
+                    </span>
 
-                    <td>{{ pedido.cpf }}</td>
+                    {% else %}
+                    <span class="status bloqueado">
+                        BLOQUEADO
+                    </span>
+                    {% endif %}
 
-                    <td>{{ pedido.email }}</td>
+                </div>
 
-                    <td>{{ pedido.cidade }}</td>
+            </div>
 
-                    <td>{{ pedido.estado }}</td>
+            <div class="pedido-grid">
 
-                    <td>{{ pedido.ip }}</td>
+                <div class="item">
+                    <small>CPF</small>
+                    <strong>{{ pedido.cpf }}</strong>
+                </div>
 
-                    <td>{{ pedido.dispositivo }}</td>
+                <div class="item">
+                    <small>Email</small>
+                    <strong>{{ pedido.email }}</strong>
+                </div>
 
-                    <td>R$ {{ pedido.valor }}</td>
+                <div class="item">
+                    <small>Cidade</small>
+                    <strong>{{ pedido.cidade }}</strong>
+                </div>
 
-                    <td>{{ pedido.score_risco }}</td>
+                <div class="item">
+                    <small>Estado</small>
+                    <strong>{{ pedido.estado }}</strong>
+                </div>
 
-                    <td>
+                <div class="item">
+                    <small>País</small>
+                    <strong>{{ pedido.pais }}</strong>
+                </div>
 
-                        {% if pedido.status == 'aprovado' %}
-                            <span class="badge badge-aprovado">
-                                APROVADO
-                            </span>
+                <div class="item">
+                    <small>IP</small>
+                    <strong>{{ pedido.ip }}</strong>
+                </div>
 
-                        {% elif pedido.status == 'analise' %}
-                            <span class="badge badge-analise">
-                                ANÁLISE
-                            </span>
+                <div class="item">
+                    <small>Dispositivo</small>
+                    <strong>{{ pedido.dispositivo }}</strong>
+                </div>
 
-                        {% else %}
-                            <span class="badge badge-bloqueado">
-                                BLOQUEADO
-                            </span>
-                        {% endif %}
+                <div class="item">
+                    <small>Valor</small>
+                    <strong>
+                        R$ {{ pedido.valor }}
+                    </strong>
+                </div>
 
-                    </td>
+                <div class="item">
+                    <small>Score de Risco</small>
+                    <strong>{{ pedido.score_risco }}</strong>
+                </div>
 
-                    <td>{{ pedido.motivo }}</td>
+                <div class="item">
+                    <small>Analista</small>
+                    <strong>{{ pedido.analisado_por }}</strong>
+                </div>
 
-                    <td>{{ pedido.created_at }}</td>
+            </div>
 
-                    <td>{{ pedido.analisado_por }}</td>
+            <div class="footer-card">
 
-                    <td>{{ pedido.data_analise }}</td>
+                <div>
+                    <strong>Motivo:</strong>
+                    {{ pedido.motivo }}
+                </div>
 
-                    <td>{{ pedido.pais }}</td>
+                <div>
+                    {{ pedido.created_at }}
+                </div>
 
-                </tr>
-
-                {% endfor %}
-
-                </tbody>
-
-            </table>
+            </div>
 
         </div>
+
+        {% endfor %}
 
     </div>
 
@@ -336,3 +556,4 @@ body{
 
 </body>
 </html>
+```

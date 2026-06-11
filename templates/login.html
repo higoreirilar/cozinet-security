@@ -2,190 +2,162 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Cozinet Shield - Login</title>
+<title>Eirilar Shield - Login</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Inter',sans-serif;
+:root{
+    --bg:#f4f6fb;
+    --card:#ffffff;
+    --border:#e5e7eb;
+
+    --red:#e11d48;
+    --green:#16a34a;
+    --yellow:#f59e0b;
+    --blue:#2563eb;
 }
 
 body{
-    background:#0b0b0b;
-    min-height:100vh;
+    background:var(--bg);
+    font-family:Arial;
     display:flex;
     justify-content:center;
     align-items:center;
-    color:#fff;
+    min-height:100vh;
 }
 
-.login-container{
+/* CARD LOGIN */
+.login-card{
     width:100%;
     max-width:420px;
-    padding:20px;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:35px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.05);
 }
 
-.login-card{
-    background:#151515;
-    border:1px solid #252525;
-    border-radius:24px;
-    padding:40px;
-    box-shadow:0 0 30px rgba(0,0,0,.4);
-}
-
+/* LOGO */
 .logo{
     text-align:center;
-    margin-bottom:30px;
+    margin-bottom:20px;
 }
 
 .logo img{
-    width:180px;
-    display:block;
-    margin:auto;
-    margin-bottom:15px;
+    width:160px;
 }
 
-.logo h1{
-    font-size:32px;
-    font-weight:800;
-}
-
-.logo span{
-    color:#ff7a00;
-    letter-spacing:5px;
-    font-size:13px;
-    font-weight:700;
+/* TITULO */
+.title{
+    text-align:center;
+    font-size:20px;
+    font-weight:900;
+    margin-bottom:5px;
+    color:#111;
 }
 
 .subtitle{
     text-align:center;
-    color:#888;
-    margin-bottom:30px;
-    font-size:14px;
+    font-size:13px;
+    color:#666;
+    margin-bottom:25px;
 }
 
-.form-group{
-    margin-bottom:18px;
-}
-
+/* INPUTS */
 label{
-    display:block;
-    margin-bottom:8px;
-    color:#bbb;
-    font-size:14px;
+    font-size:13px;
+    color:#444;
+    margin-bottom:6px;
 }
 
 input{
     width:100%;
-    background:#101010;
-    border:1px solid #2a2a2a;
-    border-radius:12px;
-    padding:14px;
-    color:white;
-    font-size:15px;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid var(--border);
     outline:none;
-    transition:.3s;
+    margin-bottom:15px;
+    transition:0.2s;
 }
 
 input:focus{
-    border-color:#ff7a00;
+    border-color:var(--red);
 }
 
-.login-btn{
+/* BOTÃO */
+button{
     width:100%;
+    padding:12px;
     border:none;
-    background:#ff7a00;
+    border-radius:10px;
+    background:var(--red);
     color:white;
-    padding:15px;
-    border-radius:12px;
-    font-size:15px;
     font-weight:700;
     cursor:pointer;
-    transition:.3s;
+    transition:0.2s;
 }
 
-.login-btn:hover{
-    transform:translateY(-1px);
+button:hover{
+    background:#be123c;
 }
 
+/* ERRO */
 .error{
-    background:rgba(239,68,68,.15);
-    border:1px solid rgba(239,68,68,.4);
-    color:#ef4444;
-    padding:12px;
-    border-radius:12px;
-    margin-bottom:20px;
+    background:#fee2e2;
+    color:#b91c1c;
+    padding:10px;
+    border-radius:10px;
+    font-size:13px;
+    margin-bottom:15px;
     text-align:center;
 }
 
+/* FOOTER */
 .footer{
     text-align:center;
-    margin-top:20px;
-    color:#666;
-    font-size:12px;
+    font-size:11px;
+    color:#888;
+    margin-top:15px;
 }
 
 </style>
 </head>
+
 <body>
 
-<div class="login-container">
+<div class="login-card">
 
-    <div class="login-card">
+    <div class="logo">
+        <img src="https://i.ibb.co/vxN1xS0R/logo-vermelho.png">
+    </div>
 
-        <div class="logo">
+    <div class="title">Eirilar Shield</div>
+    <div class="subtitle">Acesso ao painel antifraude</div>
 
-            <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
+    {% if erro %}
+    <div class="error">
+        {{ erro }}
+    </div>
+    {% endif %}
 
-        </div>
+    <form method="POST">
 
-        <div class="subtitle">
-            Plataforma Inteligente de Prevenção a Fraudes
-        </div>
+        <label>Email</label>
+        <input type="email" name="email" placeholder="Digite seu email" required>
 
-        {% if erro %}
-        <div class="error">
-            {{ erro }}
-        </div>
-        {% endif %}
+        <label>Senha</label>
+        <input type="password" name="senha" placeholder="Digite sua senha" required>
 
-        <form method="POST">
+        <button type="submit">Entrar</button>
 
-            <div class="form-group">
-                <label>E-mail</label>
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="Digite seu e-mail"
-                    required>
-            </div>
+    </form>
 
-            <div class="form-group">
-                <label>Senha</label>
-                <input
-                    type="password"
-                    name="senha"
-                    placeholder="Digite sua senha"
-                    required>
-            </div>
-
-            <button type="submit" class="login-btn">
-                Entrar no Painel
-            </button>
-
-        </form>
-
-        <div class="footer">
-            Cozinet Shield © 2026
-        </div>
-
+    <div class="footer">
+        © 2026 Eirilar Shield • Sistema de proteção antifraude
     </div>
 
 </div>

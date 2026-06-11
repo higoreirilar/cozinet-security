@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify, render_template, session, redirect
 import os
 import psycopg2
-from antifraude import calcular_score
 
 app = Flask(__name__)
 app.secret_key = "cozinet_saas_2026"
@@ -22,14 +21,6 @@ def get_conn():
 
 def login_required():
     return "user_id" in session
-
-
-# =========================
-# HOME
-# =========================
-@app.route("/")
-def home():
-    return redirect("/login")
 
 
 # =========================
@@ -77,7 +68,7 @@ def logout():
 
 
 # =========================
-# DASHBOARD (ROBUSTO)
+# DASHBOARD
 # =========================
 @app.route("/dashboard")
 def dashboard():
@@ -118,11 +109,13 @@ def dashboard():
     """)
     score_medio = cur.fetchone()[0]
 
-    # pedidos
+    # PEDIDOS COMPLETO
     cur.execute("""
         SELECT id, order_id, cliente, cpf, email,
-               ip, valor, score_risco, status,
-               motivo, created_at
+               telefone, rua, cep,
+               cidade, estado,
+               ip, valor, score_risco,
+               status, motivo, created_at
         FROM pedidos
         ORDER BY id DESC
         LIMIT 100
@@ -135,33 +128,27 @@ def dashboard():
     for r in rows:
 
         cpf = r[3]
-        ip = r[5]
+        ip = r[10]
 
-        # histórico CPF (seguro)
-        try:
-            cur.execute("""
-                SELECT order_id, valor, status, created_at
-                FROM pedidos
-                WHERE cpf=%s
-                ORDER BY id DESC
-                LIMIT 5
-            """, (cpf,))
-            hist_cpf = cur.fetchall()
-        except:
-            hist_cpf = []
+        # histórico CPF
+        cur.execute("""
+            SELECT order_id, valor, status, created_at
+            FROM pedidos
+            WHERE cpf=%s
+            ORDER BY id DESC
+            LIMIT 5
+        """, (cpf,))
+        hist_cpf = cur.fetchall()
 
-        # histórico IP (seguro)
-        try:
-            cur.execute("""
-                SELECT order_id, cliente, valor, status, created_at
-                FROM pedidos
-                WHERE ip=%s
-                ORDER BY id DESC
-                LIMIT 5
-            """, (ip,))
-            hist_ip = cur.fetchall()
-        except:
-            hist_ip = []
+        # histórico IP
+        cur.execute("""
+            SELECT order_id, cliente, valor, status, created_at
+            FROM pedidos
+            WHERE ip=%s
+            ORDER BY id DESC
+            LIMIT 5
+        """, (ip,))
+        hist_ip = cur.fetchall()
 
         pedidos.append({
             "id": r[0],
@@ -169,12 +156,20 @@ def dashboard():
             "cliente": r[2],
             "cpf": r[3],
             "email": r[4],
-            "ip": r[5],
-            "valor": float(r[6] or 0),
-            "score_risco": r[7],
-            "status": r[8],
-            "motivo": r[9],
-            "created_at": str(r[10]),
+
+            "telefone": r[5],
+            "rua": r[6],
+            "cep": r[7],
+            "cidade": r[8],
+            "estado": r[9],
+
+            "ip": r[10],
+            "valor": float(r[11] or 0),
+            "score_risco": r[12],
+            "status": r[13],
+            "motivo": r[14],
+            "created_at": str(r[15]),
+
             "hist_cpf": hist_cpf,
             "hist_ip": hist_ip
         })
@@ -260,7 +255,7 @@ def desbloquear_ip():
 
 
 # =========================
-# IPS BLOQUEADOS
+# BLOQUEADOS
 # =========================
 @app.route("/bloqueados")
 def bloqueados():
@@ -286,7 +281,7 @@ def bloqueados():
 
 
 # =========================
-# IPS CONFIÁVEIS
+# CONFIÁVEIS
 # =========================
 @app.route("/ips-confiaveis")
 def confiaveis():
@@ -324,7 +319,7 @@ def logs():
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT id, ip, acao, created_at
+        SELECT id, ip, acao, detalhes, created_at
         FROM logs
         ORDER BY id DESC
         LIMIT 200

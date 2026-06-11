@@ -44,7 +44,7 @@ def login():
             session["user_id"] = user[0]
             session["nome"] = user[1]
             session["role"] = user[2]
-            return redirect("/painel")
+            return redirect("/dashboard")
 
         return render_template("login.html", erro="Login inválido")
 
@@ -56,33 +56,37 @@ def logout():
     session.clear()
     return redirect("/login")
 
-# ---------------- PAINEL ----------------
-@app.route("/painel")
-def painel():
-    if not login_required():
-        return redirect("/login")
-
-    return render_template("painel.html", usuario=session.get("nome"))
-
 # ---------------- HOME ----------------
 @app.route("/")
 def home():
     return redirect("/login")
 
-# ---------------- DASHBOARD API ----------------
+# ---------------- DASHBOARD (PÁGINA COMPLETA) ----------------
 @app.route("/dashboard")
 def dashboard():
 
     if not login_required():
-        return jsonify({"error": "unauthorized"}), 401
+        return redirect("/login")
 
     conn = get_conn()
     cur = conn.cursor()
 
+    # STATS
+    cur.execute("SELECT COUNT(*) FROM pedidos WHERE status='aprovado'")
+    aprovados = cur.fetchone()[0]
+
+    cur.execute("SELECT COUNT(*) FROM pedidos WHERE status='analise'")
+    analise = cur.fetchone()[0]
+
+    cur.execute("SELECT COUNT(*) FROM pedidos WHERE status='bloqueado'")
+    bloqueados = cur.fetchone()[0]
+
+    # PEDIDOS
     cur.execute("""
         SELECT id, order_id, ip, valor, status, motivo, created_at
         FROM pedidos
         ORDER BY id DESC
+        LIMIT 50
     """)
 
     rows = cur.fetchall()
@@ -90,7 +94,7 @@ def dashboard():
     cur.close()
     conn.close()
 
-    return jsonify([
+    pedidos = [
         {
             "id": r[0],
             "order_id": r[1],
@@ -101,29 +105,16 @@ def dashboard():
             "created_at": str(r[6])
         }
         for r in rows
-    ])
+    ]
 
-# ---------------- STATS ----------------
-@app.route("/stats")
-def stats():
-
-    if not login_required():
-        return jsonify({"error": "unauthorized"}), 401
-
-    conn = get_conn()
-    cur = conn.cursor()
-
-    cur.execute("SELECT status FROM pedidos")
-    rows = cur.fetchall()
-
-    cur.close()
-    conn.close()
-
-    return jsonify({
-        "aprovados": sum(1 for r in rows if r[0] == "aprovado"),
-        "analise": sum(1 for r in rows if r[0] == "analise"),
-        "bloqueados": sum(1 for r in rows if r[0] == "bloqueado")
-    })
+    return render_template(
+        "dashboard.html",
+        aprovados=aprovados,
+        analise=analise,
+        bloqueados=bloqueados,
+        pedidos=pedidos,
+        usuario=session.get("nome")
+    )
 
 # ---------------- BLOQUEAR IP ----------------
 @app.route("/bloquear-ip", methods=["POST"])
@@ -154,7 +145,7 @@ def bloquear_ip():
         INSERT INTO ips_bloqueados (ip, motivo)
         VALUES (%s, %s)
         ON CONFLICT (ip) DO NOTHING
-    """, (ip, "Bloqueio manual pelo administrador"))
+    """, (ip, "Bloqueio manual"))
 
     conn.commit()
 
@@ -163,10 +154,10 @@ def bloquear_ip():
 
     return jsonify({
         "success": True,
-        "message": f"IP {ip} bloqueado com sucesso"
+        "message": f"IP {ip} bloqueado"
     })
 
-# ---------------- LISTAR IPS BLOQUEADOS (API) ----------------
+# ---------------- LISTAR IPS BLOQUEADOS ----------------
 @app.route("/ips-bloqueados")
 def listar_ips_bloqueados():
 
@@ -197,7 +188,7 @@ def listar_ips_bloqueados():
         for r in rows
     ])
 
-# ---------------- TELA HTML BLOQUEADOS ----------------
+# ---------------- TELA BLOQUEADOS ----------------
 @app.route("/bloqueados")
 def bloqueados():
 

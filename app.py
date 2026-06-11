@@ -68,15 +68,6 @@ def login():
 
 
 # =========================
-# LOGOUT
-# =========================
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect("/login")
-
-
-# =========================
 # DASHBOARD
 # =========================
 @app.route("/dashboard")
@@ -118,8 +109,9 @@ def dashboard():
     score_medio = cur.fetchone()[0]
 
     cur.execute("""
-        SELECT id, order_id, cliente, cpf, email, cidade, estado,
-               ip, dispositivo, valor, score_risco, status,
+        SELECT id, order_id, cliente, cpf, email, telefone,
+               rua, numero, bairro, cidade, estado,
+               ip, valor, score_risco, status,
                motivo, created_at
         FROM pedidos
         ORDER BY id DESC
@@ -132,7 +124,6 @@ def dashboard():
     conn.close()
 
     pedidos = []
-
     for r in rows:
         pedidos.append({
             "id": r[0],
@@ -140,15 +131,18 @@ def dashboard():
             "cliente": r[2],
             "cpf": r[3],
             "email": r[4],
-            "cidade": r[5],
-            "estado": r[6],
-            "ip": r[7],
-            "dispositivo": r[8],
-            "valor": float(r[9]) if r[9] else 0,
-            "score_risco": r[10] if r[10] else 0,
-            "status": r[11],
-            "motivo": r[12],
-            "created_at": str(r[13]) if r[13] else ""
+            "telefone": r[5],
+            "rua": r[6],
+            "numero": r[7],
+            "bairro": r[8],
+            "cidade": r[9],
+            "estado": r[10],
+            "ip": r[11],
+            "valor": float(r[12]) if r[12] else 0,
+            "score_risco": r[13],
+            "status": r[14],
+            "motivo": r[15],
+            "created_at": str(r[16])
         })
 
     return render_template(
@@ -204,7 +198,7 @@ def bloquear_ip():
 
 
 # =========================
-# DESBLOQUEAR (IP OU ID)
+# DESBLOQUEAR IP
 # =========================
 @app.route("/desbloquear-ip", methods=["POST"])
 def desbloquear_ip():
@@ -213,51 +207,32 @@ def desbloquear_ip():
         return jsonify({"error": "unauthorized"}), 401
 
     data = request.get_json()
-
     ip = data.get("ip")
-    pedido_id = data.get("id")
 
     conn = get_conn()
     cur = conn.cursor()
 
-    # CASO 1: por IP
-    if ip:
+    cur.execute("""
+        DELETE FROM ips_bloqueados
+        WHERE ip=%s
+    """, (ip,))
 
-        cur.execute("""
-            DELETE FROM ips_bloqueados
-            WHERE ip=%s
-        """, (ip,))
+    cur.execute("""
+        UPDATE pedidos
+        SET status='analise'
+        WHERE ip=%s
+    """, (ip,))
 
-        cur.execute("""
-            UPDATE pedidos
-            SET status='analise'
-            WHERE ip=%s
-        """, (ip,))
-
-        cur.execute("""
-            INSERT INTO logs(tipo, mensagem, ip)
-            VALUES(%s,%s,%s)
-        """, ("UNBLOCK_IP", f"IP desbloqueado {ip}", ip))
-
-    # CASO 2: por ID
-    elif pedido_id:
-
-        cur.execute("""
-            UPDATE pedidos
-            SET status='analise'
-            WHERE id=%s
-        """, (pedido_id,))
-
-        cur.execute("""
-            INSERT INTO logs(tipo, mensagem, ip)
-            VALUES(%s,%s,%s)
-        """, ("UNBLOCK_ID", f"Pedido desbloqueado {pedido_id}", "manual"))
+    cur.execute("""
+        INSERT INTO logs(tipo, mensagem, ip)
+        VALUES(%s,%s,%s)
+    """, ("UNBLOCK", f"IP desbloqueado {ip}", ip))
 
     conn.commit()
     cur.close()
     conn.close()
 
-    return jsonify({"success": True, "message": "Desbloqueado"})
+    return jsonify({"success": True, "message": "IP desbloqueado"})
 
 
 # =========================
@@ -338,16 +313,14 @@ def logs():
     conn = get_conn()
     cur = conn.cursor()
 
-    try:
-        cur.execute("""
-            SELECT id, tipo, mensagem, ip, created_at
-            FROM logs
-            ORDER BY created_at DESC
-            LIMIT 200
-        """)
-        rows = cur.fetchall()
-    except:
-        rows = []
+    cur.execute("""
+        SELECT id, tipo, mensagem, ip, created_at
+        FROM logs
+        ORDER BY created_at DESC
+        LIMIT 200
+    """)
+
+    rows = cur.fetchall()
 
     cur.close()
     conn.close()

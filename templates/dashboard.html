@@ -160,7 +160,7 @@ body{
     margin:15px 0;
 }
 
-/* GRID FINAL (UMA LINHA, SEM QUEBRA) */
+/* GRID */
 .pedido-grid{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
@@ -179,16 +179,12 @@ body{
 
 .item small{
     color:#888;
-    font-size:11px;
-    white-space:nowrap;
 }
 
 .item .value{
     color:white;
     font-weight:600;
     white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
 }
 
 /* FOOTER */
@@ -206,12 +202,6 @@ body{
 .modal-content{
     background:#111;
     color:white;
-}
-
-/* RESPONSIVO */
-@media(max-width:991px){
-    .sidebar{position:relative;width:100%;height:auto;}
-    .content{margin-left:0;}
 }
 
 </style>
@@ -298,6 +288,7 @@ body{
                     🚫 Bloquear IP
                 </button>
 
+                <!-- FIX: desbloqueia via IP (corrigido backend padrão) -->
                 <button class="btn btn-success btn-sm" onclick="desbloquearIP('{{ pedido.ip }}')">
                     🔓 Desbloquear
                 </button>
@@ -308,43 +299,16 @@ body{
 
             </div>
 
-            <!-- GRID (SEM QUEBRAR TEXTO) -->
+            <!-- GRID -->
             <div class="pedido-grid">
 
-                <div class="item">
-                    <small>CPF</small>
-                    <div class="value">{{ pedido.cpf }}</div>
-                </div>
-
-                <div class="item">
-                    <small>Email</small>
-                    <div class="value">{{ pedido.email }}</div>
-                </div>
-
-                <div class="item">
-                    <small>Cidade</small>
-                    <div class="value">{{ pedido.cidade }}</div>
-                </div>
-
-                <div class="item">
-                    <small>Estado</small>
-                    <div class="value">{{ pedido.estado }}</div>
-                </div>
-
-                <div class="item">
-                    <small>IP</small>
-                    <div class="value">{{ pedido.ip }}</div>
-                </div>
-
-                <div class="item">
-                    <small>Valor</small>
-                    <div class="value">R$ {{ pedido.valor }}</div>
-                </div>
-
-                <div class="item">
-                    <small>Score</small>
-                    <div class="value">{{ pedido.score_risco }}</div>
-                </div>
+                <div class="item"><small>CPF</small><div class="value">{{ pedido.cpf }}</div></div>
+                <div class="item"><small>Email</small><div class="value">{{ pedido.email }}</div></div>
+                <div class="item"><small>Cidade</small><div class="value">{{ pedido.cidade }}</div></div>
+                <div class="item"><small>Estado</small><div class="value">{{ pedido.estado }}</div></div>
+                <div class="item"><small>IP</small><div class="value">{{ pedido.ip }}</div></div>
+                <div class="item"><small>Valor</small><div class="value">R$ {{ pedido.valor }}</div></div>
+                <div class="item"><small>Score</small><div class="value">{{ pedido.score_risco }}</div></div>
 
             </div>
 
@@ -357,18 +321,13 @@ body{
 
         <!-- MODAL -->
         <div class="modal fade" id="modal{{ pedido.id }}" tabindex="-1">
-
             <div class="modal-dialog modal-lg">
-
                 <div class="modal-content">
-
                     <div class="modal-header">
                         <h5 class="modal-title">Pedido #{{ pedido.order_id }}</h5>
                         <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
-
                     <div class="modal-body">
-
                         <p><b>Cliente:</b> {{ pedido.cliente }}</p>
                         <p><b>CPF:</b> {{ pedido.cpf }}</p>
                         <p><b>Email:</b> {{ pedido.email }}</p>
@@ -377,13 +336,9 @@ body{
                         <p><b>Score:</b> {{ pedido.score_risco }}</p>
                         <p><b>Status:</b> {{ pedido.status }}</p>
                         <p><b>Motivo:</b> {{ pedido.motivo }}</p>
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
 
         {% endfor %}

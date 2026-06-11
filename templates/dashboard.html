@@ -2,301 +2,69 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Cozinet Control Center</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cozinet Shield - Dashboard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
-body{
-    margin:0;
-    font-family: Arial, sans-serif;
-    background:#0f0f12;
-    color:#fff;
-    display:flex;
-}
-
-/* SIDEBAR */
-.sidebar{
-    width:280px;
-    height:100vh;
-    background:#15151a;
-    border-right:1px solid #2a2a2f;
-    padding:20px;
-}
-
-/* LOGO GRANDE */
-.logo{
-    text-align:center;
-    margin-bottom:25px;
-}
-
-.logo img{
-    width:220px;
-}
-
-/* MENU */
-.menu-title{
-    color:#888;
-    font-size:12px;
-    margin:15px 0 5px;
-}
-
-.menu a{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    padding:12px;
-    color:#ddd;
-    text-decoration:none;
-    border-radius:8px;
-    transition:0.2s;
-}
-
-.menu a:hover{
-    background:#22222a;
-    color:#ff6a00;
-}
-
-/* MAIN */
-.main{
-    flex:1;
-    padding:20px;
-}
-
-/* HEADER */
-.header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    background:#15151a;
-    padding:15px;
-    border-radius:10px;
-    border:1px solid #2a2a2f;
-}
-
-.header h2{
-    margin:0;
-    color:#ff6a00;
-}
-
-/* CARDS */
-.cards{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:15px;
-    margin-top:20px;
-}
-
-.card{
-    background:#15151a;
-    border:1px solid #2a2a2f;
-    padding:18px;
-    border-radius:10px;
-}
-
-.card b{
-    font-size:26px;
-    display:block;
-    margin-top:5px;
-}
-
-.green{ border-left:4px solid #22c55e; }
-.orange{ border-left:4px solid #ff6a00; }
-.red{ border-left:4px solid #ef4444; }
-
-/* TABLE */
-.table{
-    margin-top:25px;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-    background:#15151a;
-    border:1px solid #2a2a2f;
-}
-
-th{
-    background:#1b1b22;
-    color:#ff6a00;
-    padding:12px;
-    text-align:left;
-    font-size:12px;
-    text-transform:uppercase;
-    border-bottom:1px solid #2a2a2f;
-}
-
-td{
-    padding:12px;
-    border-bottom:1px solid #2a2a2f;
-    color:#ddd;
-}
-
-/* BOTÕES */
-.btn{
-    padding:6px 10px;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
-    margin-right:5px;
-    display:inline-flex;
-    align-items:center;
-    gap:5px;
-    font-size:12px;
-}
-
-.block{
-    background:#ef4444;
-    color:#fff;
-}
-
-.unblock{
-    background:#22c55e;
-    color:#000;
-}
-
-.details{
-    background:#333;
-    color:#fff;
-}
-
-/* HOVER */
-.btn:hover{
-    opacity:0.8;
-}
-
-/* ICON */
-.icon{
-    font-size:14px;
-}
+body{background:#0f172a;color:white;margin:0;font-family:Arial,sans-serif}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:#111827;padding:20px}
+.content{margin-left:260px;padding:20px}
+.card-box{background:#1e293b;padding:15px;border-radius:12px}
+.cards{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+a{color:#cbd5e1;text-decoration:none;display:block;padding:10px}
 </style>
 </head>
-
 <body>
-
-<!-- SIDEBAR -->
 <div class="sidebar">
-
-    <div class="logo">
-        <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
-    </div>
-
-    <div class="menu">
-
-        <div class="menu-title">MENU PRINCIPAL</div>
-
-        <a href="/dashboard">📊 Dashboard</a>
-        <a href="/bloqueados">🚫 Bloqueados</a>
-
-        <div class="menu-title">SISTEMA</div>
-
-        <a href="/logout">🚪 Sair</a>
-
-    </div>
-
+<h3>Cozinet Shield</h3>
+<a href="/dashboard">Dashboard</a>
+<a href="/bloqueados">IPs Bloqueados</a>
+<a href="/ips-confiaveis">IPs Confiáveis</a>
+<a href="/logs">Logs</a>
+<a href="/logout">Sair</a>
 </div>
 
-<!-- MAIN -->
-<div class="main">
+<div class="content">
+<h2>Bem-vindo, {{ usuario }}</h2>
 
-    <div class="header">
-        <h2>COZINET CONTROL CENTER</h2>
-        <div>👤 {{ usuario }}</div>
-    </div>
-
-    <!-- CARDS -->
-    <div class="cards">
-
-        <div class="card green">
-            ✔ APROVADOS
-            <b>{{ aprovados }}</b>
-        </div>
-
-        <div class="card orange">
-            ⏳ ANÁLISE
-            <b>{{ analise }}</b>
-        </div>
-
-        <div class="card red">
-            🚫 BLOQUEADOS
-            <b>{{ bloqueados }}</b>
-        </div>
-
-    </div>
-
-    <!-- TABLE -->
-    <div class="table">
-    <table>
-
-        <tr>
-            <th>ID</th>
-            <th>Pedido</th>
-            <th>IP</th>
-            <th>Valor</th>
-            <th>Status</th>
-            <th>Motivo</th>
-            <th>Ações</th>
-        </tr>
-
-        {% for p in pedidos %}
-        <tr>
-            <td>{{ p.id }}</td>
-            <td>{{ p.order_id }}</td>
-            <td>{{ p.ip }}</td>
-            <td>R$ {{ p.valor }}</td>
-            <td>{{ p.status }}</td>
-            <td>{{ p.motivo }}</td>
-
-            <td>
-
-                <button class="btn block" onclick="bloquear('{{ p.ip }}')">
-                    🚫 Bloquear
-                </button>
-
-                <button class="btn unblock" onclick="desbloquear('{{ p.ip }}')">
-                    🔓 Desbloquear
-                </button>
-
-                <button class="btn details" onclick="detalhes('{{ p.ip }}')">
-                    👁 Detalhes
-                </button>
-
-            </td>
-        </tr>
-        {% endfor %}
-
-    </table>
-    </div>
-
+<div class="cards">
+<div class="card-box">Total<br><h3>{{ total_pedidos }}</h3></div>
+<div class="card-box">Aprovados<br><h3>{{ aprovados }}</h3></div>
+<div class="card-box">Análise<br><h3>{{ analise }}</h3></div>
+<div class="card-box">Bloqueados<br><h3>{{ bloqueados }}</h3></div>
+<div class="card-box">Score Médio<br><h3>{{ score_medio }}</h3></div>
+<div class="card-box">Valor Protegido<br><h3>R$ {{ valor_protegido }}</h3></div>
 </div>
 
-<script>
-
-function bloquear(ip){
-    fetch("/bloquear-ip", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({ip})
-    }).then(r=>r.json()).then(d=>{
-        alert(d.message);
-        location.reload();
-    });
-}
-
-function desbloquear(ip){
-    fetch("/desbloquear-ip", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({ip})
-    }).then(r=>r.json()).then(d=>{
-        alert(d.message);
-        location.reload();
-    });
-}
-
-function detalhes(ip){
-    alert("Detalhes do IP: " + ip);
-}
-
-</script>
-
+<div class="mt-4">
+<table class="table table-dark table-striped">
+<thead>
+<tr>
+<th>ID</th><th>Pedido</th><th>Cliente</th><th>CPF</th><th>Email</th>
+<th>Cidade</th><th>Estado</th><th>IP</th><th>Dispositivo</th>
+<th>Valor</th><th>Score</th><th>Status</th>
+</tr>
+</thead>
+<tbody>
+{% for p in pedidos %}
+<tr>
+<td>{{ p.id }}</td>
+<td>{{ p.order_id }}</td>
+<td>{{ p.cliente }}</td>
+<td>{{ p.cpf }}</td>
+<td>{{ p.email }}</td>
+<td>{{ p.cidade }}</td>
+<td>{{ p.estado }}</td>
+<td>{{ p.ip }}</td>
+<td>{{ p.dispositivo }}</td>
+<td>R$ {{ p.valor }}</td>
+<td>{{ p.score_risco }}</td>
+<td>{{ p.status }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+</div>
 </body>
 </html>

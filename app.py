@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, render_template, session, redirect
 import os
 import psycopg2
 import time
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = "cozinet_saas_2026"
@@ -20,15 +21,24 @@ def get_conn():
         port=os.getenv("PGPORT")
     )
 
+# =========================
 def login_required():
     return "user_id" in session
 
+
 # =========================
-# ROOT
+# SYSTEM INFO (PAINEL TOPO)
 # =========================
-@app.route("/")
-def root():
-    return redirect("/login")
+def get_system_info():
+    return {
+        "status": "online",
+        "host": os.getenv("PGHOST", "-"),
+        "uptime": int(time.time() - START_TIME),
+        "hostname": os.uname().nodename if hasattr(os, "uname") else "server",
+        "port": 8080,
+        "env": "production"
+    }
+
 
 # =========================
 # LOGIN
@@ -50,6 +60,7 @@ def login():
         """, (email, senha))
 
         user = cur.fetchone()
+
         cur.close()
         conn.close()
 
@@ -63,6 +74,7 @@ def login():
 
     return render_template("login.html")
 
+
 # =========================
 # DASHBOARD
 # =========================
@@ -75,9 +87,8 @@ def dashboard():
     conn = get_conn()
     cur = conn.cursor()
 
-    # KPIs
     cur.execute("SELECT COUNT(*) FROM pedidos")
-    total = cur.fetchone()[0]
+    total_pedidos = cur.fetchone()[0]
 
     cur.execute("SELECT COUNT(*) FROM pedidos WHERE status='aprovado'")
     aprovados = cur.fetchone()[0]
@@ -97,18 +108,18 @@ def dashboard():
         FROM pedidos
         WHERE ip IN (SELECT ip FROM ips_bloqueados)
     """)
-    protegido = float(cur.fetchone()[0] or 0)
+    valor_protegido = float(cur.fetchone()[0] or 0)
 
     cur.execute("""
         SELECT COALESCE(ROUND(AVG(score_risco),2),0)
         FROM pedidos
     """)
-    score = cur.fetchone()[0]
+    score_medio = cur.fetchone()[0]
 
-    # pedidos
     cur.execute("""
         SELECT id, order_id, cliente, cpf, email,
-               ip, valor, score_risco, status
+               ip, valor, score_risco, status,
+               motivo, created_at
         FROM pedidos
         ORDER BY id DESC
         LIMIT 50
@@ -119,9 +130,8 @@ def dashboard():
     cur.close()
     conn.close()
 
-    pedidos = []
-    for r in rows:
-        pedidos.append({
+    pedidos = [
+        {
             "id": r[0],
             "order_id": r[1],
             "cliente": r[2],
@@ -130,69 +140,28 @@ def dashboard():
             "ip": r[5],
             "valor": float(r[6]) if r[6] else 0,
             "score_risco": r[7],
-            "status": r[8]
-        })
+            "status": r[8],
+            "motivo": r[9],
+            "created_at": str(r[10])
+        }
+        for r in rows
+    ]
 
-return render_template(
-    "dashboard.html",
-    usuario=session.get("nome"),
-    total_pedidos=total_pedidos,
-    aprovados=aprovados,
-    analise=analise,
-    bloqueados=bloqueados,
-    valor_protegido=valor_protegido,
-    score_medio=score_medio,
-    pedidos=pedidos,
-    system=get_system_info()   # <<<<<< ISSO TEM QUE EXISTIR
-)
+    system = get_system_info()
 
-# =========================
-# BLOQUEAR IP
-# =========================
-@app.route("/bloquear-ip", methods=["POST"])
-def bloquear_ip():
+    return render_template(
+        "dashboard.html",
+        usuario=session.get("nome"),
+        total_pedidos=total_pedidos,
+        aprovados=aprovados,
+        analise=analise,
+        bloqueados=bloqueados,
+        valor_protegido=valor_protegido,
+        score_medio=score_medio,
+        pedidos=pedidos,
+        system=system
+    )
 
-    if not login_required():
-        return jsonify({"error": "unauthorized"}), 401
-
-    ip = request.get_json().get("ip")
-
-    conn = get_conn()
-    cur = conn.cursor()
-
-    cur.execute("""
-        INSERT INTO ips_bloqueados(ip, motivo)
-        VALUES(%s, %s)
-        ON CONFLICT DO NOTHING
-    """, (ip, "manual"))
-
-    conn.commit()
-    cur.close()
-    conn.close()
-
-    return jsonify({"ok": True})
-
-# =========================
-# DESBLOQUEAR IP
-# =========================
-@app.route("/desbloquear-ip", methods=["POST"])
-def desbloquear_ip():
-
-    if not login_required():
-        return jsonify({"error": "unauthorized"}), 401
-
-    ip = request.get_json().get("ip")
-
-    conn = get_conn()
-    cur = conn.cursor()
-
-    cur.execute("DELETE FROM ips_bloqueados WHERE ip=%s", (ip,))
-
-    conn.commit()
-    cur.close()
-    conn.close()
-
-    return jsonify({"ok": True})
 
 # =========================
 if __name__ == "__main__":

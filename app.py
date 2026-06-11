@@ -2,12 +2,15 @@ from flask import Flask, request, jsonify, render_template, session, redirect
 import os
 import psycopg2
 
+# 👇 IMPORT DO ANTIFRAUDE
+from antifraude import calcular_score, ip_bloqueado
+
 app = Flask(__name__)
 app.secret_key = "cozinet_saas_2026"
 
 
 # =========================
-# DB CONNECTION
+# DB
 # =========================
 def get_conn():
     return psycopg2.connect(
@@ -20,7 +23,7 @@ def get_conn():
 
 
 # =========================
-# LOGIN CHECK
+# AUTH
 # =========================
 def login_required():
     return "user_id" in session
@@ -119,7 +122,7 @@ def dashboard():
     cur.execute("""
         SELECT id, order_id, cliente, cpf, email, cidade, estado,
                ip, dispositivo, valor, score_risco, status,
-               motivo, created_at, analisado_por, data_analise, pais
+               motivo, created_at
         FROM pedidos
         ORDER BY id DESC
         LIMIT 100
@@ -143,12 +146,9 @@ def dashboard():
             "dispositivo": r[8],
             "valor": float(r[9]) if r[9] else 0,
             "score_risco": r[10] if r[10] else 0,
-            "status": r[11] or "analise",
+            "status": r[11],
             "motivo": r[12],
-            "created_at": str(r[13]) if r[13] else "",
-            "analisado_por": r[14],
-            "data_analise": str(r[15]) if r[15] else "",
-            "pais": r[16]
+            "created_at": str(r[13]) if r[13] else ""
         }
         for r in rows
     ]
@@ -167,6 +167,56 @@ def dashboard():
 
 
 # =========================
+# CRIAR / AVALIAR PEDIDO (🔥 ANTIFRAUDE AQUI)
+# =========================
+@app.route("/avaliar-pedido", methods=["POST"])
+def avaliar_pedido():
+
+    if not login_required():
+        return jsonify({"error": "unauthorized"}), 401
+
+    data = request.get_json()
+
+    ip = data.get("ip")
+    valor = data.get("valor", 0)
+
+    # 🔥 ANTIFRAUDE ENTRANDO AQUI
+    score, motivos = calcular_score(ip, valor)
+
+    if score >= 70:
+        status = "bloqueado"
+    elif score >= 40:
+        status = "analise"
+    else:
+        status = "aprovado"
+
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute("""
+        INSERT INTO pedidos (ip, valor, score_risco, motivo, status)
+        VALUES (%s, %s, %s, %s, %s)
+    """, (
+        ip,
+        valor,
+        score,
+        ",".join(motivos),
+        status
+    ))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return jsonify({
+        "success": True,
+        "score": score,
+        "status": status,
+        "motivos": motivos
+    })
+
+
+# =========================
 # BLOQUEAR IP
 # =========================
 @app.route("/bloquear-ip", methods=["POST"])
@@ -181,14 +231,12 @@ def bloquear_ip():
     conn = get_conn()
     cur = conn.cursor()
 
-    # salva bloqueio
     cur.execute("""
         INSERT INTO ips_bloqueados(ip, motivo)
         VALUES(%s,%s)
         ON CONFLICT(ip) DO NOTHING
     """, (ip, "Bloqueio manual"))
 
-    # bloqueia pedidos
     cur.execute("""
         UPDATE pedidos
         SET status='bloqueado'
@@ -203,7 +251,7 @@ def bloquear_ip():
 
 
 # =========================
-# DESBLOQUEAR IP (CORRIGIDO DEFINITIVO)
+# DESBLOQUEAR IP
 # =========================
 @app.route("/desbloquear-ip/<int:id>", methods=["POST"])
 def desbloquear_ip(id):
@@ -214,7 +262,6 @@ def desbloquear_ip(id):
     conn = get_conn()
     cur = conn.cursor()
 
-    # pega IP do bloqueio
     cur.execute("SELECT ip FROM ips_bloqueados WHERE id=%s", (id,))
     row = cur.fetchone()
 
@@ -223,10 +270,8 @@ def desbloquear_ip(id):
 
     ip = row[0]
 
-    # remove bloqueio
     cur.execute("DELETE FROM ips_bloqueados WHERE id=%s", (id,))
 
-    # reativa pedidos
     cur.execute("""
         UPDATE pedidos
         SET status='analise'
@@ -238,6 +283,46 @@ def desbloquear_ip(id):
     conn.close()
 
     return jsonify({"success": True, "message": "IP desbloqueado"})
+
+
+# =========================
+# IPs BLOQUEADOS
+# =========================
+@app.route("/bloqueados")
+def bloqueados():
+
+    if not login_required():
+        return redirect("/login")
+
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT id, ip, motivo, data_cadastro
+        FROM ips_bloqueados
+        ORDER BY data_cadastro DESC
+    """)
+
+    rows = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    bloqueados = [
+        {
+            "id": r[0],
+            "ip": r[1],
+            "motivo": r[2],
+            "data": str(r[3]) if r[3] else ""
+        }
+        for r in rows
+    ]
+
+    return render_template(
+        "bloqueados.html",
+        bloqueados=bloqueados,
+        usuario=session.get("nome")
+    )
 
 
 # =========================

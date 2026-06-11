@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify, render_template, session, redirect
 import os
 import psycopg2
-from antifraude import calcular_score, should_block
 
 app = Flask(__name__)
 app.secret_key = "cozinet_saas_2026"
@@ -22,6 +21,14 @@ def get_conn():
 
 def login_required():
     return "user_id" in session
+
+
+# =========================
+# HOME
+# =========================
+@app.route("/")
+def home():
+    return redirect("/login")
 
 
 # =========================
@@ -60,7 +67,16 @@ def login():
 
 
 # =========================
-# DASHBOARD
+# LOGOUT
+# =========================
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/login")
+
+
+# =========================
+# DASHBOARD (SAFE)
 # =========================
 @app.route("/dashboard")
 def dashboard():
@@ -82,15 +98,15 @@ def dashboard():
 
     cur.execute("""
         SELECT COUNT(*)
-        FROM pedidos
-        WHERE ip IN (SELECT ip FROM ips_bloqueados)
+        FROM pedidos p
+        JOIN ips_bloqueados b ON b.ip = p.ip
     """)
     bloqueados = cur.fetchone()[0]
 
     cur.execute("""
-        SELECT COALESCE(SUM(valor),0)
-        FROM pedidos
-        WHERE ip IN (SELECT ip FROM ips_bloqueados)
+        SELECT COALESCE(SUM(p.valor),0)
+        FROM pedidos p
+        JOIN ips_bloqueados b ON b.ip = p.ip
     """)
     valor_protegido = float(cur.fetchone()[0] or 0)
 
@@ -110,7 +126,6 @@ def dashboard():
     """)
 
     rows = cur.fetchall()
-
     cur.close()
     conn.close()
 
@@ -123,7 +138,7 @@ def dashboard():
             "cpf": r[3],
             "email": r[4],
             "ip": r[5],
-            "valor": float(r[6]) if r[6] else 0,
+            "valor": float(r[6] or 0),
             "score_risco": r[7],
             "status": r[8],
             "motivo": r[9],
@@ -144,7 +159,7 @@ def dashboard():
 
 
 # =========================
-# BLOQUEAR (MANUAL + AUTO)
+# BLOQUEAR IP
 # =========================
 @app.route("/bloquear-ip", methods=["POST"])
 def bloquear_ip():
@@ -178,7 +193,7 @@ def bloquear_ip():
 
 
 # =========================
-# DESBLOQUEAR
+# DESBLOQUEAR IP
 # =========================
 @app.route("/desbloquear-ip", methods=["POST"])
 def desbloquear_ip():
@@ -192,10 +207,7 @@ def desbloquear_ip():
     conn = get_conn()
     cur = conn.cursor()
 
-    cur.execute("""
-        DELETE FROM ips_bloqueados
-        WHERE ip=%s
-    """, (ip,))
+    cur.execute("DELETE FROM ips_bloqueados WHERE ip=%s", (ip,))
 
     cur.execute("""
         UPDATE pedidos
@@ -211,45 +223,79 @@ def desbloquear_ip():
 
 
 # =========================
-# EXEMPLO: quando criar pedido (AUTO BLOCK)
+# IPS BLOQUEADOS
 # =========================
-@app.route("/processar-pedido", methods=["POST"])
-def processar_pedido():
+@app.route("/bloqueados")
+def bloqueados():
 
-    data = request.get_json()
+    if not login_required():
+        return redirect("/login")
 
-    ip = data.get("ip")
-    valor = data.get("valor")
-    cpf = data.get("cpf")
-    email = data.get("email")
+    conn = get_conn()
+    cur = conn.cursor()
 
-    score, motivos = calcular_score(ip, valor, cpf, email)
+    cur.execute("""
+        SELECT id, ip, motivo, data_cadastro
+        FROM ips_bloqueados
+        ORDER BY id DESC
+    """)
 
-    if should_block(score, motivos):
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
 
-        status = "bloqueado"
+    return render_template("bloqueados.html", bloqueados=rows)
 
-        conn = get_conn()
-        cur = conn.cursor()
 
-        cur.execute("""
-            INSERT INTO ips_bloqueados(ip, motivo)
-            VALUES(%s,%s)
-            ON CONFLICT(ip) DO NOTHING
-        """, (ip, "auto_score"))
+# =========================
+# IPS CONFIÁVEIS
+# =========================
+@app.route("/ips-confiaveis")
+def confiaveis():
 
-        conn.commit()
-        cur.close()
-        conn.close()
+    if not login_required():
+        return redirect("/login")
 
-    else:
-        status = "analise"
+    conn = get_conn()
+    cur = conn.cursor()
 
-    return jsonify({
-        "status": status,
-        "score": score,
-        "motivos": motivos
-    })
+    cur.execute("""
+        SELECT id, ip, observacao, data_cadastro
+        FROM ips_confiaveis
+        ORDER BY id DESC
+    """)
+
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    return render_template("ips_confiaveis.html", ips=rows)
+
+
+# =========================
+# LOGS (BÁSICO)
+# =========================
+@app.route("/logs")
+def logs():
+
+    if not login_required():
+        return redirect("/login")
+
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT id, ip, acao, created_at
+        FROM logs
+        ORDER BY id DESC
+        LIMIT 200
+    """)
+
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    return render_template("logs.html", logs=rows)
 
 
 # =========================

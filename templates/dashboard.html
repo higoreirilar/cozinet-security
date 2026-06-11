@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -19,7 +18,6 @@
     --border:#292929;
     --orange:#ff7a00;
     --orange2:#ff9333;
-    --text:#ffffff;
     --muted:#8f8f8f;
 }
 
@@ -36,7 +34,6 @@ body{
 }
 
 /* SIDEBAR */
-
 .sidebar{
     position:fixed;
     left:0;
@@ -46,7 +43,6 @@ body{
     background:var(--sidebar);
     border-right:1px solid var(--border);
     padding:25px;
-    overflow-y:auto;
 }
 
 .logo{
@@ -74,7 +70,6 @@ body{
 }
 
 /* CONTENT */
-
 .content{
     margin-left:280px;
     padding:30px;
@@ -85,8 +80,6 @@ body{
     justify-content:space-between;
     align-items:center;
     margin-bottom:25px;
-    flex-wrap:wrap;
-    gap:15px;
 }
 
 .title{
@@ -99,31 +92,19 @@ body{
 }
 
 .user-box{
-    background:linear-gradient(
-        135deg,
-        var(--orange),
-        var(--orange2)
-    );
+    background:linear-gradient(135deg,var(--orange),var(--orange2));
     padding:12px 18px;
     border-radius:14px;
     font-weight:700;
 }
 
-/* KPIs */
-
+/* KPI */
 .kpi-card{
     background:var(--card);
     border:1px solid var(--border);
     border-radius:16px;
     padding:12px;
     text-align:center;
-    height:100%;
-    transition:.3s;
-}
-
-.kpi-card:hover{
-    border-color:var(--orange);
-    transform:translateY(-2px);
 }
 
 .kpi-title{
@@ -138,11 +119,9 @@ body{
     color:var(--orange);
     font-size:22px;
     font-weight:800;
-    line-height:1.1;
 }
 
 /* PEDIDOS */
-
 .orders-section{
     margin-top:30px;
 }
@@ -160,101 +139,90 @@ body{
     border-radius:20px;
     padding:20px;
     margin-bottom:16px;
-    transition:.3s;
-}
-
-.pedido-card:hover{
-    border-color:var(--orange);
-    transform:translateY(-2px);
-    box-shadow:0 0 25px rgba(255,122,0,.12);
 }
 
 .pedido-header{
     display:flex;
     justify-content:space-between;
-    align-items:center;
-    margin-bottom:18px;
     flex-wrap:wrap;
     gap:10px;
+    margin-bottom:15px;
 }
 
 .pedido-id{
     color:var(--orange);
-    font-size:18px;
-    font-weight:700;
+    font-weight:800;
 }
 
 .pedido-cliente{
-    font-size:22px;
+    font-size:20px;
     font-weight:700;
 }
 
 .status{
-    padding:8px 16px;
+    padding:8px 14px;
     border-radius:999px;
     font-size:12px;
     font-weight:700;
 }
 
-.aprovado{
-    background:#15803d;
-}
-
-.analise{
-    background:#d97706;
-}
-
-.bloqueado{
-    background:#dc2626;
-}
+.aprovado{background:#15803d;}
+.analise{background:#d97706;}
+.bloqueado{background:#dc2626;}
 
 .pedido-grid{
     display:grid;
-    grid-template-columns:
-    repeat(auto-fit,minmax(220px,1fr));
-    gap:16px;
-    margin-bottom:18px;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:14px;
+    margin-top:10px;
 }
 
 .item small{
-    display:block;
     color:#888;
-    margin-bottom:4px;
+    display:block;
 }
 
 .item strong{
     color:white;
 }
 
+/* ACTIONS */
+.pedido-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin:15px 0;
+}
+
+.pedido-actions button{
+    border-radius:10px;
+    font-weight:600;
+}
+
+/* FOOTER */
 .footer-card{
-    border-top:1px solid var(--border);
-    padding-top:15px;
+    border-top:1px solid #2b2b2b;
+    margin-top:15px;
+    padding-top:10px;
     display:flex;
     justify-content:space-between;
     flex-wrap:wrap;
-    gap:10px;
     color:#bbb;
 }
 
+/* RESPONSIVO */
 @media(max-width:991px){
-
-    .sidebar{
-        position:relative;
-        width:100%;
-        height:auto;
-    }
-
-    .content{
-        margin-left:0;
-    }
-
+    .sidebar{position:relative;width:100%;height:auto;}
+    .content{margin-left:0;}
 }
 
 </style>
 
 </head>
+
 <body>
 
+<!-- SIDEBAR -->
 <div class="sidebar">
 
     <div class="logo">
@@ -271,15 +239,14 @@ body{
 
 </div>
 
+<!-- CONTENT -->
 <div class="content">
 
     <div class="topbar">
 
         <div>
             <div class="title">Cozinet Shield</div>
-            <div class="subtitle">
-                Plataforma Inteligente de Prevenção a Fraudes
-            </div>
+            <div class="subtitle">Plataforma Antifraude</div>
         </div>
 
         <div class="user-box">
@@ -288,61 +255,57 @@ body{
 
     </div>
 
-    <div class="row g-2">
+    <!-- KPIs -->
+    <div class="row g-2 mb-4">
 
         <div class="col-xl-2 col-lg-2 col-md-4 col-6">
             <div class="kpi-card">
-                <div class="kpi-title">📦 Total Pedidos</div>
+                <div class="kpi-title">Total Pedidos</div>
                 <div class="kpi-value">{{ total_pedidos }}</div>
             </div>
         </div>
 
         <div class="col-xl-2 col-lg-2 col-md-4 col-6">
             <div class="kpi-card">
-                <div class="kpi-title">✅ Aprovados</div>
+                <div class="kpi-title">Aprovados</div>
                 <div class="kpi-value">{{ aprovados }}</div>
             </div>
         </div>
 
         <div class="col-xl-2 col-lg-2 col-md-4 col-6">
             <div class="kpi-card">
-                <div class="kpi-title">🟡 Análise</div>
+                <div class="kpi-title">Análise</div>
                 <div class="kpi-value">{{ analise }}</div>
             </div>
         </div>
 
         <div class="col-xl-2 col-lg-2 col-md-4 col-6">
             <div class="kpi-card">
-                <div class="kpi-title">🚫 Bloqueados</div>
+                <div class="kpi-title">Bloqueados</div>
                 <div class="kpi-value">{{ bloqueados }}</div>
             </div>
         </div>
 
         <div class="col-xl-2 col-lg-2 col-md-4 col-6">
             <div class="kpi-card">
-                <div class="kpi-title">💰 Valor Protegido</div>
-                <div class="kpi-value">
-                    R$ {{ valor_protegido }}
-                </div>
+                <div class="kpi-title">Valor Protegido</div>
+                <div class="kpi-value">R$ {{ valor_protegido }}</div>
             </div>
         </div>
 
         <div class="col-xl-2 col-lg-2 col-md-4 col-6">
             <div class="kpi-card">
-                <div class="kpi-title">📊 Score Médio</div>
-                <div class="kpi-value">
-                    {{ score_medio }}
-                </div>
+                <div class="kpi-title">Score Médio</div>
+                <div class="kpi-value">{{ score_medio }}</div>
             </div>
         </div>
 
     </div>
 
+    <!-- PEDIDOS -->
     <div class="orders-section">
 
-        <div class="section-title">
-            Pedidos Recentes
-        </div>
+        <div class="section-title">Pedidos Recentes</div>
 
         {% for pedido in pedidos %}
 
@@ -351,103 +314,59 @@ body{
             <div class="pedido-header">
 
                 <div>
-
-                    <div class="pedido-id">
-                        Pedido #{{ pedido.order_id }}
-                    </div>
-
-                    <div class="pedido-cliente">
-                        {{ pedido.cliente }}
-                    </div>
-
+                    <div class="pedido-id">#{{ pedido.order_id }}</div>
+                    <div class="pedido-cliente">{{ pedido.cliente }}</div>
                 </div>
 
                 <div>
-
                     {% if pedido.status == 'aprovado' %}
-                        <span class="status aprovado">
-                            APROVADO
-                        </span>
-
+                        <span class="status aprovado">APROVADO</span>
                     {% elif pedido.status == 'analise' %}
-                        <span class="status analise">
-                            EM ANÁLISE
-                        </span>
-
+                        <span class="status analise">ANÁLISE</span>
                     {% else %}
-                        <span class="status bloqueado">
-                            BLOQUEADO
-                        </span>
+                        <span class="status bloqueado">BLOQUEADO</span>
                     {% endif %}
-
                 </div>
+
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="pedido-actions">
+
+                <button class="btn btn-danger btn-sm"
+                        onclick="bloquearIP('{{ pedido.ip }}')">
+                    🚫 Bloquear IP
+                </button>
+
+                <button class="btn btn-success btn-sm"
+                        onclick="desbloquearIP('{{ pedido.id }}')">
+                    🔓 Desbloquear
+                </button>
+
+                <button class="btn btn-warning btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modal{{ pedido.id }}">
+                    👁 Detalhes
+                </button>
 
             </div>
 
             <div class="pedido-grid">
 
-                <div class="item">
-                    <small>CPF</small>
-                    <strong>{{ pedido.cpf }}</strong>
-                </div>
-
-                <div class="item">
-                    <small>Email</small>
-                    <strong>{{ pedido.email }}</strong>
-                </div>
-
-                <div class="item">
-                    <small>Cidade</small>
-                    <strong>{{ pedido.cidade }}</strong>
-                </div>
-
-                <div class="item">
-                    <small>Estado</small>
-                    <strong>{{ pedido.estado }}</strong>
-                </div>
-
-                <div class="item">
-                    <small>País</small>
-                    <strong>{{ pedido.pais }}</strong>
-                </div>
-
-                <div class="item">
-                    <small>IP</small>
-                    <strong>{{ pedido.ip }}</strong>
-                </div>
-
-                <div class="item">
-                    <small>Dispositivo</small>
-                    <strong>{{ pedido.dispositivo }}</strong>
-                </div>
-
-                <div class="item">
-                    <small>Valor</small>
-                    <strong>R$ {{ pedido.valor }}</strong>
-                </div>
-
-                <div class="item">
-                    <small>Score de Risco</small>
-                    <strong>{{ pedido.score_risco }}</strong>
-                </div>
-
-                <div class="item">
-                    <small>Analista</small>
-                    <strong>{{ pedido.analisado_por }}</strong>
-                </div>
+                <div class="item"><small>CPF</small><strong>{{ pedido.cpf }}</strong></div>
+                <div class="item"><small>Email</small><strong>{{ pedido.email }}</strong></div>
+                <div class="item"><small>Cidade</small><strong>{{ pedido.cidade }}</strong></div>
+                <div class="item"><small>Estado</small><strong>{{ pedido.estado }}</strong></div>
+                <div class="item"><small>IP</small><strong>{{ pedido.ip }}</strong></div>
+                <div class="item"><small>Valor</small><strong>R$ {{ pedido.valor }}</strong></div>
+                <div class="item"><small>Score</small><strong>{{ pedido.score_risco }}</strong></div>
 
             </div>
 
             <div class="footer-card">
 
-                <div>
-                    <strong>Motivo:</strong>
-                    {{ pedido.motivo }}
-                </div>
-
-                <div>
-                    {{ pedido.created_at }}
-                </div>
+                <div><b>Motivo:</b> {{ pedido.motivo }}</div>
+                <div>{{ pedido.created_at }}</div>
 
             </div>
 
@@ -459,6 +378,40 @@ body{
 
 </div>
 
+<!-- JS -->
+<script>
+
+function bloquearIP(ip){
+
+    fetch("/bloquear-ip",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({ip})
+    })
+    .then(r=>r.json())
+    .then(data=>{
+        alert(data.message);
+        location.reload();
+    });
+}
+
+function desbloquearIP(id){
+
+    fetch("/desbloquear-ip/"+id,{
+        method:"POST"
+    })
+    .then(r=>r.json())
+    .then(data=>{
+        alert(data.message);
+        location.reload();
+    });
+}
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
-```

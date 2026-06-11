@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, render_template, session, redirect
 import os
 import psycopg2
+from antifraude import calcular_score
 
 app = Flask(__name__)
 app.secret_key = "cozinet_saas_2026"
@@ -76,7 +77,7 @@ def logout():
 
 
 # =========================
-# DASHBOARD (SAFE)
+# DASHBOARD (ROBUSTO)
 # =========================
 @app.route("/dashboard")
 def dashboard():
@@ -87,6 +88,7 @@ def dashboard():
     conn = get_conn()
     cur = conn.cursor()
 
+    # KPIs
     cur.execute("SELECT COUNT(*) FROM pedidos")
     total_pedidos = cur.fetchone()[0]
 
@@ -116,6 +118,7 @@ def dashboard():
     """)
     score_medio = cur.fetchone()[0]
 
+    # pedidos
     cur.execute("""
         SELECT id, order_id, cliente, cpf, email,
                ip, valor, score_risco, status,
@@ -126,11 +129,40 @@ def dashboard():
     """)
 
     rows = cur.fetchall()
-    cur.close()
-    conn.close()
 
     pedidos = []
+
     for r in rows:
+
+        cpf = r[3]
+        ip = r[5]
+
+        # histórico CPF (seguro)
+        try:
+            cur.execute("""
+                SELECT order_id, valor, status, created_at
+                FROM pedidos
+                WHERE cpf=%s
+                ORDER BY id DESC
+                LIMIT 5
+            """, (cpf,))
+            hist_cpf = cur.fetchall()
+        except:
+            hist_cpf = []
+
+        # histórico IP (seguro)
+        try:
+            cur.execute("""
+                SELECT order_id, cliente, valor, status, created_at
+                FROM pedidos
+                WHERE ip=%s
+                ORDER BY id DESC
+                LIMIT 5
+            """, (ip,))
+            hist_ip = cur.fetchall()
+        except:
+            hist_ip = []
+
         pedidos.append({
             "id": r[0],
             "order_id": r[1],
@@ -142,8 +174,13 @@ def dashboard():
             "score_risco": r[7],
             "status": r[8],
             "motivo": r[9],
-            "created_at": str(r[10])
+            "created_at": str(r[10]),
+            "hist_cpf": hist_cpf,
+            "hist_ip": hist_ip
         })
+
+    cur.close()
+    conn.close()
 
     return render_template(
         "dashboard.html",
@@ -241,6 +278,7 @@ def bloqueados():
     """)
 
     rows = cur.fetchall()
+
     cur.close()
     conn.close()
 
@@ -266,6 +304,7 @@ def confiaveis():
     """)
 
     rows = cur.fetchall()
+
     cur.close()
     conn.close()
 
@@ -273,7 +312,7 @@ def confiaveis():
 
 
 # =========================
-# LOGS (BÁSICO)
+# LOGS
 # =========================
 @app.route("/logs")
 def logs():
@@ -292,12 +331,15 @@ def logs():
     """)
 
     rows = cur.fetchall()
+
     cur.close()
     conn.close()
 
     return render_template("logs.html", logs=rows)
 
 
+# =========================
+# RUN
 # =========================
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)

@@ -2,57 +2,63 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Cozinet • Control Center</title>
+<title>Cozinet Control Center</title>
 
 <style>
 body{
     margin:0;
-    font-family: Arial;
-    background:#07070c;
+    font-family: Arial, sans-serif;
+    background:#0f0f12;
     color:#fff;
     display:flex;
 }
 
-/* SIDEBAR GLASS */
+/* SIDEBAR */
 .sidebar{
-    width:260px;
+    width:280px;
     height:100vh;
-    background:rgba(15,15,20,0.7);
-    backdrop-filter: blur(12px);
-    border-right:1px solid rgba(255,106,0,0.3);
+    background:#15151a;
+    border-right:1px solid #2a2a2f;
     padding:20px;
 }
 
+/* LOGO GRANDE */
 .logo{
-    width:100%;
     text-align:center;
-    margin-bottom:20px;
+    margin-bottom:25px;
 }
 
 .logo img{
-    width:170px;
-    filter: drop-shadow(0 0 15px #ff6a00);
+    width:220px;
+}
+
+/* MENU */
+.menu-title{
+    color:#888;
+    font-size:12px;
+    margin:15px 0 5px;
 }
 
 .menu a{
-    display:block;
+    display:flex;
+    align-items:center;
+    gap:10px;
     padding:12px;
-    margin:5px 0;
-    color:#bbb;
+    color:#ddd;
     text-decoration:none;
     border-radius:8px;
-    transition:0.3s;
+    transition:0.2s;
 }
 
 .menu a:hover{
-    background:rgba(255,106,0,0.1);
+    background:#22222a;
     color:#ff6a00;
 }
 
 /* MAIN */
 .main{
     flex:1;
-    padding:25px;
+    padding:20px;
 }
 
 /* HEADER */
@@ -60,11 +66,10 @@ body{
     display:flex;
     justify-content:space-between;
     align-items:center;
+    background:#15151a;
     padding:15px;
-    background:rgba(20,20,30,0.6);
-    backdrop-filter: blur(10px);
-    border-radius:12px;
-    border:1px solid rgba(255,106,0,0.2);
+    border-radius:10px;
+    border:1px solid #2a2a2f;
 }
 
 .header h2{
@@ -81,24 +86,11 @@ body{
 }
 
 .card{
+    background:#15151a;
+    border:1px solid #2a2a2f;
     padding:18px;
-    border-radius:14px;
-    background:rgba(18,18,26,0.8);
-    border:1px solid #1f1f2a;
-    transition:0.3s;
-    position:relative;
-    overflow:hidden;
+    border-radius:10px;
 }
-
-.card:hover{
-    transform:translateY(-5px);
-    border-color:#ff6a00;
-}
-
-/* COLORS */
-.green{ border-left:4px solid #22c55e; }
-.orange{ border-left:4px solid #ff6a00; }
-.red{ border-left:4px solid #ef4444; }
 
 .card b{
     font-size:26px;
@@ -106,74 +98,74 @@ body{
     margin-top:5px;
 }
 
+.green{ border-left:4px solid #22c55e; }
+.orange{ border-left:4px solid #ff6a00; }
+.red{ border-left:4px solid #ef4444; }
+
 /* TABLE */
+.table{
+    margin-top:25px;
+}
+
 table{
     width:100%;
-    margin-top:25px;
     border-collapse:collapse;
-    background:rgba(18,18,26,0.8);
-    border-radius:12px;
-    overflow:hidden;
+    background:#15151a;
+    border:1px solid #2a2a2f;
 }
 
 th{
-    background:#0f0f14;
+    background:#1b1b22;
     color:#ff6a00;
     padding:12px;
-    text-transform:uppercase;
+    text-align:left;
     font-size:12px;
+    text-transform:uppercase;
+    border-bottom:1px solid #2a2a2f;
 }
 
 td{
     padding:12px;
-    text-align:center;
-    border-bottom:1px solid #1f1f2a;
+    border-bottom:1px solid #2a2a2f;
+    color:#ddd;
 }
 
-/* BADGES */
-.badge{
-    padding:4px 8px;
-    border-radius:6px;
-    font-size:12px;
-}
-
-.aprovado{ background:#14532d; color:#22c55e; }
-.analise{ background:#3b2f12; color:#ffb020; }
-.bloqueado{ background:#3b1212; color:#ef4444; }
-
-/* BUTTONS */
-button{
+/* BOTÕES */
+.btn{
     padding:6px 10px;
     border:none;
     border-radius:6px;
     cursor:pointer;
-    transition:0.3s;
-}
-
-.block{ background:#ef4444; color:#fff; }
-.unblock{ background:#22c55e; color:#000; }
-
-button:hover{ transform:scale(1.1); }
-
-/* GLASS BACKGROUND */
-body::before{
-    content:"";
-    position:fixed;
-    width:200%;
-    height:200%;
-    background:radial-gradient(circle, rgba(255,106,0,0.05), transparent 60%);
-    animation:move 15s linear infinite;
-    z-index:-1;
-}
-
-@keyframes move{
-    from{transform:translate(0,0);}
-    to{transform:translate(-200px,-200px);}
-}
-
-.small{
+    margin-right:5px;
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
     font-size:12px;
-    color:#888;
+}
+
+.block{
+    background:#ef4444;
+    color:#fff;
+}
+
+.unblock{
+    background:#22c55e;
+    color:#000;
+}
+
+.details{
+    background:#333;
+    color:#fff;
+}
+
+/* HOVER */
+.btn:hover{
+    opacity:0.8;
+}
+
+/* ICON */
+.icon{
+    font-size:14px;
 }
 </style>
 </head>
@@ -188,9 +180,16 @@ body::before{
     </div>
 
     <div class="menu">
+
+        <div class="menu-title">MENU PRINCIPAL</div>
+
         <a href="/dashboard">📊 Dashboard</a>
         <a href="/bloqueados">🚫 Bloqueados</a>
+
+        <div class="menu-title">SISTEMA</div>
+
         <a href="/logout">🚪 Sair</a>
+
     </div>
 
 </div>
@@ -209,25 +208,24 @@ body::before{
         <div class="card green">
             ✔ APROVADOS
             <b>{{ aprovados }}</b>
-            <div class="small">Pedidos liberados com sucesso</div>
         </div>
 
         <div class="card orange">
             ⏳ ANÁLISE
             <b>{{ analise }}</b>
-            <div class="small">Em verificação antifraude</div>
         </div>
 
         <div class="card red">
             🚫 BLOQUEADOS
             <b>{{ bloqueados }}</b>
-            <div class="small">IPs ou pedidos suspeitos</div>
         </div>
 
     </div>
 
     <!-- TABLE -->
+    <div class="table">
     <table>
+
         <tr>
             <th>ID</th>
             <th>Pedido</th>
@@ -239,33 +237,39 @@ body::before{
         </tr>
 
         {% for p in pedidos %}
-
         <tr>
             <td>{{ p.id }}</td>
             <td>{{ p.order_id }}</td>
             <td>{{ p.ip }}</td>
             <td>R$ {{ p.valor }}</td>
-
-            <td>
-                <span class="badge {{ p.status }}">
-                    {{ p.status }}
-                </span>
-            </td>
-
+            <td>{{ p.status }}</td>
             <td>{{ p.motivo }}</td>
 
             <td>
-                <button class="block" onclick="bloquear('{{ p.ip }}')">🚫</button>
-                <button class="unblock" onclick="desbloquear('{{ p.ip }}')">🔓</button>
+
+                <button class="btn block" onclick="bloquear('{{ p.ip }}')">
+                    🚫 Bloquear
+                </button>
+
+                <button class="btn unblock" onclick="desbloquear('{{ p.ip }}')">
+                    🔓 Desbloquear
+                </button>
+
+                <button class="btn details" onclick="detalhes('{{ p.ip }}')">
+                    👁 Detalhes
+                </button>
+
             </td>
         </tr>
-
         {% endfor %}
+
     </table>
+    </div>
 
 </div>
 
 <script>
+
 function bloquear(ip){
     fetch("/bloquear-ip", {
         method:"POST",
@@ -287,6 +291,11 @@ function desbloquear(ip){
         location.reload();
     });
 }
+
+function detalhes(ip){
+    alert("Detalhes do IP: " + ip);
+}
+
 </script>
 
 </body>

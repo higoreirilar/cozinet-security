@@ -59,7 +59,7 @@ def login():
 
 
 # =========================
-# DASHBOARD (SEGURO)
+# DASHBOARD (BLINDADO)
 # =========================
 @app.route("/dashboard")
 def dashboard():
@@ -99,7 +99,7 @@ def dashboard():
     """)
     score_medio = cur.fetchone()[0]
 
-    # 🔥 SELECT 100% COMPATÍVEL (SEM CAMPOS QUE QUEBRAM)
+    # 🔥 SELECT SEGURO (SEM CAMPOS EXTRAS)
     cur.execute("""
         SELECT id, order_id, cliente, cpf, email,
                ip, valor, score_risco, status,
@@ -115,7 +115,6 @@ def dashboard():
     conn.close()
 
     pedidos = []
-
     for r in rows:
         pedidos.append({
             "id": r[0],
@@ -145,7 +144,7 @@ def dashboard():
 
 
 # =========================
-# BLOQUEAR
+# BLOQUEAR IP
 # =========================
 @app.route("/bloquear-ip", methods=["POST"])
 def bloquear_ip():
@@ -179,7 +178,7 @@ def bloquear_ip():
 
 
 # =========================
-# DESBLOQUEAR
+# DESBLOQUEAR IP
 # =========================
 @app.route("/desbloquear-ip", methods=["POST"])
 def desbloquear_ip():
@@ -226,7 +225,7 @@ def bloqueados():
     cur.execute("""
         SELECT id, ip, motivo, data_cadastro
         FROM ips_bloqueados
-        ORDER BY data_cadastro DESC
+        ORDER BY id DESC
     """)
 
     rows = cur.fetchall()
@@ -254,7 +253,7 @@ def ips_confiaveis():
     cur.execute("""
         SELECT id, ip, observacao, data_cadastro
         FROM ips_confiaveis
-        ORDER BY data_cadastro DESC
+        ORDER BY id DESC
     """)
 
     rows = cur.fetchall()
@@ -282,7 +281,7 @@ def logs():
     cur.execute("""
         SELECT id, tipo, mensagem, ip, created_at
         FROM logs
-        ORDER BY created_at DESC
+        ORDER BY id DESC
     """)
 
     rows = cur.fetchall()

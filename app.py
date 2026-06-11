@@ -7,7 +7,7 @@ app.secret_key = "cozinet_saas_2026"
 
 
 # =========================
-# DB CONNECTION
+# DB
 # =========================
 def get_conn():
     return psycopg2.connect(
@@ -19,9 +19,6 @@ def get_conn():
     )
 
 
-# =========================
-# LOGIN CHECK
-# =========================
 def login_required():
     return "user_id" in session
 
@@ -41,6 +38,7 @@ def home():
 def login():
 
     if request.method == "POST":
+
         email = request.form.get("email")
         senha = request.form.get("senha")
 
@@ -99,7 +97,6 @@ def dashboard():
     cur.execute("SELECT COUNT(*) FROM pedidos WHERE status='analise'")
     analise = cur.fetchone()[0]
 
-    # BLOQUEADOS CORRETO
     cur.execute("""
         SELECT COUNT(*)
         FROM pedidos
@@ -123,7 +120,7 @@ def dashboard():
     cur.execute("""
         SELECT id, order_id, cliente, cpf, email, cidade, estado,
                ip, dispositivo, valor, score_risco, status,
-               motivo, created_at, analisado_por, data_analise, pais
+               motivo, created_at
         FROM pedidos
         ORDER BY id DESC
         LIMIT 100
@@ -135,6 +132,7 @@ def dashboard():
     conn.close()
 
     pedidos = []
+
     for r in rows:
         pedidos.append({
             "id": r[0],
@@ -150,10 +148,7 @@ def dashboard():
             "score_risco": r[10] if r[10] else 0,
             "status": r[11],
             "motivo": r[12],
-            "created_at": str(r[13]) if r[13] else "",
-            "analisado_por": r[14],
-            "data_analise": str(r[15]) if r[15] else "",
-            "pais": r[16]
+            "created_at": str(r[13]) if r[13] else ""
         })
 
     return render_template(
@@ -170,7 +165,7 @@ def dashboard():
 
 
 # =========================
-# BLOQUEAR IP + LOG
+# BLOQUEAR IP
 # =========================
 @app.route("/bloquear-ip", methods=["POST"])
 def bloquear_ip():
@@ -186,7 +181,7 @@ def bloquear_ip():
 
     cur.execute("""
         INSERT INTO ips_bloqueados(ip, motivo)
-        VALUES(%s, %s)
+        VALUES(%s,%s)
         ON CONFLICT(ip) DO NOTHING
     """, (ip, "Bloqueio manual"))
 
@@ -196,11 +191,10 @@ def bloquear_ip():
         WHERE ip=%s
     """, (ip,))
 
-    # LOG
     cur.execute("""
         INSERT INTO logs(tipo, mensagem, ip)
         VALUES(%s,%s,%s)
-    """, ("BLOCK", f"IP bloqueado: {ip}", ip))
+    """, ("BLOCK", f"IP bloqueado {ip}", ip))
 
     conn.commit()
     cur.close()
@@ -210,7 +204,7 @@ def bloquear_ip():
 
 
 # =========================
-# DESBLOQUEAR IP + LOG
+# DESBLOQUEAR (IP OU ID)
 # =========================
 @app.route("/desbloquear-ip", methods=["POST"])
 def desbloquear_ip():
@@ -219,33 +213,51 @@ def desbloquear_ip():
         return jsonify({"error": "unauthorized"}), 401
 
     data = request.get_json()
+
     ip = data.get("ip")
+    pedido_id = data.get("id")
 
     conn = get_conn()
     cur = conn.cursor()
 
-    cur.execute("""
-        DELETE FROM ips_bloqueados
-        WHERE ip=%s
-    """, (ip,))
+    # CASO 1: por IP
+    if ip:
 
-    cur.execute("""
-        UPDATE pedidos
-        SET status='analise'
-        WHERE ip=%s
-    """, (ip,))
+        cur.execute("""
+            DELETE FROM ips_bloqueados
+            WHERE ip=%s
+        """, (ip,))
 
-    # LOG
-    cur.execute("""
-        INSERT INTO logs(tipo, mensagem, ip)
-        VALUES(%s,%s,%s)
-    """, ("UNBLOCK", f"IP desbloqueado: {ip}", ip))
+        cur.execute("""
+            UPDATE pedidos
+            SET status='analise'
+            WHERE ip=%s
+        """, (ip,))
+
+        cur.execute("""
+            INSERT INTO logs(tipo, mensagem, ip)
+            VALUES(%s,%s,%s)
+        """, ("UNBLOCK_IP", f"IP desbloqueado {ip}", ip))
+
+    # CASO 2: por ID
+    elif pedido_id:
+
+        cur.execute("""
+            UPDATE pedidos
+            SET status='analise'
+            WHERE id=%s
+        """, (pedido_id,))
+
+        cur.execute("""
+            INSERT INTO logs(tipo, mensagem, ip)
+            VALUES(%s,%s,%s)
+        """, ("UNBLOCK_ID", f"Pedido desbloqueado {pedido_id}", "manual"))
 
     conn.commit()
     cur.close()
     conn.close()
 
-    return jsonify({"success": True, "message": "IP desbloqueado"})
+    return jsonify({"success": True, "message": "Desbloqueado"})
 
 
 # =========================
@@ -271,16 +283,14 @@ def bloqueados():
     cur.close()
     conn.close()
 
-    data = []
-    for r in rows:
-        data.append({
-            "id": r[0],
-            "ip": r[1],
-            "motivo": r[2],
-            "data": str(r[3])
-        })
+    data = [{
+        "id": r[0],
+        "ip": r[1],
+        "motivo": r[2],
+        "data": str(r[3])
+    } for r in rows]
 
-    return render_template("bloqueados.html", bloqueados=data)
+    return render_template("bloqueados.html", bloqueados=data, usuario=session.get("nome"))
 
 
 # =========================
@@ -306,16 +316,14 @@ def ips_confiaveis():
     cur.close()
     conn.close()
 
-    data = []
-    for r in rows:
-        data.append({
-            "id": r[0],
-            "ip": r[1],
-            "observacao": r[2],
-            "data": str(r[3])
-        })
+    data = [{
+        "id": r[0],
+        "ip": r[1],
+        "observacao": r[2],
+        "data": str(r[3])
+    } for r in rows]
 
-    return render_template("ips_confiaveis.html", ips=data)
+    return render_template("ips_confiaveis.html", ips=data, usuario=session.get("nome"))
 
 
 # =========================
@@ -344,17 +352,15 @@ def logs():
     cur.close()
     conn.close()
 
-    logs = []
-    for r in rows:
-        logs.append({
-            "id": r[0],
-            "tipo": r[1],
-            "mensagem": r[2],
-            "ip": r[3],
-            "data": str(r[4])
-        })
+    data = [{
+        "id": r[0],
+        "tipo": r[1],
+        "mensagem": r[2],
+        "ip": r[3],
+        "data": str(r[4])
+    } for r in rows]
 
-    return render_template("logs.html", logs=logs)
+    return render_template("logs.html", logs=data, usuario=session.get("nome"))
 
 
 # =========================

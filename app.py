@@ -79,7 +79,7 @@ def logout():
 
 
 # =========================
-# DASHBOARD (CORRIGIDO E CONSISTENTE)
+# DASHBOARD
 # =========================
 @app.route("/dashboard")
 def dashboard():
@@ -90,19 +90,16 @@ def dashboard():
     conn = get_conn()
     cur = conn.cursor()
 
-    # TOTAL PEDIDOS
     cur.execute("SELECT COUNT(*) FROM pedidos")
     total_pedidos = cur.fetchone()[0]
 
-    # APROVADOS
     cur.execute("SELECT COUNT(*) FROM pedidos WHERE status='aprovado'")
     aprovados = cur.fetchone()[0]
 
-    # ANÁLISE
     cur.execute("SELECT COUNT(*) FROM pedidos WHERE status='analise'")
     analise = cur.fetchone()[0]
 
-    # 🚨 BLOQUEADOS (CORRETO E REAL)
+    # BLOQUEADOS CORRETO
     cur.execute("""
         SELECT COUNT(*)
         FROM pedidos
@@ -110,7 +107,6 @@ def dashboard():
     """)
     bloqueados = cur.fetchone()[0]
 
-    # 💰 VALOR PROTEGIDO
     cur.execute("""
         SELECT COALESCE(SUM(valor),0)
         FROM pedidos
@@ -118,14 +114,12 @@ def dashboard():
     """)
     valor_protegido = float(cur.fetchone()[0] or 0)
 
-    # SCORE MÉDIO
     cur.execute("""
         SELECT COALESCE(ROUND(AVG(score_risco),2),0)
         FROM pedidos
     """)
     score_medio = cur.fetchone()[0]
 
-    # PEDIDOS
     cur.execute("""
         SELECT id, order_id, cliente, cpf, email, cidade, estado,
                ip, dispositivo, valor, score_risco, status,
@@ -176,7 +170,7 @@ def dashboard():
 
 
 # =========================
-# BLOQUEAR IP
+# BLOQUEAR IP + LOG
 # =========================
 @app.route("/bloquear-ip", methods=["POST"])
 def bloquear_ip():
@@ -190,19 +184,23 @@ def bloquear_ip():
     conn = get_conn()
     cur = conn.cursor()
 
-    # salva IP bloqueado
     cur.execute("""
         INSERT INTO ips_bloqueados(ip, motivo)
         VALUES(%s, %s)
         ON CONFLICT(ip) DO NOTHING
     """, (ip, "Bloqueio manual"))
 
-    # marca pedidos
     cur.execute("""
         UPDATE pedidos
         SET status='bloqueado'
         WHERE ip=%s
     """, (ip,))
+
+    # LOG
+    cur.execute("""
+        INSERT INTO logs(tipo, mensagem, ip)
+        VALUES(%s,%s,%s)
+    """, ("BLOCK", f"IP bloqueado: {ip}", ip))
 
     conn.commit()
     cur.close()
@@ -212,7 +210,7 @@ def bloquear_ip():
 
 
 # =========================
-# DESBLOQUEAR IP (CORRIGIDO)
+# DESBLOQUEAR IP + LOG
 # =========================
 @app.route("/desbloquear-ip", methods=["POST"])
 def desbloquear_ip():
@@ -226,18 +224,22 @@ def desbloquear_ip():
     conn = get_conn()
     cur = conn.cursor()
 
-    # remove bloqueio
     cur.execute("""
         DELETE FROM ips_bloqueados
         WHERE ip=%s
     """, (ip,))
 
-    # volta pra análise
     cur.execute("""
         UPDATE pedidos
         SET status='analise'
         WHERE ip=%s
     """, (ip,))
+
+    # LOG
+    cur.execute("""
+        INSERT INTO logs(tipo, mensagem, ip)
+        VALUES(%s,%s,%s)
+    """, ("UNBLOCK", f"IP desbloqueado: {ip}", ip))
 
     conn.commit()
     cur.close()
@@ -247,7 +249,7 @@ def desbloquear_ip():
 
 
 # =========================
-# IPS BLOQUEADOS (ROTA QUE FALTAVA)
+# BLOQUEADOS
 # =========================
 @app.route("/bloqueados")
 def bloqueados():
@@ -269,20 +271,20 @@ def bloqueados():
     cur.close()
     conn.close()
 
-    bloqueados = []
+    data = []
     for r in rows:
-        bloqueados.append({
+        data.append({
             "id": r[0],
             "ip": r[1],
             "motivo": r[2],
-            "data": str(r[3]) if r[3] else ""
+            "data": str(r[3])
         })
 
-    return render_template("bloqueados.html", bloqueados=bloqueados)
+    return render_template("bloqueados.html", bloqueados=data)
 
 
 # =========================
-# IPS CONFIÁVEIS (ROTA NOVA)
+# IPS CONFIÁVEIS
 # =========================
 @app.route("/ips-confiaveis")
 def ips_confiaveis():
@@ -304,16 +306,55 @@ def ips_confiaveis():
     cur.close()
     conn.close()
 
-    ips = []
+    data = []
     for r in rows:
-        ips.append({
+        data.append({
             "id": r[0],
             "ip": r[1],
             "observacao": r[2],
             "data": str(r[3])
         })
 
-    return render_template("ips_confiaveis.html", ips=ips)
+    return render_template("ips_confiaveis.html", ips=data)
+
+
+# =========================
+# LOGS
+# =========================
+@app.route("/logs")
+def logs():
+
+    if not login_required():
+        return redirect("/login")
+
+    conn = get_conn()
+    cur = conn.cursor()
+
+    try:
+        cur.execute("""
+            SELECT id, tipo, mensagem, ip, created_at
+            FROM logs
+            ORDER BY created_at DESC
+            LIMIT 200
+        """)
+        rows = cur.fetchall()
+    except:
+        rows = []
+
+    cur.close()
+    conn.close()
+
+    logs = []
+    for r in rows:
+        logs.append({
+            "id": r[0],
+            "tipo": r[1],
+            "mensagem": r[2],
+            "ip": r[3],
+            "data": str(r[4])
+        })
+
+    return render_template("logs.html", logs=logs)
 
 
 # =========================

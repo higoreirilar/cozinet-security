@@ -32,6 +32,7 @@ def login():
         """, (email, senha))
 
         user = cur.fetchone()
+
         cur.close()
         conn.close()
 
@@ -61,11 +62,15 @@ def painel():
     if not login_required():
         return redirect("/login")
 
-    return render_template("painel.html", usuario=session.get("nome"))
+    return render_template(
+        "painel.html",
+        usuario=session.get("nome")
+    )
 
 # ---------------- DASHBOARD API ----------------
 @app.route("/dashboard")
 def dashboard():
+
     if not login_required():
         return jsonify({"error": "unauthorized"}), 401
 
@@ -73,7 +78,14 @@ def dashboard():
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT id, order_id, ip, valor, status, motivo, created_at
+        SELECT
+            id,
+            order_id,
+            ip,
+            valor,
+            status,
+            motivo,
+            created_at
         FROM pedidos
         ORDER BY id DESC
     """)
@@ -84,6 +96,7 @@ def dashboard():
     conn.close()
 
     data = []
+
     for r in rows:
         data.append({
             "id": r[0],
@@ -100,6 +113,7 @@ def dashboard():
 # ---------------- API RESUMO ----------------
 @app.route("/stats")
 def stats():
+
     if not login_required():
         return jsonify({"error": "unauthorized"}), 401
 
@@ -107,6 +121,7 @@ def stats():
     cur = conn.cursor()
 
     cur.execute("SELECT status FROM pedidos")
+
     rows = cur.fetchall()
 
     cur.close()
@@ -122,6 +137,116 @@ def stats():
         "bloqueados": bloqueados
     })
 
+# ---------------- BLOQUEAR IP ----------------
+@app.route("/bloquear-ip", methods=["POST"])
+def bloquear_ip():
+
+    if not login_required():
+        return jsonify({"error": "unauthorized"}), 401
+
+    dados = request.get_json()
+    ip = dados.get("ip")
+
+    if not ip:
+        return jsonify({"error": "ip obrigatório"}), 400
+
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS ips_bloqueados (
+            id SERIAL PRIMARY KEY,
+            ip VARCHAR(100) UNIQUE,
+            motivo TEXT,
+            data_bloqueio TIMESTAMP DEFAULT NOW()
+        )
+    """)
+
+    cur.execute("""
+        INSERT INTO ips_bloqueados (
+            ip,
+            motivo
+        )
+        VALUES (%s,%s)
+        ON CONFLICT (ip) DO NOTHING
+    """, (
+        ip,
+        "Bloqueio manual pelo administrador"
+    ))
+
+    conn.commit()
+
+    cur.close()
+    conn.close()
+
+    return jsonify({
+        "success": True,
+        "message": f"IP {ip} bloqueado com sucesso"
+    })
+
+# ---------------- LISTAR IPS BLOQUEADOS ----------------
+@app.route("/ips-bloqueados")
+def listar_ips_bloqueados():
+
+    if not login_required():
+        return jsonify({"error": "unauthorized"}), 401
+
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT
+            id,
+            ip,
+            motivo,
+            data_bloqueio
+        FROM ips_bloqueados
+        ORDER BY data_bloqueio DESC
+    """)
+
+    rows = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return jsonify([
+        {
+            "id": r[0],
+            "ip": r[1],
+            "motivo": r[2],
+            "data": str(r[3])
+        }
+        for r in rows
+    ])
+
+# ---------------- DESBLOQUEAR IP ----------------
+@app.route("/desbloquear-ip", methods=["POST"])
+def desbloquear_ip():
+
+    if not login_required():
+        return jsonify({"error": "unauthorized"}), 401
+
+    dados = request.get_json()
+    ip = dados.get("ip")
+
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute("""
+        DELETE FROM ips_bloqueados
+        WHERE ip=%s
+    """, (ip,))
+
+    conn.commit()
+
+    cur.close()
+    conn.close()
+
+    return jsonify({
+        "success": True,
+        "message": f"IP {ip} removido da lista de bloqueio"
+    })
+
 # ---------------- HOME ----------------
 @app.route("/")
 def home():
@@ -129,4 +254,7 @@ def home():
 
 # ---------------- START ----------------
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000)
+    app.run(
+        host="0.0.0.0",
+        port=8000
+    )

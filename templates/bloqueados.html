@@ -11,57 +11,69 @@
 <style>
 
 :root{
-    --bg:#0f172a;
-    --card:#1e293b;
-    --sidebar:#111827;
-    --border:#334155;
-    --red:#ef4444;
+    --bg:#0b0b0b;
+    --sidebar:#111111;
+    --card:#171717;
+    --border:#292929;
+    --orange:#ff7a00;
+    --orange2:#ff9333;
+    --muted:#8f8f8f;
+    --red:#dc2626;
+    --green:#22c55e;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
 }
 
 body{
     background:var(--bg);
     color:white;
-    margin:0;
     font-family:Arial,sans-serif;
 }
 
+/* SIDEBAR */
 .sidebar{
     position:fixed;
     left:0;
     top:0;
-    width:260px;
+    width:280px;
     height:100vh;
     background:var(--sidebar);
     border-right:1px solid var(--border);
-    padding:20px;
+    padding:25px;
 }
 
 .logo{
     text-align:center;
-    margin-bottom:25px;
+    margin-bottom:35px;
 }
 
 .logo img{
-    width:190px;
+    width:230px;
 }
 
 .sidebar a{
     display:block;
-    color:#cbd5e1;
     text-decoration:none;
-    padding:12px;
-    border-radius:10px;
-    margin-bottom:8px;
+    color:#d1d5db;
+    padding:14px;
+    border-radius:14px;
+    margin-bottom:10px;
+    transition:.3s;
 }
 
 .sidebar a:hover{
-    background:#1e293b;
+    background:var(--orange);
     color:white;
 }
 
+/* CONTENT */
 .content{
-    margin-left:260px;
-    padding:25px;
+    margin-left:280px;
+    padding:30px;
 }
 
 .topbar{
@@ -74,6 +86,25 @@ body{
     align-items:center;
 }
 
+.title{
+    font-size:24px;
+    font-weight:800;
+}
+
+.subtitle{
+    color:var(--muted);
+    font-size:13px;
+}
+
+.badge-total{
+    background:var(--red);
+    padding:10px 15px;
+    border-radius:10px;
+    font-size:14px;
+    font-weight:700;
+}
+
+/* CARD */
 .card-box{
     margin-top:20px;
     background:var(--card);
@@ -82,6 +113,7 @@ body{
     padding:20px;
 }
 
+/* TABLE */
 .table{
     color:white;
 }
@@ -90,20 +122,20 @@ body{
     background:#0b1220;
 }
 
-.badge-total{
-    background:var(--red);
-    padding:10px 15px;
-    border-radius:10px;
-    font-size:14px;
-}
-
 .btn-desbloquear{
-    background:#22c55e;
+    background:var(--green);
     border:none;
+    font-weight:600;
 }
 
 .btn-desbloquear:hover{
     background:#16a34a;
+}
+
+/* RESPONSIVO */
+@media(max-width:991px){
+    .sidebar{position:relative;width:100%;height:auto;}
+    .content{margin-left:0;}
 }
 
 </style>
@@ -112,6 +144,7 @@ body{
 
 <body>
 
+<!-- SIDEBAR -->
 <div class="sidebar">
 
     <div class="logo">
@@ -119,28 +152,25 @@ body{
     </div>
 
     <a href="/dashboard">🏠 Dashboard</a>
-
     <a href="/bloqueados">🚫 IPs Bloqueados</a>
-
     <a href="/ips-confiaveis">🟢 IPs Confiáveis</a>
-
     <a href="/logs">📜 Logs</a>
-
     <a href="/logout">🚪 Sair</a>
 
 </div>
 
+<!-- CONTENT -->
 <div class="content">
 
     <div class="topbar">
 
         <div>
-            <h2>🚫 IPs Bloqueados</h2>
-            <small>Lista de IPs bloqueados manualmente</small>
+            <div class="title">🚫 IPs Bloqueados</div>
+            <div class="subtitle">Gerenciamento de bloqueios do sistema</div>
         </div>
 
         <div class="badge-total">
-            Total: {{ bloqueados|length }}
+            Total: {{ bloqueados|length if bloqueados else 0 }}
         </div>
 
     </div>
@@ -156,7 +186,7 @@ body{
                         <th>ID</th>
                         <th>IP</th>
                         <th>Motivo</th>
-                        <th>Data Bloqueio</th>
+                        <th>Data</th>
                         <th>Ação</th>
                     </tr>
                 </thead>
@@ -166,29 +196,16 @@ body{
                 {% for ip in bloqueados %}
 
                     <tr>
-
                         <td>{{ ip.id }}</td>
-
-                        <td>
-                            <strong>{{ ip.ip }}</strong>
-                        </td>
-
+                        <td><b>{{ ip.ip }}</b></td>
                         <td>{{ ip.motivo }}</td>
-
                         <td>{{ ip.data }}</td>
-
                         <td>
-
-                            <button
-                                class="btn btn-desbloquear text-white"
+                            <button class="btn btn-desbloquear text-white"
                                 onclick="desbloquear({{ ip.id }})">
-
                                 🔓 Desbloquear
-
                             </button>
-
                         </td>
-
                     </tr>
 
                 {% endfor %}
@@ -207,27 +224,19 @@ body{
 
 function desbloquear(id){
 
-    if(!confirm("Deseja desbloquear este IP?")){
-        return;
-    }
+    if(!confirm("Deseja desbloquear este IP?")) return;
 
     fetch("/desbloquear-ip/" + id,{
         method:"POST"
     })
-    .then(response => response.json())
+    .then(r => r.json())
     .then(data => {
-
         alert(data.message);
-
         location.reload();
-
     })
-    .catch(error => {
-
+    .catch(err => {
         alert("Erro ao desbloquear IP");
-
-        console.log(error);
-
+        console.log(err);
     });
 
 }

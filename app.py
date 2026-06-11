@@ -24,21 +24,12 @@ def login_required():
 
 
 # =========================
-# HOME
-# =========================
-@app.route("/")
-def home():
-    return redirect("/login")
-
-
-# =========================
 # LOGIN
 # =========================
 @app.route("/login", methods=["GET", "POST"])
 def login():
 
     if request.method == "POST":
-
         email = request.form.get("email")
         senha = request.form.get("senha")
 
@@ -68,7 +59,7 @@ def login():
 
 
 # =========================
-# DASHBOARD
+# DASHBOARD (SEGURO)
 # =========================
 @app.route("/dashboard")
 def dashboard():
@@ -108,9 +99,9 @@ def dashboard():
     """)
     score_medio = cur.fetchone()[0]
 
+    # 🔥 SELECT 100% COMPATÍVEL (SEM CAMPOS QUE QUEBRAM)
     cur.execute("""
-        SELECT id, order_id, cliente, cpf, email, telefone,
-               rua, numero, bairro, cidade, estado,
+        SELECT id, order_id, cliente, cpf, email,
                ip, valor, score_risco, status,
                motivo, created_at
         FROM pedidos
@@ -124,6 +115,7 @@ def dashboard():
     conn.close()
 
     pedidos = []
+
     for r in rows:
         pedidos.append({
             "id": r[0],
@@ -131,18 +123,12 @@ def dashboard():
             "cliente": r[2],
             "cpf": r[3],
             "email": r[4],
-            "telefone": r[5],
-            "rua": r[6],
-            "numero": r[7],
-            "bairro": r[8],
-            "cidade": r[9],
-            "estado": r[10],
-            "ip": r[11],
-            "valor": float(r[12]) if r[12] else 0,
-            "score_risco": r[13],
-            "status": r[14],
-            "motivo": r[15],
-            "created_at": str(r[16])
+            "ip": r[5],
+            "valor": float(r[6]) if r[6] else 0,
+            "score_risco": r[7],
+            "status": r[8],
+            "motivo": r[9],
+            "created_at": str(r[10])
         })
 
     return render_template(
@@ -159,7 +145,7 @@ def dashboard():
 
 
 # =========================
-# BLOQUEAR IP
+# BLOQUEAR
 # =========================
 @app.route("/bloquear-ip", methods=["POST"])
 def bloquear_ip():
@@ -177,7 +163,7 @@ def bloquear_ip():
         INSERT INTO ips_bloqueados(ip, motivo)
         VALUES(%s,%s)
         ON CONFLICT(ip) DO NOTHING
-    """, (ip, "Bloqueio manual"))
+    """, (ip, "manual"))
 
     cur.execute("""
         UPDATE pedidos
@@ -185,20 +171,15 @@ def bloquear_ip():
         WHERE ip=%s
     """, (ip,))
 
-    cur.execute("""
-        INSERT INTO logs(tipo, mensagem, ip)
-        VALUES(%s,%s,%s)
-    """, ("BLOCK", f"IP bloqueado {ip}", ip))
-
     conn.commit()
     cur.close()
     conn.close()
 
-    return jsonify({"success": True, "message": "IP bloqueado"})
+    return jsonify({"message": "bloqueado"})
 
 
 # =========================
-# DESBLOQUEAR IP
+# DESBLOQUEAR
 # =========================
 @app.route("/desbloquear-ip", methods=["POST"])
 def desbloquear_ip():
@@ -223,16 +204,11 @@ def desbloquear_ip():
         WHERE ip=%s
     """, (ip,))
 
-    cur.execute("""
-        INSERT INTO logs(tipo, mensagem, ip)
-        VALUES(%s,%s,%s)
-    """, ("UNBLOCK", f"IP desbloqueado {ip}", ip))
-
     conn.commit()
     cur.close()
     conn.close()
 
-    return jsonify({"success": True, "message": "IP desbloqueado"})
+    return jsonify({"message": "desbloqueado"})
 
 
 # =========================
@@ -258,18 +234,13 @@ def bloqueados():
     cur.close()
     conn.close()
 
-    data = [{
-        "id": r[0],
-        "ip": r[1],
-        "motivo": r[2],
-        "data": str(r[3])
-    } for r in rows]
+    data = [{"id": r[0], "ip": r[1], "motivo": r[2], "data": str(r[3])} for r in rows]
 
     return render_template("bloqueados.html", bloqueados=data, usuario=session.get("nome"))
 
 
 # =========================
-# IPS CONFIÁVEIS
+# CONFIÁVEIS
 # =========================
 @app.route("/ips-confiaveis")
 def ips_confiaveis():
@@ -291,12 +262,7 @@ def ips_confiaveis():
     cur.close()
     conn.close()
 
-    data = [{
-        "id": r[0],
-        "ip": r[1],
-        "observacao": r[2],
-        "data": str(r[3])
-    } for r in rows]
+    data = [{"id": r[0], "ip": r[1], "observacao": r[2], "data": str(r[3])} for r in rows]
 
     return render_template("ips_confiaveis.html", ips=data, usuario=session.get("nome"))
 
@@ -317,7 +283,6 @@ def logs():
         SELECT id, tipo, mensagem, ip, created_at
         FROM logs
         ORDER BY created_at DESC
-        LIMIT 200
     """)
 
     rows = cur.fetchall()
@@ -325,19 +290,11 @@ def logs():
     cur.close()
     conn.close()
 
-    data = [{
-        "id": r[0],
-        "tipo": r[1],
-        "mensagem": r[2],
-        "ip": r[3],
-        "data": str(r[4])
-    } for r in rows]
+    data = [{"id": r[0], "tipo": r[1], "mensagem": r[2], "ip": r[3], "data": str(r[4])} for r in rows]
 
     return render_template("logs.html", logs=data, usuario=session.get("nome"))
 
 
-# =========================
-# RUN
 # =========================
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)

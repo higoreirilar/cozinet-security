@@ -248,6 +248,36 @@ tr:hover{
     color:#ef4444;
 }
 
+
+.action-btn{
+    border:none;
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:12px;
+    font-weight:600;
+    margin:2px;
+}
+
+.btn-block{
+    background:#ef4444;
+    color:white;
+}
+
+.btn-block:hover{
+    background:#dc2626;
+}
+
+.btn-info{
+    background:#2563eb;
+    color:white;
+}
+
+.btn-info:hover{
+    background:#1d4ed8;
+}
+
+
 @media(max-width:1200px){
 
 .sidebar{
@@ -362,6 +392,7 @@ tr:hover{
             <th>Status</th>
             <th>Motivo</th>
             <th>Data</th>
+            <th>Ações</th>
         </tr>
 
         </thead>
@@ -495,6 +526,22 @@ async function carregarPedidos(){
                     ${pedido.created_at || ''}
                 </td>
 
+                <td>
+
+                    <button
+                        class="action-btn btn-block"
+                        onclick="bloquearIP('${pedido.ip}')">
+                        🚫 Bloquear
+                    </button>
+
+                    <button
+                        class="action-btn btn-info"
+                        onclick="verDetalhes('${pedido.order_id}')">
+                        👁 Detalhes
+                    </button>
+
+                </td>
+
             </tr>
             `;
         });
@@ -507,7 +554,50 @@ async function carregarPedidos(){
 
 }
 
+
+async function bloquearIP(ip){
+
+    if(!ip){
+        alert("IP inválido");
+        return;
+    }
+
+    const confirmar = confirm(`Deseja bloquear o IP ${ip}?`);
+
+    if(!confirmar){
+        return;
+    }
+
+    try{
+
+        const response = await fetch('/bloquear-ip',{
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify({ip:ip})
+        });
+
+        const data = await response.json();
+
+        alert(data.message || 'IP bloqueado com sucesso');
+
+        atualizarPainel();
+
+    }catch(error){
+
+        console.error(error);
+        alert('Erro ao bloquear IP');
+
+    }
+}
+
+function verDetalhes(orderId){
+    alert('Pedido: ' + orderId);
+}
+
 /* INICIALIZAÇÃO */
+
 
 async function atualizarPainel(){
 

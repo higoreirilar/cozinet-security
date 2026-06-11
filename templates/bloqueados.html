@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>IPs Bloqueados</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #0f172a;
+            color: #fff;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #38bdf8;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: #1e293b;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #334155;
+            text-align: left;
+        }
+
+        th {
+            background: #0b1220;
+        }
+
+        tr:hover {
+            background: #334155;
+        }
+
+        .btn {
+            padding: 6px 10px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .desbloquear {
+            background: #ef4444;
+            color: white;
+        }
+
+        .search {
+            margin-top: 10px;
+            padding: 10px;
+            width: 300px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>🔒 IPs Bloqueados</h1>
+
+<input type="text" class="search" id="search" placeholder="Pesquisar IP..." onkeyup="filtrarTabela()">
+
+<table id="tabela">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>IP</th>
+            <th>Motivo</th>
+            <th>Data</th>
+            <th>Ação</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for ip in bloqueados %}
+        <tr>
+            <td>{{ ip.id }}</td>
+            <td>{{ ip.ip }}</td>
+            <td>{{ ip.motivo }}</td>
+            <td>{{ ip.data }}</td>
+            <td>
+                <a href="/desbloquear/{{ ip.id }}">
+                    <button class="btn desbloquear">Desbloquear</button>
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+function filtrarTabela() {
+    let input = document.getElementById("search").value.toLowerCase();
+    let linhas = document.querySelectorAll("#tabela tbody tr");
+
+    linhas.forEach(linha => {
+        let ip = linha.children[1].innerText.toLowerCase();
+        linha.style.display = ip.includes(input) ? "" : "none";
+    });
+}
+</script>
+
+</body>
+</html>

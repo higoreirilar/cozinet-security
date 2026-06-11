@@ -11,9 +11,9 @@
 <style>
 
 :root{
-    --bg:#f4f6fb;
+    --bg:#f5f6fa;
     --card:#ffffff;
-    --border:#e5e7eb;
+    --border:#e6e8ef;
 
     --red:#e11d48;
     --green:#16a34a;
@@ -65,7 +65,7 @@ body{
     padding:25px;
 }
 
-/* SYSTEM TOPBAR */
+/* TOP SYSTEM BAR */
 .topbar{
     display:flex;
     justify-content:space-between;
@@ -85,15 +85,7 @@ body{
     align-items:center;
 }
 
-.user-box{
-    background:var(--red);
-    color:white;
-    padding:8px 14px;
-    border-radius:12px;
-    font-weight:700;
-}
-
-/* KPI */
+/* KPIs */
 .kpi-grid{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
@@ -109,33 +101,33 @@ body{
     text-align:center;
 }
 
-.kpi-title{
-    font-size:12px;
-    color:#666;
-}
-
 .kpi-value{
     font-size:22px;
     font-weight:900;
 }
 
-.green{ color:var(--green); }
-.red{ color:var(--red); }
-.yellow{ color:var(--yellow); }
-.blue{ color:var(--blue); }
+.kpi-title{
+    font-size:12px;
+    color:#777;
+}
 
-/* GRID 2 COLUNAS */
+.green{color:var(--green);}
+.red{color:var(--red);}
+.yellow{color:var(--yellow);}
+.blue{color:var(--blue);}
+
+/* GRID */
 .grid{
     display:grid;
-    grid-template-columns:repeat(2, 1fr);
+    grid-template-columns:repeat(2,1fr);
     gap:15px;
 }
 
 @media(max-width:900px){
-    .grid{ grid-template-columns:1fr; }
+    .grid{grid-template-columns:1fr;}
 }
 
-/* CARD PEDIDO */
+/* CARD */
 .card{
     background:#fff;
     border:1px solid var(--border);
@@ -152,18 +144,38 @@ body{
     color:#fff;
 }
 
-.aprovado{ background:var(--green); }
-.analise{ background:var(--yellow); color:#111; }
-.bloqueado{ background:var(--red); }
+.aprovado{background:var(--green);}
+.analise{background:var(--yellow); color:#000;}
+.bloqueado{background:var(--red);}
 
 /* ITEM */
 .item{
-    background:#f9fafb;
-    border:1px solid #eee;
-    padding:7px 10px;
-    border-radius:10px;
-    font-size:13px;
+    background:#f8fafc;
+    padding:6px 10px;
+    border-radius:8px;
     margin-top:5px;
+    font-size:13px;
+    border:1px solid #eee;
+}
+
+/* MODAL */
+.modal-bg{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.5);
+    display:none;
+    justify-content:center;
+    align-items:center;
+}
+
+.modal-box{
+    background:#fff;
+    width:500px;
+    border-radius:12px;
+    padding:20px;
 }
 
 </style>
@@ -173,7 +185,6 @@ body{
 
 <!-- SIDEBAR -->
 <div class="sidebar">
-
     <img src="https://i.ibb.co/vxN1xS0R/logo-vermelho.png">
 
     <div class="menu">
@@ -183,59 +194,36 @@ body{
         <a href="/logs">📜 Logs</a>
         <a href="/logout">🚪 Sair</a>
     </div>
-
 </div>
 
 <!-- CONTENT -->
 <div class="content">
 
-    <!-- SYSTEM STATUS (SEU NOVO TOPO) -->
+    <!-- SYSTEM BAR -->
     <div class="topbar">
-
         <div class="system-bar">
 
-            <div style="font-weight:900;color:#e11d48;">
-                🖥️ Sistema rodando
-            </div>
-
-            <div style="color:#16a34a;">
-                🟢 {{ system.status }}
-            </div>
-
-            <div style="color:#2563eb;">
-                🌐 {{ system.host }}
-            </div>
-
-            <div style="color:#6b7280;">
-                ⏱ {{ system.uptime }}s
-            </div>
-
-            <div style="color:#111827;">
-                ⚙ {{ system.env }}
-            </div>
-
-            <div style="color:#f59e0b;">
-                📡 {{ system.port }}
-            </div>
-
-            <div style="color:#8b5cf6;">
-                🧠 {{ system.worker }}
-            </div>
+            <div><b>🖥️ Sistema rodando</b></div>
+            <div style="color:green;">🟢 {{ system.status }}</div>
+            <div>🌐 {{ system.host }}</div>
+            <div>⏱ {{ system.uptime }}s</div>
+            <div>⚙ {{ system.env }}</div>
+            <div>📡 {{ system.port }}</div>
+            <div>🧠 Flask</div>
 
         </div>
 
-        <div class="user-box">
+        <div style="font-weight:700;color:#e11d48;">
             👤 {{ usuario }}
         </div>
-
     </div>
 
-    <!-- KPIs -->
+    <!-- KPI -->
     <div class="kpi-grid">
 
         <div class="kpi">
             <div class="kpi-title">Total</div>
-            <div class="kpi-value">{{ total }}</div>
+            <div class="kpi-value">{{ total_pedidos }}</div>
         </div>
 
         <div class="kpi">
@@ -255,12 +243,12 @@ body{
 
         <div class="kpi">
             <div class="kpi-title">Protegido</div>
-            <div class="kpi-value blue">R$ {{ valor }}</div>
+            <div class="kpi-value blue">R$ {{ valor_protegido }}</div>
         </div>
 
         <div class="kpi">
-            <div class="kpi-title">Score Médio</div>
-            <div class="kpi-value">{{ score }}</div>
+            <div class="kpi-title">Score</div>
+            <div class="kpi-value">{{ score_medio }}</div>
         </div>
 
     </div>
@@ -280,7 +268,7 @@ body{
 
                 <div>
                     {% if p.status == 'aprovado' %}
-                        <span class="status aprovado">APROVADO</span>
+                        <span class="status aprovado">OK</span>
                     {% elif p.status == 'analise' %}
                         <span class="status analise">ANÁLISE</span>
                     {% else %}
@@ -291,8 +279,10 @@ body{
 
             <div class="item">CPF: {{ p.cpf }}</div>
             <div class="item">Email: {{ p.email }}</div>
+            <div class="item">Telefone: {{ p.telefone }}</div>
+            <div class="item">Cidade: {{ p.cidade }} - {{ p.estado }}</div>
             <div class="item">IP: {{ p.ip }}</div>
-            <div class="item">Valor: R$ {{ p.valor }}</div>
+            <div class="item">Dispositivo: {{ p.dispositivo }}</div>
             <div class="item">Score: {{ p.score_risco }}</div>
 
         </div>

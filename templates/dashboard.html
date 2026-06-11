@@ -2,43 +2,72 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Cozinet - Antifraude</title>
+<title>Cozinet Premium Dashboard</title>
 
 <style>
 body {
     margin: 0;
-    font-family: 'Arial';
-    background: #0a0a0f;
-    color: #fff;
+    font-family: Arial, sans-serif;
+    background: #07070c;
+    color: white;
+    display: flex;
 }
 
-/* TOP BAR */
+/* SIDEBAR */
+.sidebar {
+    width: 260px;
+    height: 100vh;
+    background: #0e0e14;
+    border-right: 2px solid #ff6a00;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 25px;
+}
+
+.sidebar img {
+    width: 170px;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 12px #ff6a00);
+}
+
+.menu {
+    width: 100%;
+}
+
+.menu a {
+    display: block;
+    padding: 12px 20px;
+    color: white;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.menu a:hover {
+    background: rgba(255,106,0,0.1);
+    border-left: 3px solid #ff6a00;
+    color: #ff6a00;
+}
+
+/* MAIN */
+.main {
+    flex: 1;
+    padding: 20px;
+}
+
+/* TOPBAR */
 .topbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 25px;
-    background: #0f0f14;
-    border-bottom: 2px solid #ff6a00;
-    box-shadow: 0 0 15px rgba(255, 106, 0, 0.2);
+    padding: 15px;
+    background: #0f0f18;
+    border-bottom: 1px solid #1f1f2a;
 }
 
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.brand img {
-    width: 40px;
-    height: 40px;
-    filter: drop-shadow(0 0 8px #ff6a00);
-}
-
-.brand h2 {
-    color: #ff6a00;
+.topbar h2 {
     margin: 0;
-    letter-spacing: 1px;
+    color: #ff6a00;
 }
 
 /* CARDS */
@@ -46,15 +75,16 @@ body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 15px;
-    padding: 20px;
+    margin-top: 20px;
 }
 
+/* CARD BASE */
 .card {
-    background: #12121a;
-    border: 1px solid #1f1f2a;
-    padding: 20px;
+    padding: 22px;
     border-radius: 14px;
     text-align: center;
+    background: #11111a;
+    border: 1px solid #1f1f2a;
     transition: 0.3s;
     position: relative;
     overflow: hidden;
@@ -62,41 +92,58 @@ body {
 
 .card:hover {
     transform: translateY(-6px);
+}
+
+/* CORES PREMIUM */
+.green {
+    border-color: #22c55e;
+    box-shadow: 0 0 18px rgba(34,197,94,0.2);
+}
+
+.orange {
     border-color: #ff6a00;
-    box-shadow: 0 0 25px rgba(255, 106, 0, 0.25);
+    box-shadow: 0 0 18px rgba(255,106,0,0.2);
 }
 
+.red {
+    border-color: #ef4444;
+    box-shadow: 0 0 18px rgba(239,68,68,0.2);
+}
+
+/* NUMEROS */
 .card b {
-    font-size: 24px;
-    color: #ff6a00;
+    font-size: 28px;
+    display: block;
+    margin-top: 8px;
 }
 
-/* TABLE */
-.table-container {
-    padding: 20px;
-}
+/* cores texto */
+.green b { color: #22c55e; }
+.orange b { color: #ff6a00; }
+.red b { color: #ef4444; }
 
+/* TABELA */
 table {
     width: 100%;
+    margin-top: 25px;
     border-collapse: collapse;
-    background: #12121a;
+    background: #11111a;
     border-radius: 12px;
     overflow: hidden;
 }
 
-th {
-    background: #0f0f14;
-    color: #ff6a00;
-    padding: 12px;
-}
-
-td {
+th, td {
     padding: 12px;
     text-align: center;
     border-bottom: 1px solid #1f1f2a;
 }
 
-/* BUTTONS */
+th {
+    background: #0f0f14;
+    color: #ff6a00;
+}
+
+/* BOTÕES */
 button {
     padding: 6px 10px;
     border: none;
@@ -106,12 +153,12 @@ button {
 }
 
 .block {
-    background: #ff3b30;
+    background: #ef4444;
     color: white;
 }
 
 .unblock {
-    background: #ff6a00;
+    background: #22c55e;
     color: black;
     font-weight: bold;
 }
@@ -120,14 +167,14 @@ button:hover {
     transform: scale(1.08);
 }
 
-/* BACKGROUND EFFECT */
+/* FUNDO ANIMADO */
 body::before {
     content: "";
     position: fixed;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(255,106,0,0.08) 0%, transparent 60%);
-    animation: move 12s linear infinite;
+    background: radial-gradient(circle, rgba(255,106,0,0.06), transparent 60%);
+    animation: move 14s linear infinite;
     z-index: -1;
 }
 
@@ -135,90 +182,80 @@ body::before {
     from { transform: translate(0,0); }
     to { transform: translate(-200px,-200px); }
 }
-
-/* TITLE EFFECT */
-.title {
-    text-align: center;
-    padding: 10px;
-    color: #ff6a00;
-    font-size: 18px;
-    opacity: 0.8;
-}
 </style>
 </head>
 
 <body>
 
-<!-- TOP -->
-<div class="topbar">
+<!-- SIDEBAR -->
+<div class="sidebar">
 
-    <div class="brand">
-        <img src="/static/logo.png">
-        <h2>COZINET</h2>
-    </div>
+    <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
 
-    <div>
-        👤 {{ usuario }}
-    </div>
-
-</div>
-
-<div class="title">
-    Painel Antifraude em tempo real
-</div>
-
-<!-- CARDS -->
-<div class="cards">
-
-    <div class="card">
-        ✔ APROVADOS<br>
-        <b>{{ aprovados }}</b>
-    </div>
-
-    <div class="card">
-        ⏳ ANÁLISE<br>
-        <b>{{ analise }}</b>
-    </div>
-
-    <div class="card">
-        🚫 BLOQUEADOS<br>
-        <b>{{ bloqueados }}</b>
+    <div class="menu">
+        <a href="/dashboard">📊 Dashboard</a>
+        <a href="/bloqueados">🚫 Bloqueados</a>
+        <a href="/logout">🚪 Sair</a>
     </div>
 
 </div>
 
-<!-- TABLE -->
-<div class="table-container">
-<table>
+<!-- MAIN -->
+<div class="main">
 
-<tr>
-    <th>ID</th>
-    <th>Pedido</th>
-    <th>IP</th>
-    <th>Valor</th>
-    <th>Status</th>
-    <th>Motivo</th>
-    <th>Ações</th>
-</tr>
+    <div class="topbar">
+        <h2>COZINET • ANTIFRAUDE PREMIUM</h2>
+        <div>👤 {{ usuario }}</div>
+    </div>
 
-{% for p in pedidos %}
+    <!-- CARDS -->
+    <div class="cards">
 
-<tr>
-    <td>{{ p.id }}</td>
-    <td>{{ p.order_id }}</td>
-    <td>{{ p.ip }}</td>
-    <td>R$ {{ p.valor }}</td>
-    <td>{{ p.status }}</td>
-    <td>{{ p.motivo }}</td>
-    <td>
-        <button class="block" onclick="bloquear('{{ p.ip }}')">🚫 Bloquear</button>
-        <button class="unblock" onclick="desbloquear('{{ p.ip }}')">🔓 Desbloquear</button>
-    </td>
-</tr>
+        <div class="card green">
+            ✔ APROVADOS
+            <b>{{ aprovados }}</b>
+        </div>
 
-{% endfor %}
+        <div class="card orange">
+            ⏳ ANÁLISE
+            <b>{{ analise }}</b>
+        </div>
 
-</table>
+        <div class="card red">
+            🚫 BLOQUEADOS
+            <b>{{ bloqueados }}</b>
+        </div>
+
+    </div>
+
+    <!-- TABLE -->
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Pedido</th>
+            <th>IP</th>
+            <th>Valor</th>
+            <th>Status</th>
+            <th>Motivo</th>
+            <th>Ações</th>
+        </tr>
+
+        {% for p in pedidos %}
+        <tr>
+            <td>{{ p.id }}</td>
+            <td>{{ p.order_id }}</td>
+            <td>{{ p.ip }}</td>
+            <td>R$ {{ p.valor }}</td>
+            <td>{{ p.status }}</td>
+            <td>{{ p.motivo }}</td>
+            <td>
+                <button class="block" onclick="bloquear('{{ p.ip }}')">🚫</button>
+                <button class="unblock" onclick="desbloquear('{{ p.ip }}')">🔓</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
 </div>
 
 <script>
@@ -226,11 +263,9 @@ function bloquear(ip){
     fetch("/bloquear-ip", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ip: ip})
-    })
-    .then(r => r.json())
-    .then(data => {
-        alert(data.message);
+        body: JSON.stringify({ip})
+    }).then(r => r.json()).then(d => {
+        alert(d.message);
         location.reload();
     });
 }
@@ -239,11 +274,9 @@ function desbloquear(ip){
     fetch("/desbloquear-ip", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ip: ip})
-    })
-    .then(r => r.json())
-    .then(data => {
-        alert(data.message);
+        body: JSON.stringify({ip})
+    }).then(r => r.json()).then(d => {
+        alert(d.message);
         location.reload();
     });
 }

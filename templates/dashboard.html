@@ -3,28 +3,69 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dashboard</title>
+
+<title>Dashboard | Shield</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
+
+:root{
+    --bg:#f4f6fb;
+    --card:#ffffff;
+    --border:#e5e7eb;
+
+    --red:#e11d48;
+    --green:#16a34a;
+    --yellow:#f59e0b;
+    --blue:#2563eb;
+    --purple:#8b5cf6;
+}
+
 body{
-    background:#f4f6fb;
+    background:var(--bg);
     font-family:Arial;
 }
 
+/* SIDEBAR */
 .sidebar{
     position:fixed;
+    left:0;
+    top:0;
     width:260px;
     height:100vh;
     background:#fff;
-    border-right:1px solid #e5e7eb;
+    border-right:1px solid var(--border);
     padding:20px;
 }
 
+.sidebar img{
+    width:180px;
+    margin-bottom:20px;
+}
+
+.menu a{
+    display:block;
+    text-decoration:none;
+    color:#333;
+    padding:12px;
+    border-radius:10px;
+    margin-bottom:8px;
+    font-weight:600;
+}
+
+.menu a:hover{
+    background:var(--red);
+    color:#fff;
+}
+
+/* CONTENT */
 .content{
     margin-left:260px;
     padding:25px;
 }
 
+/* TOP BAR */
 .topbar{
     display:flex;
     justify-content:space-between;
@@ -32,82 +73,204 @@ body{
     margin-bottom:20px;
 }
 
-.system-bar{
+/* SYSTEM MINI PANEL */
+.system{
     display:flex;
-    gap:12px;
+    flex-wrap:wrap;
+    gap:10px;
     font-size:12px;
-    font-weight:600;
-    color:#444;
+    color:#333;
 }
 
-.user-box{
-    background:#e11d48;
-    color:#fff;
+.pill{
+    background:#fff;
+    border:1px solid var(--border);
+    padding:6px 10px;
+    border-radius:999px;
+}
+
+/* USER */
+.user{
+    background:var(--red);
+    color:white;
     padding:8px 14px;
     border-radius:12px;
+    font-weight:700;
 }
 
-.kpi{
-    display:flex;
-    gap:10px;
+/* KPI GRID */
+.kpi-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:12px;
     margin-bottom:20px;
 }
 
+.kpi{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:15px;
+}
+
+.kpi-title{
+    font-size:12px;
+    color:#666;
+}
+
+.kpi-value{
+    font-size:22px;
+    font-weight:900;
+}
+
+.green{color:var(--green);}
+.red{color:var(--red);}
+.yellow{color:var(--yellow);}
+.blue{color:var(--blue);}
+
+/* GRID */
+.grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:15px;
+}
+
+@media(max-width:900px){
+    .grid{grid-template-columns:1fr;}
+}
+
+/* CARD PEDIDO */
 .card{
     background:#fff;
-    border:1px solid #e5e7eb;
+    border:1px solid var(--border);
+    border-radius:14px;
     padding:15px;
-    border-radius:12px;
 }
+
+/* STATUS */
+.status{
+    padding:5px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:700;
+    color:#fff;
+}
+
+.aprovado{background:var(--green);}
+.analise{background:var(--yellow); color:#111;}
+.bloqueado{background:var(--red);}
+
+/* ITEM */
+.item{
+    background:#f9fafb;
+    border:1px solid #eee;
+    padding:7px 10px;
+    border-radius:10px;
+    margin-top:5px;
+    font-size:13px;
+}
+
 </style>
 </head>
 
 <body>
 
+<!-- SIDEBAR -->
 <div class="sidebar">
-    <h3>Menu</h3>
-    <a href="/dashboard">Dashboard</a><br>
-    <a href="/bloqueados">Bloqueados</a><br>
-    <a href="/logout">Sair</a>
+    <img src="https://i.ibb.co/vxN1xS0R/logo-vermelho.png">
+
+    <div class="menu">
+        <a href="/dashboard">🏠 Dashboard</a>
+        <a href="/bloqueados">🚫 Bloqueados</a>
+        <a href="/ips-confiaveis">🟢 Confiáveis</a>
+        <a href="/logs">📜 Logs</a>
+        <a href="/logout">🚪 Sair</a>
+    </div>
 </div>
 
+<!-- CONTENT -->
 <div class="content">
 
+    <!-- TOP SYSTEM BAR -->
     <div class="topbar">
 
-        <div class="system-bar">
-            🖥️ Sistema rodando
-            🟢 Online
-            🌐 {{ request.host }}
-            ⚙ Production
-            📡 8000
-            🧠 Gunicorn
-            🕒 Live
+        <div class="system">
+            <div class="pill">🟢 {{ system.status }}</div>
+            <div class="pill">🌐 {{ system.host }}</div>
+            <div class="pill">⏱ {{ system.uptime }}s</div>
+            <div class="pill">🖥 {{ system.hostname }}</div>
+            <div class="pill">📡 {{ system.port }}</div>
+            <div class="pill">⚙ {{ system.env }}</div>
         </div>
 
-        <div class="user-box">
+        <div class="user">
             👤 {{ usuario }}
         </div>
 
     </div>
 
-    <div class="kpi">
-        <div class="card">Total: {{ total }}</div>
-        <div class="card">Aprovados: {{ aprovados }}</div>
-        <div class="card">Análise: {{ analise }}</div>
-        <div class="card">Bloqueados: {{ bloqueados }}</div>
-        <div class="card">Protegido: R$ {{ protegido }}</div>
-        <div class="card">Score: {{ score }}</div>
+    <!-- KPI -->
+    <div class="kpi-grid">
+
+        <div class="kpi">
+            <div class="kpi-title">Total Pedidos</div>
+            <div class="kpi-value">{{ total_pedidos }}</div>
+        </div>
+
+        <div class="kpi">
+            <div class="kpi-title">Aprovados</div>
+            <div class="kpi-value green">{{ aprovados }}</div>
+        </div>
+
+        <div class="kpi">
+            <div class="kpi-title">Em Análise</div>
+            <div class="kpi-value yellow">{{ analise }}</div>
+        </div>
+
+        <div class="kpi">
+            <div class="kpi-title">Bloqueados</div>
+            <div class="kpi-value red">{{ bloqueados }}</div>
+        </div>
+
+        <div class="kpi">
+            <div class="kpi-title">Protegido</div>
+            <div class="kpi-value blue">R$ {{ valor_protegido }}</div>
+        </div>
+
+        <div class="kpi">
+            <div class="kpi-title">Score Médio</div>
+            <div class="kpi-value">{{ score_medio }}</div>
+        </div>
+
     </div>
 
-    <h3>Pedidos</h3>
+    <!-- PEDIDOS -->
+    <div class="grid">
 
-    {% for p in pedidos %}
-    <div class="card">
-        <b>#{{ p.order_id }}</b> - {{ p.cliente }}<br>
-        {{ p.email }} | {{ p.ip }} | R$ {{ p.valor }} | Score {{ p.score_risco }}
+        {% for p in pedidos %}
+        <div class="card">
+
+            <div style="display:flex;justify-content:space-between;">
+                <b>#{{ p.order_id }}</b>
+
+                {% if p.status == 'aprovado' %}
+                    <span class="status aprovado">APROVADO</span>
+                {% elif p.status == 'analise' %}
+                    <span class="status analise">ANÁLISE</span>
+                {% else %}
+                    <span class="status bloqueado">BLOQUEADO</span>
+                {% endif %}
+            </div>
+
+            <div class="item">Cliente: {{ p.cliente }}</div>
+            <div class="item">IP: {{ p.ip }}</div>
+            <div class="item">Valor: R$ {{ p.valor }}</div>
+            <div class="item">Score: {{ p.score_risco }}</div>
+
+        </div>
+        {% endfor %}
+
     </div>
-    {% endfor %}
 
 </div>
 

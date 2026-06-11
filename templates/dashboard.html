@@ -1,70 +1,338 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cozinet Shield - Dashboard</title>
+
+<title>Cozinet Shield</title>
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
 <style>
-body{background:#0f172a;color:white;margin:0;font-family:Arial,sans-serif}
-.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:#111827;padding:20px}
-.content{margin-left:260px;padding:20px}
-.card-box{background:#1e293b;padding:15px;border-radius:12px}
-.cards{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
-a{color:#cbd5e1;text-decoration:none;display:block;padding:10px}
+
+:root{
+    --bg:#0a0a0a;
+    --sidebar:#111111;
+    --card:#181818;
+    --border:#2b2b2b;
+    --orange:#ff7a00;
+    --orange-dark:#e76f00;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:var(--bg);
+    color:white;
+    font-family:Inter,Arial,sans-serif;
+}
+
+.sidebar{
+    position:fixed;
+    left:0;
+    top:0;
+    width:280px;
+    height:100vh;
+    background:var(--sidebar);
+    border-right:1px solid var(--border);
+    padding:20px;
+}
+
+.logo{
+    text-align:center;
+    margin-bottom:30px;
+}
+
+.logo img{
+    width:230px;
+}
+
+.menu a{
+    display:block;
+    text-decoration:none;
+    color:#d1d5db;
+    padding:14px;
+    margin-bottom:8px;
+    border-radius:12px;
+    transition:.3s;
+}
+
+.menu a:hover{
+    background:var(--orange);
+    color:white;
+}
+
+.content{
+    margin-left:280px;
+    padding:25px;
+}
+
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.welcome h2{
+    margin:0;
+}
+
+.welcome small{
+    color:#888;
+}
+
+.card-dashboard{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:20px;
+    height:100%;
+}
+
+.card-dashboard h6{
+    color:#999;
+}
+
+.card-dashboard h2{
+    color:var(--orange);
+    margin-top:10px;
+    font-weight:700;
+}
+
+.table-box{
+    margin-top:25px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:20px;
+}
+
+.table-dark{
+    --bs-table-bg:#181818;
+}
+
+.badge-aprovado{
+    background:#16a34a;
+}
+
+.badge-analise{
+    background:#f59e0b;
+}
+
+.badge-bloqueado{
+    background:#dc2626;
+}
+
+.table thead{
+    color:var(--orange);
+}
+
+.user-box{
+    background:var(--orange);
+    padding:10px 15px;
+    border-radius:12px;
+    font-weight:600;
+}
+
 </style>
+
 </head>
+
 <body>
+
 <div class="sidebar">
-<h3>Cozinet Shield</h3>
-<a href="/dashboard">Dashboard</a>
-<a href="/bloqueados">IPs Bloqueados</a>
-<a href="/ips-confiaveis">IPs Confiáveis</a>
-<a href="/logs">Logs</a>
-<a href="/logout">Sair</a>
+
+    <div class="logo">
+        <img src="https://i.ibb.co/p6D813mT/Cozinet-1.png">
+    </div>
+
+    <div class="menu">
+
+        <a href="/dashboard">🏠 Dashboard</a>
+
+        <a href="/bloqueados">🚫 IPs Bloqueados</a>
+
+        <a href="/ips-confiaveis">🟢 IPs Confiáveis</a>
+
+        <a href="/logs">📜 Logs</a>
+
+        <a href="/logout">🚪 Sair</a>
+
+    </div>
+
 </div>
 
 <div class="content">
-<h2>Bem-vindo, {{ usuario }}</h2>
 
-<div class="cards">
-<div class="card-box">Total<br><h3>{{ total_pedidos }}</h3></div>
-<div class="card-box">Aprovados<br><h3>{{ aprovados }}</h3></div>
-<div class="card-box">Análise<br><h3>{{ analise }}</h3></div>
-<div class="card-box">Bloqueados<br><h3>{{ bloqueados }}</h3></div>
-<div class="card-box">Score Médio<br><h3>{{ score_medio }}</h3></div>
-<div class="card-box">Valor Protegido<br><h3>R$ {{ valor_protegido }}</h3></div>
+    <div class="topbar">
+
+        <div class="welcome">
+            <h2>Painel Antifraude</h2>
+            <small>Monitoramento em tempo real</small>
+        </div>
+
+        <div class="user-box">
+            👤 {{ usuario }}
+        </div>
+
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-md-2">
+            <div class="card-dashboard">
+                <h6>Total Pedidos</h6>
+                <h2>{{ total_pedidos }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card-dashboard">
+                <h6>Aprovados</h6>
+                <h2>{{ aprovados }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card-dashboard">
+                <h6>Em Análise</h6>
+                <h2>{{ analise }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card-dashboard">
+                <h6>Bloqueados</h6>
+                <h2>{{ bloqueados }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card-dashboard">
+                <h6>Valor Protegido</h6>
+                <h2>R$ {{ valor_protegido }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card-dashboard">
+                <h6>Score Médio</h6>
+                <h2>{{ score_medio }}</h2>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="table-box">
+
+        <h4 style="color:#ff7a00;">
+            Pedidos Recentes
+        </h4>
+
+        <br>
+
+        <div class="table-responsive">
+
+            <table class="table table-dark table-hover align-middle">
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Order</th>
+                        <th>Cliente</th>
+                        <th>CPF</th>
+                        <th>Email</th>
+                        <th>Cidade</th>
+                        <th>UF</th>
+                        <th>IP</th>
+                        <th>Dispositivo</th>
+                        <th>Valor</th>
+                        <th>Score</th>
+                        <th>Status</th>
+                        <th>Motivo</th>
+                        <th>Data</th>
+                        <th>Analista</th>
+                        <th>Data Análise</th>
+                        <th>País</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                {% for pedido in pedidos %}
+
+                <tr>
+
+                    <td>{{ pedido.id }}</td>
+
+                    <td>{{ pedido.order_id }}</td>
+
+                    <td>{{ pedido.cliente }}</td>
+
+                    <td>{{ pedido.cpf }}</td>
+
+                    <td>{{ pedido.email }}</td>
+
+                    <td>{{ pedido.cidade }}</td>
+
+                    <td>{{ pedido.estado }}</td>
+
+                    <td>{{ pedido.ip }}</td>
+
+                    <td>{{ pedido.dispositivo }}</td>
+
+                    <td>R$ {{ pedido.valor }}</td>
+
+                    <td>{{ pedido.score_risco }}</td>
+
+                    <td>
+
+                        {% if pedido.status == 'aprovado' %}
+                            <span class="badge badge-aprovado">
+                                APROVADO
+                            </span>
+
+                        {% elif pedido.status == 'analise' %}
+                            <span class="badge badge-analise">
+                                ANÁLISE
+                            </span>
+
+                        {% else %}
+                            <span class="badge badge-bloqueado">
+                                BLOQUEADO
+                            </span>
+                        {% endif %}
+
+                    </td>
+
+                    <td>{{ pedido.motivo }}</td>
+
+                    <td>{{ pedido.created_at }}</td>
+
+                    <td>{{ pedido.analisado_por }}</td>
+
+                    <td>{{ pedido.data_analise }}</td>
+
+                    <td>{{ pedido.pais }}</td>
+
+                </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
 </div>
 
-<div class="mt-4">
-<table class="table table-dark table-striped">
-<thead>
-<tr>
-<th>ID</th><th>Pedido</th><th>Cliente</th><th>CPF</th><th>Email</th>
-<th>Cidade</th><th>Estado</th><th>IP</th><th>Dispositivo</th>
-<th>Valor</th><th>Score</th><th>Status</th>
-</tr>
-</thead>
-<tbody>
-{% for p in pedidos %}
-<tr>
-<td>{{ p.id }}</td>
-<td>{{ p.order_id }}</td>
-<td>{{ p.cliente }}</td>
-<td>{{ p.cpf }}</td>
-<td>{{ p.email }}</td>
-<td>{{ p.cidade }}</td>
-<td>{{ p.estado }}</td>
-<td>{{ p.ip }}</td>
-<td>{{ p.dispositivo }}</td>
-<td>R$ {{ p.valor }}</td>
-<td>{{ p.score_risco }}</td>
-<td>{{ p.status }}</td>
-</tr>
-{% endfor %}
-</tbody>
-</table>
-</div>
-</div>
 </body>
 </html>

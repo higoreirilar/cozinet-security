@@ -1,82 +1,46 @@
-from flask import Flask, request, jsonify, render_template, session, redirect
-import os
+from flask import Flask, render_template, request, redirect, session, jsonify
 import psycopg2
+import os
 
 app = Flask(__name__)
-app.secret_key = "cozinet_saas_2026"
-
+app.secret_key = "secret-key-change"
 
 # =========================
-# DB CONNECTION
+# DATABASE
 # =========================
 def get_conn():
     return psycopg2.connect(
-        dbname=os.getenv("PGDATABASE"),
-        user=os.getenv("PGUSER"),
-        password=os.getenv("PGPASSWORD"),
-        host=os.getenv("PGHOST"),
-        port=os.getenv("PGPORT")
+        host=os.getenv("DB_HOST"),
+        database=os.getenv("DB_NAME"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        port=os.getenv("DB_PORT", 5432)
     )
-
-
-# =========================
-# LOGIN CHECK
-# =========================
-def login_required():
-    return "user_id" in session
-
-
-# =========================
-# HOME
-# =========================
-@app.route("/")
-def home():
-    return redirect("/login")
 
 
 # =========================
 # LOGIN
 # =========================
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/", methods=["GET", "POST"])
 def login():
-
     if request.method == "POST":
-
-        email = request.form.get("email")
-        senha = request.form.get("senha")
+        email = request.form["email"]
+        senha = request.form["senha"]
 
         conn = get_conn()
         cur = conn.cursor()
-
-        cur.execute("""
-            SELECT id, nome, role
-            FROM usuarios
-            WHERE email=%s AND senha=%s
-        """, (email, senha))
-
+        cur.execute("SELECT id, nome FROM usuarios WHERE email=%s AND senha=%s", (email, senha))
         user = cur.fetchone()
-
-        cur.close()
         conn.close()
 
         if user:
             session["user_id"] = user[0]
-            session["nome"] = user[1]
-            session["role"] = user[2]
+            session["user"] = user[1]
             return redirect("/dashboard")
 
-        return render_template("login.html", erro="Login inválido")
+        return "Login inválido"
 
     return render_template("login.html")
-
-
-# =========================
-# LOGOUT
-# =========================
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect("/login")
 
 
 # =========================
@@ -84,13 +48,38 @@ def logout():
 # =========================
 @app.route("/dashboard")
 def dashboard():
-
-    if not login_required():
-        return redirect("/login")
+    if "user_id" not in session:
+        return redirect("/")
 
     conn = get_conn()
     cur = conn.cursor()
 
+    # pedidos
+    cur.execute("""
+        SELECT id, order_id, cliente, cpf, email, telefone, ip,
+               valor, score_risco, status
+        FROM pedidos
+        ORDER BY id DESC
+    """)
+    rows = cur.fetchall()
+
+    pedidos = [
+        {
+            "id": r[0],
+            "order_id": r[1],
+            "cliente": r[2],
+            "cpf": r[3],
+            "email": r[4],
+            "telefone": r[5],
+            "ip": r[6],
+            "valor": float(r[7]) if r[7] else 0,
+            "score_risco": r[8],
+            "status": r[9]
+        }
+        for r in rows
+    ]
+
+    # KPIs
     cur.execute("SELECT COUNT(*) FROM pedidos")
     total_pedidos = cur.fetchone()[0]
 
@@ -103,142 +92,144 @@ def dashboard():
     cur.execute("SELECT COUNT(*) FROM pedidos WHERE status='bloqueado'")
     bloqueados = cur.fetchone()[0]
 
-    cur.execute("""
-        SELECT COALESCE(SUM(valor),0)
-        FROM pedidos
-        WHERE status='bloqueado'
-    """)
-    valor_protegido = float(cur.fetchone()[0] or 0)
+    cur.execute("SELECT COALESCE(SUM(valor),0) FROM pedidos WHERE status='aprovado'")
+    valor_protegido = cur.fetchone()[0]
 
-    cur.execute("""
-        SELECT COALESCE(ROUND(AVG(score_risco),2),0)
-        FROM pedidos
-    """)
-    score_medio = cur.fetchone()[0]
+    cur.execute("SELECT COALESCE(AVG(score_risco),0) FROM pedidos")
+    score_medio = round(cur.fetchone()[0], 2)
 
-    cur.execute("""
-        SELECT id, order_id, cliente, cpf, email, cidade, estado,
-               ip, dispositivo, valor, score_risco, status,
-               motivo, created_at, analisado_por, data_analise, pais
-        FROM pedidos
-        ORDER BY id DESC
-        LIMIT 100
-    """)
-
-    rows = cur.fetchall()
-
-    cur.close()
     conn.close()
-
-    pedidos = []
-
-    for r in rows:
-        pedidos.append({
-            "id": r[0],
-            "order_id": r[1],
-            "cliente": r[2],
-            "cpf": r[3],
-            "email": r[4],
-            "cidade": r[5],
-            "estado": r[6],
-            "ip": r[7],
-            "dispositivo": r[8],
-            "valor": float(r[9]) if r[9] else 0,
-            "score_risco": r[10] if r[10] else 0,
-            "status": r[11],
-            "motivo": r[12],
-            "created_at": str(r[13]) if r[13] else "",
-            "analisado_por": r[14],
-            "data_analise": str(r[15]) if r[15] else "",
-            "pais": r[16]
-        })
 
     return render_template(
         "dashboard.html",
-        usuario=session.get("nome"),
+        usuario=session.get("user"),
+        pedidos=pedidos,
         total_pedidos=total_pedidos,
         aprovados=aprovados,
         analise=analise,
         bloqueados=bloqueados,
         valor_protegido=valor_protegido,
-        score_medio=score_medio,
-        pedidos=pedidos
+        score_medio=score_medio
     )
 
 
 # =========================
-# BLOQUEAR IP + BLOQUEAR PEDIDOS
+# BLOQUEAR IP
 # =========================
 @app.route("/bloquear-ip", methods=["POST"])
 def bloquear_ip():
-
-    if not login_required():
-        return jsonify({"error": "unauthorized"}), 401
-
-    dados = request.get_json()
-    ip = dados.get("ip")
+    data = request.get_json()
+    ip = data["ip"]
 
     conn = get_conn()
     cur = conn.cursor()
 
-    # insere bloqueio IP
     cur.execute("""
-        INSERT INTO ips_bloqueados(ip, motivo)
-        VALUES(%s,%s)
-        ON CONFLICT(ip) DO NOTHING
-    """, (ip, "Bloqueio manual"))
+        INSERT INTO ips_bloqueados (ip, motivo, data_bloqueio)
+        VALUES (%s, %s, NOW())
+        ON CONFLICT DO NOTHING
+    """, (ip, "manual"))
 
-    # bloqueia pedidos desse IP
     cur.execute("""
-        UPDATE pedidos
-        SET status='bloqueado'
-        WHERE ip=%s
+        UPDATE pedidos SET status='bloqueado' WHERE ip=%s
     """, (ip,))
 
     conn.commit()
-    cur.close()
     conn.close()
 
-    return jsonify({"success": True, "message": f"IP {ip} bloqueado"})
+    return jsonify({"ok": True})
 
 
 # =========================
-# DESBLOQUEAR IP (CORRIGIDO)
+# DESBLOQUEAR IP
 # =========================
 @app.route("/desbloquear-ip", methods=["POST"])
 def desbloquear_ip():
-
-    if not login_required():
-        return jsonify({"error": "unauthorized"}), 401
-
-    dados = request.get_json()
-    ip = dados.get("ip")
+    data = request.get_json()
+    ip = data["ip"]
 
     conn = get_conn()
     cur = conn.cursor()
 
-    # remove bloqueio
-    cur.execute("""
-        DELETE FROM ips_bloqueados
-        WHERE ip=%s
-    """, (ip,))
-
-    # reativa pedidos desse IP
-    cur.execute("""
-        UPDATE pedidos
-        SET status='analise'
-        WHERE ip=%s
-    """, (ip,))
+    cur.execute("DELETE FROM ips_bloqueados WHERE ip=%s", (ip,))
+    cur.execute("UPDATE pedidos SET status='analise' WHERE ip=%s", (ip,))
 
     conn.commit()
-    cur.close()
     conn.close()
 
-    return jsonify({"success": True, "message": "IP desbloqueado"})
+    return jsonify({"ok": True})
 
 
 # =========================
-# RUN
+# LOGS
+# =========================
+@app.route("/logs")
+def logs():
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT id, ip, acao, created_at, detalhes
+        FROM logs
+        ORDER BY id DESC
+        LIMIT 200
+    """)
+
+    logs = cur.fetchall()
+    conn.close()
+
+    return render_template("logs.html", logs=logs)
+
+
+# =========================
+# BLOQUEADOS
+# =========================
+@app.route("/bloqueados")
+def bloqueados():
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT ip, motivo, data_bloqueio
+        FROM ips_bloqueados
+        ORDER BY data_bloqueio DESC
+    """)
+
+    data = cur.fetchall()
+    conn.close()
+
+    return render_template("bloqueados.html", ips=data)
+
+
+# =========================
+# CONFIÁVEIS
+# =========================
+@app.route("/ips-confiaveis")
+def confiaveis():
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT ip, observacao, data_cadastro
+        FROM ips_confiaveis
+        ORDER BY data_cadastro DESC
+    """)
+
+    data = cur.fetchall()
+    conn.close()
+
+    return render_template("ips_confiaveis.html", ips=data)
+
+
+# =========================
+# LOGOUT
+# =========================
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/")
+
+
 # =========================
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000, debug=True)
+    app.run(host="0.0.0.0", port=8080)

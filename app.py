@@ -133,17 +133,18 @@ def dashboard():
             "status": r[8]
         })
 
-    return render_template(
-        "dashboard.html",
-        usuario=session.get("nome"),
-        total=total,
-        aprovados=aprovados,
-        analise=analise,
-        bloqueados=bloqueados,
-        protegido=protegido,
-        score=score,
-        pedidos=pedidos
-    )
+return render_template(
+    "dashboard.html",
+    usuario=session.get("nome"),
+    total_pedidos=total_pedidos,
+    aprovados=aprovados,
+    analise=analise,
+    bloqueados=bloqueados,
+    valor_protegido=valor_protegido,
+    score_medio=score_medio,
+    pedidos=pedidos,
+    system=get_system_info()   # <<< ISSO É O QUE FALTAVA
+)
 
 # =========================
 # BLOQUEAR IP
